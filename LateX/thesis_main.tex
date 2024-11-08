@@ -1,0 +1,176 @@
+\documentclass[a4paper,oneside,12pt]{book}
+
+% INITIALIZATION 
+\linespread{1.5}
+\setlength{\headheight}{14.5pt}
+\setlength{\skip\footins}{3.5pc plus 5pt minus 2pt}
+
+% IMPORT ALL THE USEFUL PACKAGES
+\usepackage{layout}
+\RequirePackage{watermark}
+\usepackage{background}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc} 
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage[nosort]{cite}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{xcolor}
+\usepackage{paralist}
+\usepackage{subfigure}
+\usepackage[backend=biber]{biblatex}
+\addbibresource{bibl.bib}
+
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsfonts}
+
+% SET THE GEOMETRY OF THE DOCUMENT
+\usepackage{geometry}
+\geometry{top=3cm, bottom=3cm, left=3cm, right=3cm}
+\NoBgThispage
+
+% PERSONAL DATA
+% Author:
+\providecommand{\authorname}{Francesco Carpanini}
+% Advisor:
+\providecommand{\advisorname}{Prof. Pietro Cerri}
+% Academic Year:
+\providecommand{\acyear}{2023/2024}			
+% Title of the Thesis:
+\providecommand{\thesistitle}{DEVELOPMENT OF OFFLINE METHODS FOR LOCALIZATION ON HD-MAPS USING DEEP-LEARNING-BASED NEURAL-NETWORKS FOR AUTOMATIC GROUND-TRUTH GENERATION}				
+%-------------------------------------------------------------------------------------------------------
+
+\usepackage[pdftex, pdfauthor={\authorname}, pdftitle={\thesistitle}, pdfsubject={}, pdfkeywords={}, colorlinks=false, linktocpage=true, pdfstartpage=3, pdfstartview=FitV,breaklinks=true, pdfpagemode=UseNone, pageanchor=true, pdfpagemode=UseOutlines, plainpages=false, bookmarksnumbered, bookmarksopen=true, bookmarksopenlevel=1,hypertexnames=true, pdfhighlight=/O, urlcolor=webbrown, linkcolor=RoyalBlue, citecolor=webgreen, colorlinks=false, allbordercolors=black, hidelinks]{hyperref}    
+
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+
+\pagestyle{fancyplain}
+\renewcommand{\chaptermark}[1]{\markboth{Chapter \thechapter{}. #1}
+{\thesection{}. #1}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection{}. #1}}
+\lhead[\fancyplain{}{\bfseries\thepage}]
+      {\fancyplain{}{\bfseries\nouppercase{\rightmark}}}
+\rhead[\fancyplain{}{\bfseries\nouppercase{\leftmark}}]
+      {\fancyplain{}{\bfseries\thepage}}
+\cfoot[\fancyplain{}{}]{\fancyplain{}{}}
+\addtolength{\headheight}{1.6pt}
+
+\makeatletter
+\def\cleardoublepage{
+\clearpage
+\if@twoside
+  \ifodd\c@page
+  \else
+    \mbox{}
+    \thispagestyle{empty}
+    \newpage
+    \if@twocolumn
+      \mbox{}
+      \newpage
+    \fi
+  \fi
+\fi
+}
+
+
+\begin{document}
+\frenchspacing 
+\linespread{1.2}
+\graphicspath{{figs/}}
+
+\newgeometry{top=3cm, bottom=3cm, left=3cm, right=3cm}
+\begin{frontmatter}
+\input{Frontpage.tex}
+\restoregeometry
+\NoBgThispage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\null
+\thispagestyle{empty}
+\clearpage
+\cleardoublepage
+\clearpage
+\cleardoublepage
+\thispagestyle{empty}
+\vspace*{\stretch{1}}
+\begin{flushright}
+\itshape Dedica
+\end{flushright}
+\vspace{\stretch{2}}
+\cleardoublepage
+\thispagestyle{empty}
+\clearpage
+
+\clearpage
+\null
+\thispagestyle{empty}
+\clearpage
+\newpage
+\thispagestyle{empty}
+
+\begin{center}
+  \vspace{2cm}
+  \LARGE\textbf{\MakeUppercase \thesistitle}\\
+  \vspace{1cm}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\clearpage
+
+
+
+\cleardoublepage
+\renewcommand\contentsname{Tabella dei Contenuti} % translate name in italian if necessary
+\tableofcontents
+\markboth{Tabella dei Contenuti}{Tabella dei Contenuti} % translate name in italian if necessary
+\cleardoublepage
+\phantomsection
+
+\cleardoublepage
+\renewcommand\contentsname{Elenco delle Figure} % translate name in italian if necessary
+\listoffigures
+\markboth{Elenco delle Figure}{Elenco delle Figure} % translate name in italian if necessary
+\cleardoublepage
+\phantomsection
+
+\cleardoublepage
+\renewcommand\contentsname{Elenco delle Tabelle} % translate name in italian if necessary
+\listoftables
+\markboth{Elenco delle Tabelle}{Elenco delle Tabelle} % translate name in italian if necessary
+\cleardoublepage
+\phantomsection
+
+
+\cleardoublepage
+\pagenumbering{arabic}
+\end{frontmatter}
+\mainmatter
+
+\newgeometry{top=4cm, bottom=3cm, left=4cm, right=3cm}
+%\newgeometry{top=2cm, bottom=1cm, left=1cm, right=1cm} %per stampare bozza
+
+\input{intro.tex}
+\input{ch1.tex}
+\input{ch2.tex}
+\input{ch3.tex}
+
+\input{concl.tex}
+
+\cleardoublepage
+\phantomsection
+
+\printbibliography
+
+
+
+
+\input{ack.tex}
+
+\end{document}

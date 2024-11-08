@@ -1,0 +1,49 @@
+{
+% Configure watermark
+\backgroundsetup{
+  scale=2.75,
+  color=black,
+  opacity=0.07,
+  angle=0,
+  position=current page.south,
+  vshift=5.5cm,
+  hshift=0.7cm,
+  contents={\includegraphics[width=0.5\textwidth]{LateX/figs/LOGO MUNER (2)_764.png}}
+  ifpage=1 % Only apply watermark on the first page
+}
+
+
+\thispagestyle{empty}
+\linespread{1.2}\selectfont
+\mbox{}
+\vspace{-2cm}
+\begin{center}
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=6.5cm]{LateX/figs/UNIPR_CENTRATO_2RIGHE_POS_CMYK.png}
+\end{center}
+\end{figure}
+
+% Set head width
+\setlength{\headwidth}{\textwidth}
+
+\vspace{0.75cm}
+\large\textsc{DEPARTMENT OF ENGINEERING AND ARCHITECTURE}\\[5mm]
+\large\textsc{MASTER’S DEGREE IN ELECTRONIC ENGINEERING FOR INTELLIGENT VEHICLES}\\
+\large\textsc{AUTONOMOUS DRIVING ENGINEERING}\\
+
+\vspace{1.0cm}
+\Large\textbf{\MakeUppercase{\thesistitle}}\\
+\vspace{1.0cm}
+
+\flushleft{\large \bf Supervisor: \\\textup{\advisorname}\\[0.7cm]}
+
+\vspace{0.5cm}
+\flushright{ \large \bf Master Candidate: \\\textup{\authorname}\\[0.7cm]}\\
+\vspace{1.5cm}
+\centering
+\large\textsc{ACADEMIC YEAR \acyear}\\
+\end{center}
+
+\cleardoublepage
+}
