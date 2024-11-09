@@ -3,7 +3,9 @@
 The purpose of this chapter is to provide an overview, before delving into the specifics, to first understand what High Definition (HD) maps are and their significance in the field of autonomous driving.
 
 \section{Autonomous Driving}
-The concept of autonomous driving has evolved from a theoretical idea to a rapidly advancing field with profound technological, societal, and legal implications. Autonomous vehicles (AVs) hold the potential to revolutionize transportation by improving safety, reducing congestion, and enhancing mobility \cite{9695620}. The technological backbone of this transformation involves advanced sensors, machine learning algorithms, vehicle-to-everything (V2X) communication, and real-time decision-making algorithms. At the core of understanding the complexity and potential of autonomous vehicles lies the classification system developed by the Society of Automotive Engineers (SAE)\footnote{SAE is the society which decided to declare what autonomous driving is and how has to be categorized in order to be precise and compliant.} \cite{sae2021}, which defines the various stages of vehicle automation.
+The concept of \textit{autonomous driving} has evolved from a theoretical idea to a rapidly advancing field with profound technological, societal, and legal implications. Autonomous vehicles (AVs) hold the potential to revolutionize transportation by improving safety, reducing congestion, and enhancing mobility \cite{9695620}. The technological backbone of this transformation involves advanced sensors, machine learning and deep learning algorithms, vehicle-to-everything (V2X) communication, and real-time decision-making algorithms.
+
+At the core of understanding the complexity and potential of autonomous vehicles lies the classification system developed by the Society of Automotive Engineers (SAE)\footnote{The Society of Automotive Engineers (SAE) is a global organization that established a standardized framework for defining and categorizing levels of driving automation. This framework is intended to clarify the roles of human drivers and automated systems, ensuring consistent standards for safety and functionality across various levels of automation.} \cite{sae2021}, which defines the various stages of vehicle automation.
 
 The SAE International established a six-tier classification system in 2014, which was refined in subsequent years, to standardize the levels of driving automation across the industry. The levels range from Level 0, where no automation exists, to Level 5, representing full automation. Each level represents a step toward the ultimate goal of a fully autonomous vehicle, and these levels are essential in understanding the current and future development of AV technology \cite{9881892}.
 
@@ -23,18 +25,36 @@ The SAE International established a six-tier classification system in 2014, whic
     \item Level 5: Full Automation – At the highest level, the vehicle can operate autonomously in all conditions and environments, without any need for human input. This level predicts a future where transportation no longer relies on human drivers.
 \end{itemize}
 
-The progression through these levels is not just a technical challenge but involves addressing ethical, regulatory, and safety concerns. Autonomous driving technology is a complex field that incorporates artificial intelligence, sensor fusion, human-machine interaction, and cybersecurity.
+The progression through these levels is not just a technical challenge but also involves addressing ethical, regulatory, and safety concerns. Autonomous driving technology is a complex field that incorporates artificial intelligence, sensor fusion, human-machine interaction, and cybersecurity. 
+
+Currently, the industry has achieved partial automation (level 3) in some commercial vehicles, allowing the vehicle to handle certain driving tasks with human oversight. The system is designed to activate only on pre-approved roads, meaning it won’t work just anywhere. For example, this functionality is currently available on certain highways across key regions and major city areas within approved states, linking certain metropolitan zones with limited-access highways \cite{bmw2024}.
+
+Looking ahead, certain companies have announced plans to reach level 4 automation in the near future, aiming for vehicles that can perform all driving tasks under specific conditions without human intervention. This progression is closely tied to the rise of the robo-taxi\footnote{A robo-taxi is an autonomous vehicle designed to operate as a taxi service without a human driver. Equipped with high levels of automation (at least level 4), these vehicles can navigate, pick up, and drop off passengers independently within specific operational areas or conditions} phenomenon, where fully autonomous vehicles could provide ride-hailing services without a driver. Achieving these higher levels of automation will demand sophisticated mapping and a precise, real-time reconstruction of the environment around the vehicle.
+
 
 % ----------------------------------------------------------------------------------------
 \section{HD Maps}
 % ----------------------------------------------------------------------------------------
 
+Maps are essentials to the development and implementation of autonomous driving systems, that help with navigation and understanding the surroundings. Self-driving cars use many types of maps that enable precise navigation and an accurate environmental perception. The simplest of these are Standard-Definition (SD) maps, which are typically used in conventional GPS-based navigation systems. SD maps show a complete map of the roads, points of interest (POIs) like landmarks and businesses, basic journey information, and sometimes also traffic data. They are the digital equivalent to traditional paper maps, containing essential details needed to navigate from point A to point B, such as road networks with basic shapes and directions, addresses, and notable locations.
+However, SD maps alone are not enough for autonomous driving, where a vehicle must take decisions independently and requires a clear sense of its environment. 
+These maps lack the fine-grained detail and real-time data necessary for the complex decision-making involved in self-driving technology.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{LateX//figs/SD_MAP.png}
+    \caption{Brevissima descrizione e indicare anche la fonte -> AppleMaps, provided by TomTom}
+    \label{fig:enter-label}
+\end{figure}
 
-Before delving into the specifics, it is crucial to first understand what High Definition (HD) maps are and their significance in the field of autonomous driving.
-
-High-definition (HD) semantic maps are an essential module for autonomous driving. Traditional pipelines to construct
-such HD semantic maps involve capturing point clouds beforehand, building globally-consistent maps using SLAM,
-and annotating semantics in the maps. 
+One crucial advancement is the integration of semantic information into maps, as noted by Chen et al. (2021). Semantic information improves contextual understanding, which is essential for the observance of the traffic laws and for improving the safety of autonomous driving systems. Consequently, continuous improvements in mapping technology are fundamentals to the successful distribution and safety of autonomous vehicles.
+While SD maps are helpful for basic navigation, their limited detail is insufficient for autonomous driving needs. Topological maps, on the other hand, introduce a layer of connectivity that can be helpful in robot navigation. These maps represent environments through a graph structure, where intersections, pathways, and connections between road segments are shown without needing precise geometric data (Li & Zhang, 2020). For example, a topological map of a subway system uses nodes to represent stations, with edges representing navigable paths between them.
+Topological maps provide advantages by saving only relevant information at points called nodes, which represent specific situations, places, or landmarks. They require less memory than metric maps, which memorizes every pixel in the environment. These nodes are connected by edges, defining navigable paths between locations, and can store useful data, such as poses and scans, to aid in localization. Although topological maps contain less detail than the metric maps, they are especially well-adapted for smaller environments where simplicity and efficiency are prioritized.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{LateX//figs/TOPOLOGICAL_MAP.png}
+    \caption{Brevissima descrizione e indicare anche la fonte -> in questo caso OSM}
+    \label{fig:enter-label}
+\end{figure}
 
 https://arxiv.org/pdf/2107.06307 -> questo paper mi sembra abbastanza simile a quello che prevede la RTMG, si tratta di qualcosa di simile che va a ricreare una local HD maps dai dati proveniente dal sensore senza andare a considerare una vera mappa HD che sarebbe molto difficile e costosa da mantenere e soprattutto da mentere aggiornata nel tempo considerando che la strada è soggetta a cambiamenti quotidiani che vanno dai cantieri, ai lavori in corso, alla costruzione di nuove ciclabili, alla viabilità modificata per altre motivazioni ecc ecc
 
