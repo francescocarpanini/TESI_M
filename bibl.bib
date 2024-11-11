@@ -25,13 +25,18 @@
   note = {Accessed: 2024-09-15}
 }
 
-@online{sae2021,
-    title = {SAE Levels of Driving Automation™ Refined for Clarity and International Audience},
-    author = {{SAE International}},
+@standard{SAE_J3016_202104,
+    title = {Taxonomy and Definitions for Terms Related to Driving Automation Systems for On-Road Motor Vehicles},
     year = {2021},
-    url = {https://www.sae.org/blog/sae-j3016-update},
-    note = {Accessed: 2024-09-18}
+    month = {April},
+    publisher = {SAE International},
+    organization = {SAE International},
+    author = {{On-Road Automated Driving (ORAD) Committee}},
+    doi = {10.4271/J3016_202104},
+    url = {https://www.sae.org/standards/content/j3016_202104/},
+    note = {SAE Standard J3016}
 }
+
 
 @INBOOK{9881892,
     author={Liu, Albert Chun-Chen and Law, Oscar Ming Kin and Law, Iain},
@@ -92,4 +97,97 @@ url="https://doi.org/10.1007/978-3-642-21004-4_12"
     year = {2024},
     url = {https://www.press.bmwgroup.com/global/article/detail/T0443285EN/road-to-autonomous-driving:-bmw-is-the-first-car-manufacturer-to-receive-approval-for-the-combination-of-level-2-and-level-3?language=en},
     note = {Accessed: 2024-11-09}
+}
+
+@misc{Mudduluru_SD_vs_HD_Maps,
+    author = {Mudduluru, Ram},
+    title = {SD Maps vs. HD Maps: Understanding the Navigation Divide in the Age of Autonomous Vehicles},
+    year = {2023},
+    url = {https://www.linkedin.com/pulse/sd-maps-vs-hd-understanding-navigation-divide-age-mudduluru-3j5ke/},
+    note = {Accessed: 2024-11-10}
+}
+
+@Inbook{Chiang2021,
+author="Chiang, Kai Wei
+and Tsai, Guang-Je
+and Zeng, Jhih Cing",
+editor="Shi, Wenzhong
+and Goodchild, Michael F.
+and Batty, Michael
+and Kwan, Mei-Po
+and Zhang, Anshu",
+title="Mobile Mapping Technologies",
+bookTitle="Urban Informatics",
+year="2021",
+publisher="Springer Singapore",
+address="Singapore",
+pages="439--465",
+abstract="This chapter introduces the historic development as well as the latest progress of mobile mapping systems. First, mobile mapping technologies, including the introduction of positioning and mapping sensors, and how they can be integrated together, are briefly reviewed. Then the development of land-based, aerial, marine, and mobile portable mapping platforms is presented. The latest progress in mobile-mapping technologies is further discussed, along with sensor fusion schemes, seamless indoor and outdoor mapping strategies, and disaster response applications. In addition, this chapter explores future and potential applications, such as high-definition (HD) maps and autonomous mapping with autonomous systems.",
+isbn="978-981-15-8983-6",
+doi="10.1007/978-981-15-8983-6_25",
+url="https://doi.org/10.1007/978-981-15-8983-6_25"
+}
+
+@INPROCEEDINGS{8105770,
+  author={Ravankar, Ankit A. and Ravankar, Abhijeet and Emaru, Takanori and Kobayashi, Yukinori},
+  booktitle={2017 56th Annual Conference of the Society of Instrument and Control Engineers of Japan (SICE)}, 
+  title={A hybrid topological mapping and navigation method for large area robot mapping}, 
+  year={2017},
+  volume={},
+  number={},
+  pages={1104-1107},
+  keywords={Navigation;Measurement;Simultaneous localization and mapping;Mobile robots;Robot Mapping;Topological Mapping;Navigation;Graph Theory;SLAM;Mobile Robot},
+  doi={10.23919/SICE.2017.8105770}}
+
+@article{li2020survey,
+  title={A Survey of Semantic Segmentation and Mapping for Autonomous Driving},
+  author={Li, Xiao and Zhang, Yiming},
+  journal={IEEE Transactions on Intelligent Transportation Systems},
+  volume={21},
+  number={3},
+  pages={1231--1245},
+  year={2020},
+  publisher={IEEE},
+  doi={10.1109/TITS.2020.2978372}
+}
+
+@article{murciego2021topological,
+  title = {Topological Road Mapping for Autonomous Driving Applications},
+  author = {Esther Murciego and Carlos G. Huelamo and Rafael Barea and Luis M. Bergasa and Eduardo Romera and Juan F. Arango and Miguel Tradacete and Alvaro Sáez},
+  journal = {IEEE Transactions on Intelligent Transportation Systems},
+  year = {2021},
+  url = {http://www.robesafe.uah.es/personal/bergasa/papers/WAF2018_TopologicalRoad_open.pdf},
+  note = {Accessed: 2024-09-11}
+}
+
+@article{doi:10.1177/09544070231191156,
+author = {Zhe Zhou and Zhaozheng Hu and Na Li and Guoliang Lai},
+title ={Enhancing vehicle localization by matching HD map with road marking detection},
+journal = {Proceedings of the Institution of Mechanical Engineers, Part D: Journal of Automobile Engineering},
+volume = {238},
+number = {13},
+pages = {4129-4141},
+year = {2024},
+doi = {10.1177/09544070231191156},
+URL = {https://doi.org/10.1177/09544070231191156},
+eprint = {https://doi.org/10.1177/09544070231191156},
+abstract = { Accurate and robust vehicle localization, a fundamental task for autonomous driving, is still a challenging problem especially in GPS-denied scenarios. Recently, high definition (HD) map suggests a promising solution. However, the matching between online sensed data and HD map is difficult and time-consuming. In our work, road markings are selected as landmarks due to salient appearance features. Based on the detection results of road markings from the vehicle-borne images, the points of edge lines are employed to fit straight lines with RANSAC for outlier removal. The distances between the ego-vehicle and the fitted edge lines can be computed with camera-vehicle calibration in advance. Subsequently, the point-to-line distances from the sensed data are mapped into global linear constraints on the vehicle’s positions with the support of a lane-level HD map, which provides centimeter-level coordinates of road markings. Finally, the distances and the localization from the integrated navigation system (INS) are fused with the proposed linear Kalman filter based on the second-order Markov model (KF-MM2). The proposed method has been verified in different daily driving scenarios. Experimental results demonstrate that our method can achieve good performance with an average localization error of 0.53 m and a standard deviation of 0.17 m. }
+}
+
+@article{gitlin2017detailedmaps,
+  title = {The Most Detailed Maps of the World Will Be for Cars, Not Humans},
+  author = {Jonathan M. Gitlin},
+  journal = {Ars Technica},
+  year = {2017},
+  url = {https://arstechnica.com/cars/2017/03/the-most-detailed-maps-of-the-world-will-be-for-cars-not-humans/},
+  note = {Accessed: 2024-11-11}
+}
+
+@article{dahlstrom2021hdmaps,
+  title = {The Road to Everywhere: Are HD Maps for Autonomous Driving Sustainable?},
+  author = {Tom Dahlström},
+  journal = {Autonomous Vehicle International},
+  year = {2021},
+  url = {https://www.autonomousvehicleinternational.com/features/the-road-to-everywhere-are-hd-maps-for-autonomous-driving-sustainable.html},
+  note = {Accessed: 2024-11-11}
 }
