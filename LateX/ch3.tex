@@ -255,7 +255,7 @@ The following steps outline the typical workflow for training a neural network u
 
 This iterative process, combined with optimization techniques such as gradient descent, allows neural networks to learn from data and improve over time. In the following chapters, we will explore how these principles are applied to more complex architectures and tasks, including their use in localization methods for autonomous driving.
 
-\section{Convolutional Neural Network (CNN)}
+\subsection{Convolutional Neural Network (CNN)}
 
 A Convolutional Neural Network (CNN), or \textit{ConvNet}, is a specialized type of deep learning algorithm primarily designed for tasks requiring object recognition, such as image classification, detection, and segmentation. CNNs are widely employed in various practical applications, ranging from autonomous vehicles and medical imaging to security camera systems and facial recognition technologies \cite{DBLP:journals/corr/OSheaN15}. CNNs are architecturally distinct from traditional neural networks, as they take into account the spatial structure of data—usually images—by arranging neurons in a way that mimics the human visual cortex. The network's architecture is typically organized in layers, including convolutional layers\footnote{A convolutional layer is responsible for applying a set of filters (kernels) to the input image, producing feature maps that highlight important patterns like edges, textures, or shapes.}, pooling layers\footnote{A pooling layer reduces the spatial dimensions of the feature maps, typically by using operations like max pooling or average pooling, which helps reduce computational load and control over-fitting.}, and fully connected layers\footnote{Fully connected layers are the traditional neural network layers where every neuron is connected to every neuron in the previous layer. They typically occur at the end of the network and help in decision-making, such as classifying an image into categories.}, each playing a pivotal role in feature extraction and decision making.
 
@@ -328,6 +328,31 @@ While CNNs were originally designed for image-related tasks, their versatility h
 
 Through these applications, CNNs have proven to be a flexible and powerful tool in both traditional and emerging fields, providing a foundation for extracting robust features that can enhance the performance of complex neural networks.
 
+\subsection{Transformers}
+Transformers have become an essential component in modern machine learning architectures, including the one that will be analyzed in the following sections of this thesis. In this context, a transformer model will be examined for its application in generating a Bird's Eye View (BEV) representation of the environment using images captured from six different cameras. This model aims to transform the multi-perspective input data into a unified spatial representation, a task well-suited to transformers due to their ability to capture long-range dependencies and integrate information across diverse sources \cite{DBLP:journals/corr/VaswaniSPUJGKP17}.
+
+The main challenge in multi-modal learning is representing and summarizing multi-modal data in a way that leverages the complementarity and redundancy of multiple modalities. The heterogeneity of multi-modal data makes it challenging to construct such representations, as language is often symbolic while audio and visual modalities are represented as signals \cite{DBLP:journals/corr/BaltrusaitisAM17}.
+
+A second challenge is translating data across modalities. Data is not only heterogeneous, but the relationship between modalities is often open-ended or subjective. For example, an image can have many correct descriptions, which may vary in specificity.
+
+A critical component of transformer models is the attention mechanism, introduced to address bottlenecks associated with fixed-length encoding vectors, which limit the information available to the decoder, especially for long or complex sequences. Attention mechanisms enable the model to focus selectively on different parts of the input sequence, allowing for enhanced processing of information across diverse domains, including vision, where attention can focus on discriminative regions.
+
+Attention mechanisms can be categorized based on:
+\begin{itemize}
+    \item \textbf{Channel-wise attention:} Focuses on specific features or channels in the data.
+    \item \textbf{Spatial attention:} Directs attention to particular locations in an image.
+    \item \textbf{Temporal attention:} Manages sequential data processing over time.
+\end{itemize}
+
+Self-attention, a crucial aspect of transformers, operates by transforming the input into three vectors: query, key, and value. These vectors are linearly derived from the input sequence and used to compute weighted sums of values based on the similarity between queries and keys. This process allows transformers to capture long-range dependencies efficiently \cite{DBLP:journals/corr/abs-1906-05909}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\linewidth]{LateX//figs/attention_transformer_architecture.pdf}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+
 
 \section{Dataset}
 Descrivere qui come è composto il dataset, devo dire che ci sono diverse sequenze che sono state registrate in diverse zone della città. per ogni frame (immagine) ci sono associati anche i dati che arrivano dal superdag. forse sul sito di ambarella si riesce a trovare qualche informazione sul superdag e sul suo funziomento. 
@@ -378,18 +403,7 @@ E
 
 https://hazelcast.com/glossary/directed-acyclic-graph/
 https://medium.com/@danthelion/core-data-engineering-dags-36ce241b32d5
-\begin{figure}
-    \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/loss_functions_xkcd.pdf}
-    \caption{Enter Caption}
-\begin{figure}
-        \centering
-        \includegraphics[width=1\linewidth]{LateX//figs/loss_functions_xkcd.pdf}
-        \caption{Enter Caption}
-        \label{fig:enter-label}
-    \end{figure}
-        \label{fig:enter-label}
-\end{figure}
+
 questo è altro che si è trovato sulle slide riguardo a quello. 
 
 Specificare quindi tutto quel che trovo riguardo a SuperDAG, cvflow ecc usando le pagine ambarella come fonte sicura. Guardare anche quelle slide che ci sono sul pc, magari possono essere utili. 
@@ -654,17 +668,7 @@ partiamo dal
 
 \subsubsection{BevObservationsLoader}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/bevLoader.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
-\end{figure}
 
-It creates a tensor representing all the BEV measures, It take all the data that comes from the serialization binary file and returna atrensor representing BEV measures divided between the following channels, lane markings, road boundaries, free spaces, traffic signs, obstacles, stixels, parking and instances a seconda di quello che è stato selezioanato nel file configuratore. 
-A questo punto, le cose da fare, sono convertire le diverse tipologie di coordinate dei dati provienti dai diversi sensori, in coordinate immagine, in modo da andare a stmapare tutto sul tensore a più canali che va a rappresentare il tutto. 
-Nel codice si trova che cosa viene fatto nello specifico per ogni dato, darci un'occhiata e riportare qui un riassunto. 
-Per le immagini bisogna infatti effettuare determinate operazioni, per i radar altre ecc..
 
 \subsubsection{EGOLoader}
 Questa parte di codice va a rappresentare, nello stesso tensore che stiamo indagando, un 5x2 vehicle con le sue ego-measures. 
@@ -678,7 +682,6 @@ Viene chiamata una funzione che restituisce un rettangolo, e vengono passate le 
 \end{figure}
 
 \subsubsection{BoundariesInputLoader}
-Questo è tutta farina del mio sacco, in quanto prima questo si trovava nel target, nell'applicazione che la stessa rete aveva in precedenza (questa cosa non so neanche se valga la pena dirla, visto che in teoria dovrebbe passare come tutto alvoro mio). 
 Questo input loader si occupa di semantic segmantation. Va a creare un tensore che rappresenta i boundaries e prende in ingresso un solito dizionario con al'interno i dati della mappa dell'area di riferimento. Parlare anche della dimensione del riferimento, che viene gestita sempre dal file di configurazione. Ci sono infatti dei limiti sia per quanto riguarda l'altezza sia per quanto riguarda la larghezza della zona di cui si va a scaricare la mappa rispetto alla posizione corrente del veicolo. 
 
 Farsi spiegare esattamente il comportamente del codice, ma in linea di massa va a prendere i dati dalla mappa e li disegna. nella mapppa ci sono i boundaries che sono di varie categorie (magari mettere un'immagine di quelli che sono i boundaries). 
@@ -966,3 +969,82 @@ https://elly2023.dia.unipr.it/pluginfile.php/947/course/section/11808/lecture_14
                   Transform (Conv2d) has 0.0022M parameters                                                                                                         │exiting
                   Architecture (PoseNetBEV) has 51.9576M parameters
 
+
+
+
+\subsection{MapAlign: Architecture description}
+This section introduces MapAlign, the neural network developed in this thesis, following an initial overview of neural networks. The purpose of MapAlign is to integrate seamlessly into the pipeline of RTMG, a neural network introduced in (INSERIRE CAPITOLO) that is able to generate HD maps in real time. 
+MapAlign would be positioned in the pipeline specifically at the dataset creation stage, where it addresses a crucial requirement for RTMG: achieving perfect alignment between data from the vehicle's sensor suite and the HD map, which serves as the RTMG network’s target.
+One of MapAlign’s key contributions is automating the creation of ground-truth data by significantly reducing the need for traditional optimization methods and, most importantly, by removing the necessity for manual alignment, a step previously required to ensure data precision. This integration allows the entire system to operate with greater autonomy, enabling faster and more reliable dataset creation. 
+The objective of the model is to output values to populate a rotation-translation matrix, which will align the map with the vehicle’s perception accurately. These values help define how to rotate and translate the map to match the vehicle's spatial understanding. Specifically, we need transformations between two main reference frames: \textbf{world} and \textbf{car}.
+\begin{enumerate}
+    \item \textbf{From World to Car Frame}: This transformation matrix, \( T_{\text{world} \to \text{car}} \), converts coordinates from the world frame to the car frame and is defined as:
+    \begin{equation}
+        T_{\text{world} \to \text{car}} = \begin{bmatrix} R_{\text{world} \to \text{car}} & t_{\text{world} \to \text{car}} \\ 0 & 1 \end{bmatrix}
+    \end{equation}
+    where \( R_{\text{world} \to \text{car}} \) is the rotation matrix that orients the world frame to match the car's orientation, and \( t_{\text{world} \to \text{car}} \) is the translation vector specifying the shift between the world and car frames.
+
+    \item \textbf{From Car to World Frame} (inverse transformation): To convert back from the car frame to the world frame, we use the inverse transformation \( T_{\text{car} \to \text{world}} \), calculated as:
+    \begin{equation}
+        T_{\text{car} \to \text{world}} = T_{\text{world} \to \text{car}}^{-1} = \begin{bmatrix} R_{\text{world} \to \text{car}}^T & -R_{\text{world} \to \text{car}}^T \cdot t_{\text{world} \to \text{car}} \\ 0 & 1 \end{bmatrix}
+    \end{equation}
+    Here, \( R_{\text{world} \to \text{car}}^T \) is the transpose of the rotation matrix, effectively reversing the rotation, and \( -R_{\text{world} \to \text{car}}^T \cdot t_{\text{world} \to \text{car}} \) adjusts the translation back to the world frame.
+    
+\end{enumerate}
+
+The model aims to predict the values of the three coordinates \( (x, y, z) \) and the heading angle \( \theta \), while contributions from pitch and roll are disregarded, as they are unnecessary for this alignment task.
+
+\subsubsection*{Input Loaders}
+In this subsection, all input loaders utilized in the system will be analyzed. This includes any data that the network must process. Since the network is designed to handle sensor data represented as tensors, each input is organized into tensors that construct a multi-channel image. Each channel contains data from a specific sensor, allowing for a comprehensive and layered view of the input environment.
+
+The primary input loaders are:
+\begin{itemize}
+    \item \textit{BevObservation Loader}: This loader generates a tensor representing all Bird's-Eye View (BEV) measurements. It extracts data from the binary serialization file, creating a tensor with distinct channels for each data type, such as lane markings, road boundaries, free spaces, traffic signs, obstacles, stixels, parking, and instances. The configuration file determines which specific elements are included in the tensor.
+
+    In this architecture, the focus is primarily on \textit{road boundaries}\footnote{Road boundaries refer to the edges of the roadway, such as lane markings, curbs, and other elements that define the travel lanes and guide vehicle movement. These are also present in HD maps, making them essential for aligning sensor data with map information.}. These are critical as they correspond with features present in high-definition (HD) maps.
+
+    To construct the multi-channel tensor, data from various sensors must be converted to a unified image coordinate system, allowing seamless integration across channels. Specific transformations and pre-processing steps are required for each type of sensor data:
+    \begin{itemize}
+        \item Camera Data: Image data requires calibration and warping to match the BEV perspective.
+        \item Radar Data: Radar points need to be filtered and projected onto the BEV tensor, accounting for sensor location and orientation.
+    \end{itemize}
+    
+    The codebase includes detailed implementations of each processing step. 
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.85\linewidth]{LateX//figs/bevLoader.pdf}
+        \caption{Layered Tensor Representation of Sensor Inputs}
+        \label{fig:bev-loader}
+    \end{figure}
+
+    \item \textit{Ego Loader}: This component represents the ego vehicle within the same tensor used for other sensor data, specifically representation containing its ego-measures. A function is called to generate a rectangular outline representing the vehicle's physical dimensions. These dimensions correspond to the actual vehicle used to record the dataset sequences, ensuring accurate alignment in the scene. 
+    The function takes as input the vehicle's specific coordinates, including key spatial points and orientations, particularly the heading angle, which defines the vehicle's facing direction relative to the map or environment frame. The resulting rectangular representation helps the network integrate the ego vehicle's precise location and orientation into the BEV tensor, serving as a reference point for other sensory data layers.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.75\linewidth]{LateX//figs/egoLoader.pdf}
+        \caption{Tensor Representation of Ego Vehicle}
+        \label{fig:ego-loader}
+    \end{figure}
+
+    \item \textit{Boundaries Loader}: 
+\subsubsection{BoundariesInputLoader}
+Questo input loader si occupa di semantic segmantation. Va a creare un tensore che rappresenta i boundaries e prende in ingresso un solito dizionario con al'interno i dati della mappa HD dell'area di riferimento. Parlare anche della dimensione del riferimento, che viene gestita sempre dal file di configurazione. 
+Ovvero si vanno a scaricare i boundaries presenti nella mappa in un determinato rettangolo attorno alla posizione del veicolo. Ci sono infatti dei limiti sia per quanto riguarda l'altezza sia per quanto riguarda la larghezza della zona di cui si va a scaricare la mappa rispetto alla posizione corrente del veicolo. 
+
+il codice, ma in linea di massa va a prendere i dati dalla mappa e li disegna. nella mapppa ci sono i boundaries che sono di varie categorie 
+In autonomous driving, "boundaries" refer to the limits or edges of a vehicle's operational environment. These can include physical elements like the edges of a road, curbs, walls, or even virtual markers in a mapped area that define where the vehicle is allowed to operate. Boundaries are broader than lanes, which specifically define the designated space within a road where a vehicle is supposed to travel. While lanes guide a vehicle along a path of travel, boundaries prevent the vehicle from leaving its safe operating area or driving into restricted zones. Essentially, boundaries are concerned with keeping the vehicle within the permitted environment, while lanes focus on its alignment within the road.
+Dire anche, sempre riferito a questo, che vengono tracciati sul tensore attraverso draw_polyline function di opencv, e in particolar modo si tratta della categoria 16 e uno spessore di 3. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{LateX//figs/mappaHD.pdf}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+\end{itemize}
+
+    
+
+
+\end{itemize}
