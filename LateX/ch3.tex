@@ -13,11 +13,7 @@ At the core of every neural network lies the artificial neuron, modeled after it
 \end{equation}
 
 
-Here, $(\text{in}_1, \text{in}_2, \ldots, \text{in}_d)$ are the $d$ inputs the neuron receives, analogous to signals received by biological neurons through synapses. These inputs are weighted by $w_{ji}$, which are the synaptic weights, representing the strength of the connection between neurons, which can be either positive (if one
-unit excites another) or negative (if one unit suppresses or
-inhibits another). The higher the weight, the more influence
-one unit has on another. (This corresponds to the way actual
-brain cells trigger one another across tiny gaps called synapses) \cite{10.11648/j.ajnna.20190501.12}.
+Here, $(\text{in}_1, \text{in}_2, \ldots, \text{in}_d)$ are the $d$ inputs the neuron receives, analogous to signals received by biological neurons through synapses. These inputs are weighted by $w_{ji}$, which are the synaptic weights, representing the strength of the connection between neurons, which can be either positive (if one unit excites another) or negative (if one unit suppresses or inhibits another). The higher the weight, the more influence one unit has on another. (This corresponds to the way actual brain cells trigger one another across tiny gaps called synapses) \cite{10.11648/j.ajnna.20190501.12}.
 
 Learning in a neural network is essentially an adjustment of these weights. The term $w_{0i}$ is a bias that helps adjust the output and enhances the model's flexibility. The sum of these weighted inputs results in the neuron’s excitation level, denoted as $\textit{net}_i$.
 Once the net input ${net}_i$ is computed, the neuron applies an activation function $f(\cdot)$ to determine the output:
@@ -25,14 +21,6 @@ Once the net input ${net}_i$ is computed, the neuron applies an activation funct
 \begin{equation}
     \textit{out}_i = f(\textit{net}_i)
 \end{equation}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/learning_rate.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
-\end{figure}
-
 
 The activation function introduces non-linearity to the model, enabling neural networks to learn complex, non-linear mappings between inputs and outputs. Common activation functions include:
 \begin{itemize}
@@ -48,7 +36,9 @@ The activation function introduces non-linearity to the model, enabling neural n
     \label{fig:enter-label}
 \end{figure}
 
-ReLU (Rectified Linear Unit) is popular because it introduces non-linearity without saturating for positive values. Its derivative is:
+In a neural network, the choice of activation function is critical, as it determines how data is transformed across the network layers. Among the various available activation functions, the Rectified Linear Unit (ReLU) is one of the most widely used due to its distinct advantages in training deep learning models.
+
+ReLU is particularly popular because it introduces non-linearity without saturating for positive values, an issue that affects functions like Sigmoid and Tanh, which tend to have very small gradients at extreme values, leading to the vanishing gradient problem. Additionally, the simplicity of ReLU’s derivative allows for efficient back-propagation, enhancing computational speed during training and supporting convergence in deep networks.
 % ReLU Derivative
 \begin{equation}
     f'(\textit{net}_i) =
@@ -58,7 +48,7 @@ ReLU (Rectified Linear Unit) is popular because it introduces non-linearity with
     \end{cases}
 \end{equation}
 
-This simplicity allows efficient back-propagation, enhancing computational speed during training.
+Given the importance of ReLU and its advantageous properties, this function will be the focus in subsequent sections, as it will serve as the primary activation function in the architectures discussed.
 
 \subsection{Neural Network Architecture}
 Neural networks are generally organized in layers:
@@ -75,31 +65,91 @@ Neural networks are generally organized in layers:
     \label{fig:enter-label}
 \end{figure}
 
-Forward Propagation
-Once the network architecture is defined, information propagates from the input layer to the output layer in a process called forward propagation. This involves feeding inputs through each layer, applying the weights, summing them, and computing outputs using activation functions. The forward pass determines the final output for a given input.
-Training Neural Networks
-The goal of training a neural network is to find the optimal set of weights wji that map inputs to desired outputs. This process involves minimizing the difference between the network’s predictions and the actual targets, as measured by a loss function.
-One of the most common loss functions is the sum of squared errors (SSE), given by:
-% Sum of Squared Errors (SSE) Loss Function
-\begin{equation}
-    E(\mathbf{w}, \mathbf{x}) = \frac{1}{2} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
-\end{equation}
-where $y_i$ is the true label, $\hat{y}_i$ is the predicted output, and $N$ is the number of data samples.
+\subsubsection*{Forward Propagation}
+Once the network architecture is defined, information propagates from the input layer to the output layer in a process called \textit{forward propagation}. This involves feeding inputs through each layer, applying the weights, summing them, and computing outputs using activation functions. The forward pass determines the final output for a given input.
 
-\subsection{Gradient Descent and Back-propagation}
-To minimize the loss function, neural networks use the gradient descent algorithm, which updates the weights by moving them in the direction opposite to the gradient of the loss function. The gradient represents the direction of the steepest increase in error, so stepping in the opposite direction reduces the error. The update rule is:
-% Weight Update Rule Using Gradient Descent
+\subsubsection*{Training Neural Networks}
+The goal of training a neural network is to find the optimal set of weights $w_{ji}$ that map inputs to desired outputs. This process involves minimizing the difference between the network’s predictions and the actual targets, as measured by a \textit{loss function}.
+Loss functions are a fundamental component of neural network training. They quantify the difference between the network's predictions and the true targets, guiding the network’s weight adjustments to reduce this difference. In essence, the loss function measures the "error" of the network's predictions, with the goal of minimizing this error to improve the network's accuracy.
+
+Loss functions are a fundamental component of neural network training. They quantify the difference between the network's predictions and the true targets, guiding the network’s weight adjustments to reduce this difference. In essence, the loss function measures the "error" of the network's predictions, with the goal of minimizing this error to improve the network's accuracy.
+The most common and widely used loss functions will be depicted in the following part:
+\begin{itemize}
+    \item \textbf{L1 Loss (Mean Absolute Error - MAE)}:  
+    The L1 loss calculates the absolute difference between each predicted value and its corresponding true value. This function is also known as mean absolute error (MAE) and is defined as:
+    \begin{equation}
+        E(\mathbf{w}, \mathbf{x}) = \frac{1}{N} \sum_{i=1}^{N} |y_i - \hat{y}_i|
+    \end{equation}
+    where \( y_i \) is the true label, \( \hat{y}_i \) is the predicted output, and \( N \) is the number of data samples. L1 loss is robust to outliers because it does not square the error, which makes it less sensitive to large differences.
+
+    \item \textbf{Smooth L1 Loss}:  
+    The smooth L1 loss combines aspects of both L1 and L2 losses to make the loss function more robust to outliers but still sensitive to small errors. It is defined as:
+    \begin{equation}
+        E(\mathbf{w}, \mathbf{x}) = 
+        \begin{cases} 
+            0.5 \cdot (y_i - \hat{y}_i)^2 & \text{if } |y_i - \hat{y}_i| < 1 \\
+          |y_i - \hat{y}_i| - 0.5 & \text{otherwise}
+        \end{cases}
+    \end{equation}
+
+    Smooth L1 loss is particularly useful in regression tasks where outliers might be present but penalizing large errors less than quadratic losses is still desirable.
+
+    \item \textbf{Mean Squared Error (MSE)}:  
+    Mean squared error, also known as L2 loss, calculates the average of the squared differences between predicted and actual values:
+    \begin{equation}
+        E(\mathbf{w}, \mathbf{x}) = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
+    \end{equation}
+   
+    Squaring the errors makes the MSE more sensitive to larger errors, which can be beneficial in some cases but can lead to instability if outliers are present.
+
+    \item \textbf{Sum of Squared Errors (SSE)}:  
+    A variation of MSE, the sum of squared errors (SSE) measures the total squared difference between predicted and actual values, without averaging over the number of samples:
+    \begin{equation}
+        E(\mathbf{w}, \mathbf{x}) = \frac{1}{2} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
+    \end{equation}
+    
+    SSE is widely used in gradient-based optimization, particularly because of its mathematical properties that simplify gradient calculations. Dividing by 2 is standard, as it cancels out the exponent when differentiating with respect to the weights.
+\end{itemize}
+
+Each of these loss functions offers unique benefits, with L1 and smooth L1 loss being more robust to outliers, while MSE and SSE penalize larger errors more heavily. Choosing the right loss function is critical and should be based on the specifics of the task and the characteristics of the data.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{LateX/figs/loss_functions_xkcd.pdf}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsubsection*{Gradient Descent and Back-propagation}
+To minimize the loss function, neural networks use the gradient descent algorithm, which updates the weights by moving them in the direction opposite to the gradient of the loss function. 
 \begin{equation}
-    w_{ji} = w_{ji} - \eta \frac{\partial E}{\partial w_{ji}}
+    \nabla_\theta L = \frac{\partial L}{\partial \theta}
 \end{equation}
-Here, $\eta$ is the learning rate, a hyperparameter that controls the step size of the weight update. If the learning rate is too large, the network may not converge; if it’s too small, convergence will be slow. The backpropagation algorithm computes these gradients efficiently using the chain rule of calculus.
-Stochastic Gradient Descent (SGD)
-A more practical variant of gradient descent, especially for large datasets, is stochastic gradient descent (SGD). Instead of calculating the gradient for the entire dataset at once, SGD updates weights after each mini-batch of data points. This introduces randomness but speeds up training and often leads to better generalization.
+
+In neural networks, after computing the gradients via back-propagation, the following step is to update the weights to minimize the loss function. This is done using an optimizer, which controls how the weights are adjusted based on the gradients. The learning rate $\eta$ is a key hyper-parameter in this update process, determining the step size in the direction of the gradient. 
+A proper learning rate is crucial: if it's too large, the network may overshoot the optimal solution; if it's too small, convergence becomes slow and inefficient.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{LateX//figs/learning_rate.pdf}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+The optimizer updates the weights accordingly the following general rule:
+\begin{equation}
+    \theta \leftarrow \theta - \eta \nabla_\theta L
+\end{equation}
+where where: $\theta$ represents the weights, $\eta$ depicts the learning rate and $\nabla L_\theta$ is the gradient of the loss function with respect to the weights. 
+
+Two of the most commonly used optimizers are Stochastic Gradient Descent (SGD) and Adam.
+
+\subsubsection*{Stochastic Gradient Descent}
+A practical variant of gradient descent, especially for large datasets, is stochastic gradient descent (SGD). Unlike traditional gradient descent, which computes the gradient over the entire dataset, SGD computes the gradient for a subset of the data, known as a mini-batch, and updates the weights after each \textit{mini-batch}. This introduces a level of randomness into the process but has the advantage of significantly speeding up training, especially when working with large datasets. SGD is more likely to escape \textit{local minima} and can result in better generalization.
 
 \begin{algorithm}
 \caption{Stochastic Gradient Descent (SGD)}
 \begin{algorithmic}[1]
-\State \textbf{Initialize:} weights $W_{ih}, W_{ho}, \eta$, batch size $B$, max epochs $T_{max}$
+\State \textbf{Initialize:} weights $\theta_{ih}, \theta_{ho}, \eta$, batch size $B$, max epochs $T_{\text{max}}$
 \State $t \gets 0$
 
 \Repeat
@@ -108,66 +158,175 @@ A more practical variant of gradient descent, especially for large datasets, is 
     \State Randomly shuffle the training set $\mathcal{D}$
 
     \For {each mini-batch $\mathcal{B}$ of size $B$}
-        \State Reset gradient: $\nabla W_{ih} \gets 0, \nabla W_{ho} \gets 0$
+        \State Reset gradient: $\nabla \theta_{ih} \gets 0, \nabla \theta_{ho} \gets 0$
         
         \For {each sample $x_i$ in $\mathcal{B}$}
-            \State \textbf{Forward step:} $y_i \gets \text{forward}(x_i, W_{ih}, W_{ho})$
+            \State \textbf{Forward step:} $y_i \gets \text{forward}(x_i, \theta_{ih}, \theta_{ho})$
             \State Compute loss $L \gets L + \mathcal{L}(y_i, t_i)$
             
-            \State \textbf{Backward step:} Compute gradients $\nabla W_{ho}, \nabla W_{ih}$ using backpropagation
+            \State \textbf{Backward step:} Compute gradients $\nabla \theta_{ho}, \nabla \theta_{ih}$ 
         \EndFor
 
-        \State Update hidden-output weights: $W_{ho} \gets W_{ho} - \eta \cdot \nabla W_{ho}$
-        \State Update input-hidden weights: $W_{ih} \gets W_{ih} - \eta \cdot \nabla W_{ih}$
+        \State Update hidden-output weights: $\theta_{ho} \gets \theta_{ho} - \eta \cdot \nabla \theta_{ho}$
+        \State Update input-hidden weights: $\theta_{ih} \gets \theta_{ih} - \eta \cdot \nabla \theta_{ih}$
         
         \State $L \gets L / B$ \Comment{Average the loss}
     \EndFor
     
-    \State Compute accuracy on the Train and Validation sets
-
-\Until {(not convergence \textbf{and} $t < T_{max}$)}
+\Until {(not convergence \textbf{and} $t < T_{\text{max}}$)}
 
 \end{algorithmic}
 \end{algorithm}
 
-Learning Rate, Weight Decay, and Momentum
-Several techniques help improve convergence:
-    • Learning Rate: The learning rate $\eta$ controls how quickly weights are updated. It is crucial to select an appropriate value, as too large a rate can cause instability, while too small a rate can make training slow.
-    • Weight Decay: This technique adds a regularization term to the loss function to prevent overfitting by penalizing large weight values. The modified loss function becomes:
-% Weight Decay
+Another popular optimizer, especially in deep learning, is the Adam (short for Adaptive Moment Estimation) optimizer. Adam combines the benefits of both momentum and adaptive learning rates. It calculates individual adaptive learning rates for each parameter by considering both the first moment (the mean) and the second moment (the uncentered variance) of the gradients.
 \begin{equation}
-    E(\mathbf{w}, \mathbf{x}) = \frac{1}{2} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{d} w_j^2
+    \theta_t = \theta_{t-1} - \eta \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
 \end{equation}
-where $\lambda$ is the regularization parameter.
-    • Momentum: To speed up convergence and avoid getting stuck in local minima, momentum introduces a term that accumulates the gradient from previous updates:
-% Momentum Update Rule
-\begin{equation}
-    v_t = \alpha v_{t-1} - \eta \frac{\partial E}{\partial w}
-\end{equation}
-where α is the momentum coefficient. This method helps smooth out oscillations in the weight updates.
-Loss Functions
-The choice of loss function depends on the task:
-    • Mean Squared Error (MSE): Commonly used for regression tasks.
-    • Cross-Entropy Loss: Often used for classification tasks. It compares the predicted probability distribution with the actual distribution of class labels.
-Convergence and Generalization
-During training, convergence is monitored by observing the loss function. If the loss decreases steadily and accuracy increases, the network is converging. Overfitting occurs when the model performs well on the training set but poorly on unseen data, indicating that the model has memorized the training data instead of generalizing. Techniques such as early stopping, regularization, and cross-validation help prevent overfitting.
-The final goal of a neural network is to generalize well to unseen data, maximizing accuracy on both the training and validation sets. Careful tuning of hyperparameters and monitoring of the learning process ensures that the model learns effectively without over-fitting.
+In the formula: \(\theta_t\) is the updated weight, \(\theta_{t-1}\) is the previous weight, \(\eta\) is the learning rate, \(\hat{m}_t\) is the bias-corrected first moment estimate, \(\hat{v}_t\) is the bias-corrected second moment estimate, and \(\epsilon\) is a small constant to prevent division by zero.
 
-\subsection{Conclusion}
-COPIARE QUI IMMAGINE 4 DEL PAPER \cite{10.11648/j.ajnna.20190501.12} (si trova alla pagina 10).
+\begin{algorithm}
+\caption{Adam Optimizer}
+\begin{algorithmic}[1]
+\State \textbf{Initialize:} weights \(\theta_{ih}, \theta_{ho}, \eta\), batch size \(B\), max epochs \(T_{\text{max}}\), \(\beta_1, \beta_2\), \(\epsilon\)
+\State \(m_{ih} \gets 0, v_{ih} \gets 0, m_{ho} \gets 0, v_{ho} \gets 0\) \Comment{Initialize parameters}
+\State \(t \gets 0\) \Comment{Initialize time-step}
 
-\begin{enumerate}
-    \item Assign random weights to all the linkages to start the algorithm.
-    \item Using the inputs and the (Input $\rightarrow$ Hidden Nodes) linkages, find the activation rate of Hidden Nodes.
-    \item Using the activation rate of Hidden Nodes and linkages to Output, find the activation rate of Output Nodes.
-    \item Find the error rate at the output node and re-calibrate all the linkages between Hidden Nodes and Output Nodes.
-    \item Using the weights and error found at the Output node, cascade down the error to Hidden Nodes.
-    \item Re-calibrate the weights between Hidden Nodes and Input Nodes.
-    \item Repeat the process until the convergence criterion is met.
-    \item Using the final linkage weights, score the activation rate of the Output Nodes.
+\Repeat
+    \State \(t \gets t + 1\)
+    \State \(L \gets 0\) \Comment{Initialize loss}
+    \State Randomly shuffle the training set \(\mathcal{D}\)
+
+    \For {each mini-batch \(\mathcal{B}\) of size \(B\)}
+        \State Reset gradients: \(\nabla \theta_{ih} \gets 0, \nabla \theta_{ho} \gets 0\)
+
+        \For {each sample \(x_i\) in \(\mathcal{B}\)}
+            \State \textbf{Forward step:} \(y_i \gets \text{forward}(x_i, \theta_{ih}, \theta_{ho})\)
+            \State Compute loss \(L \gets L + \mathcal{L}(y_i, t_i)\)
+
+            \State \textbf{Backward step:} Compute gradients \(\nabla \theta_{ho}, \nabla \theta_{ih}\)
+        \EndFor
+
+        \State Update first moment estimates: 
+        \[
+        m_{ih} \gets \beta_1 \cdot m_{ih} + (1 - \beta_1) \cdot \nabla \theta_{ih}, \quad m_{ho} \gets \beta_1 \cdot m_{ho} + (1 - \beta_1) \cdot \nabla \theta_{ho}
+        \]
+        \State Update second moment estimates: 
+        \[
+        v_{ih} \gets \beta_2 \cdot v_{ih} + (1 - \beta_2) \cdot (\nabla \theta_{ih})^2, \quad v_{ho} \gets \beta_2 \cdot v_{ho} + (1 - \beta_2) \cdot (\nabla \theta_{ho})^2
+        \]
+        \State Bias correction:
+        \[
+        \hat{m}_{ih} \gets \frac{m_{ih}}{1 - \beta_1^t}, \quad \hat{m}_{ho} \gets \frac{m_{ho}}{1 - \beta_1^t}
+        \]
+        \[
+        \hat{v}_{ih} \gets \frac{v_{ih}}{1 - \beta_2^t}, \quad \hat{v}_{ho} \gets \frac{v_{ho}}{1 - \beta_2^t}
+        \]
+
+        \State Update weights: 
+        \[
+        \theta_{ih} \gets \theta_{ih} - \eta \cdot \frac{\hat{m}_{ih}}{\sqrt{\hat{v}_{ih}} + \epsilon}
+        \]
+        \[
+        \theta_{ho} \gets \theta_{ho} - \eta \cdot \frac{\hat{m}_{ho}}{\sqrt{\hat{v}_{ho}} + \epsilon}
+        \]
+
+        \State \(L \gets L / B\) \Comment{Average the loss}
+    \EndFor
+
+\Until {(not convergence \textbf{and} \(t < T_{\text{max}}\))}
+
+\end{algorithmic}
+\end{algorithm}
+
+In this section, we have introduced the fundamental structure of neural networks, focusing on their building blocks, including neurons, layers, and connections. We have discussed the forward pass, where inputs are processed through hidden layers to produce an output, and the back-propagation process used to adjust the weights based on the error calculated at the output.
+
+The following steps outline the typical workflow for training a neural network using back-propagation \cite{10.11648/j.ajnna.20190501.12}:
+
+\begin{enumerate} 
+    \item Assign random weights to all the linkages to initialize the network. 
+    \item Using the inputs and the linkages from Input to Hidden Nodes, compute the activation of Hidden Nodes. 
+    \item Using the activation of Hidden Nodes and the linkages to Output Nodes, compute the activation of Output Nodes. 
+    \item Calculate the error at the output node by comparing the predicted and actual outputs. 
+    \item Propagate the error back through the network, adjusting the weights between the Output Nodes and the Hidden Nodes. 
+    \item Using the error at the Output node, propagate the error back to the Hidden Nodes and adjust the weights between the Hidden and Input Nodes. 
+    \item Repeat the process iteratively, adjusting the weights until the convergence criterion is met (e.g., minimal error or a maximum number of epochs). 
+    \item Once trained, use the final weights to make predictions by scoring the activation rate of the Output Nodes. 
 \end{enumerate}
 
+This iterative process, combined with optimization techniques such as gradient descent, allows neural networks to learn from data and improve over time. In the following chapters, we will explore how these principles are applied to more complex architectures and tasks, including their use in localization methods for autonomous driving.
 
+\section{Convolutional Neural Network (CNN)}
+
+A Convolutional Neural Network (CNN), or \textit{ConvNet}, is a specialized type of deep learning algorithm primarily designed for tasks requiring object recognition, such as image classification, detection, and segmentation. CNNs are widely employed in various practical applications, ranging from autonomous vehicles and medical imaging to security camera systems and facial recognition technologies \cite{DBLP:journals/corr/OSheaN15}. CNNs are architecturally distinct from traditional neural networks, as they take into account the spatial structure of data—usually images—by arranging neurons in a way that mimics the human visual cortex. The network's architecture is typically organized in layers, including convolutional layers\footnote{A convolutional layer is responsible for applying a set of filters (kernels) to the input image, producing feature maps that highlight important patterns like edges, textures, or shapes.}, pooling layers\footnote{A pooling layer reduces the spatial dimensions of the feature maps, typically by using operations like max pooling or average pooling, which helps reduce computational load and control over-fitting.}, and fully connected layers\footnote{Fully connected layers are the traditional neural network layers where every neuron is connected to every neuron in the previous layer. They typically occur at the end of the network and help in decision-making, such as classifying an image into categories.}, each playing a pivotal role in feature extraction and decision making.
+
+Convolutional Neural Networks (CNNs) are specifically designed to process 2D data, such as images, more efficiently than fully connected networks by utilizing convolutional operations instead of traditional matrix multiplications. This architecture enables CNNs to capture spatial hierarchies of patterns in image data, from low-level edges to high-level features like objects or faces.
+
+The basic building blocks of CNNs include:
+
+\begin{enumerate}
+    \item \textbf{Convolutional Layers}: These layers apply convolutional operations to the input data. In mathematical terms, a convolution operation is defined as:
+    \begin{equation}
+        (f * g)(x, y) = \sum_{m}\sum_{n}f(m, n) \cdot g(x - m, y - n)
+    \end{equation}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=1\linewidth]{LateX//figs/CCN_layer.pdf}
+        \caption{Enter Caption}
+        \label{fig:enter-label}
+    \end{figure}
+    where \( f \) represents the input and \( g \) denotes the kernel (or filter). For a 2D image, the convolution operation involves sliding a filter over the input image and computing the dot product between the filter and segments of the image, resulting in an \textit{activation map}. The kernels are learnable parameters, allowing the CNN to automatically learn feature detectors for edges, textures, and more complex patterns. Each filter responds to a particular feature within the input, such as vertical edges or textures.
+
+    \item \textbf{Rectified Linear Unit (ReLU)}: ReLU applies a non-linear transformation element-wise after the convolution operation. Its mathematical formulation is simple and it is already mentioned in above sections.
+
+    \item \textbf{Pooling Layers}: Pooling layers reduce the spatial dimensions of activation maps while preserving important information. The most common form is max pooling, which selects the maximum value from each patch of the feature map. The formula for max pooling is:
+    \begin{equation}
+        P = \max_{(i,j) \in \text{patch}} x(i,j)
+    \end{equation}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.85\linewidth]{LateX//figs/CNN_poolinh.pdf}
+        \caption{Enter Caption}
+        \label{fig:enter-label}
+    \end{figure}
+    where \( P \) is the pooling window, and \( x(i,j) \) represents values within this window. Pooling contributes to translation invariance, making the network more robust to variations in the input's position or scale.
+
+    \item \textbf{Fully Connected Layers}: In the final layers of a CNN, fully connected layers perform the actual classification task. These layers take the high-level features detected by previous layers and map them to the final output, such as class probabilities in image classification tasks. This is where the network "decides" based on the features it has learned through previous layers.
+\end{enumerate}
+
+One of the key advantages of Convolutional Neural Networks (CNNs) over traditional machine learning models, such as Support Vector Machines (SVMs) or Decision Trees, is their ability to automatically learn features. Unlike traditional models that require manual feature extraction, CNNs autonomously learn hierarchical representations of data by employing multiple convolutional and pooling layers to extract features at various levels of abstraction.
+
+CNNs are also commonly used as \textit{feature extractors} or \textit{backbones} in more complex neural network architectures. Their ability to automatically learn and generalize hierarchical features enables them to serve as powerful foundational networks that facilitate advanced tasks in various domains.
+
+The main advantages of CNNs include:
+\begin{itemize}
+    \item \textbf{Translation Invariance}: CNNs achieve translation invariance by applying the same convolutional filters across different parts of the image. This enables the network to recognize objects even when they appear in different locations within the image, which is a substantial advantage over traditional methods that often require manually engineered features.
+
+    \item \textbf{Hierarchical Feature Learning}: CNNs detect features in a hierarchical manner. In the initial layers, they capture low-level features such as edges, corners, or textures. In deeper layers, they detect higher-level, abstract features like shapes or object parts. This hierarchical learning process is akin to how the human visual cortex processes visual stimuli, progressing from simple to complex patterns.
+
+    \item \textbf{Efficiency}: By using local connectivity, each neuron in convolutional layers is connected only to a small region of the input, known as the \textit{receptive field}, rather than the entire input. This significantly reduces computational requirements. Additionally, weight sharing in convolution layers, where the same filter is applied across different regions, reduces the number of parameters compared to fully connected networks, making CNNs computationally efficient.
+\end{itemize}
+
+Over time, various CNN architectures have been developed to optimize performance for specific tasks. Notable architectures include:
+\begin{enumerate}
+    \item \textbf{VGG-16}: Known for its simplicity, VGG-16 uses small \(3 \times 3\) convolutional filters but stacks a large number of convolutional layers followed by fully connected layers, creating a deep architecture with strong feature extraction capabilities \cite{7486599}.
+
+    \item \textbf{ResNet}: ResNet introduced the concept of residual learning, which enables the training of very deep architectures. By incorporating skip connections, ResNet addresses the vanishing gradient problem, allowing for efficient training of deep networks. Various versions of ResNet exist, distinguished by the number of layers they contain, such as ResNet-18, ResNet-34, ResNet-50, ResNet-101, and ResNet-152. The number indicates the total layers, with deeper variants like ResNet-101 and ResNet-152 providing increasingly refined feature representations while maintaining efficient training \cite{DBLP:journals/corr/HeZRS15, 10197463}.
+
+    \item \textbf{Inception (GoogLeNet)}: The Inception network incorporates convolutional layers of varying sizes applied in parallel. This multi-scale approach allows the network to capture features at different levels of granularity, enhancing its ability to recognize complex patterns \cite{DBLP:journals/corr/SzegedyLJSRAEVR14}.
+
+    \item \textbf{EfficientNet}: This model family scales network width, depth, and resolution to achieve higher accuracy with fewer parameters. EfficientNet strikes a balance between accuracy and efficiency, making it a popular choice for many practical applications \cite{DBLP:journals/corr/abs-1905-11946}.
+\end{enumerate}
+
+While CNNs were originally designed for image-related tasks, their versatility has led to adaptations in various other domains, including:
+\begin{itemize}
+    \item \textbf{Natural Language Processing (NLP)}: CNNs are used for tasks such as text classification by applying convolutional filters over word embeddings, allowing the network to capture local dependencies in textual data.
+
+    \item \textbf{Time Series Analysis}: CNNs can be applied to temporal data, effectively capturing local dependencies between data points over time, making them suitable for analyzing patterns in time series data.
+
+    \item \textbf{Speech Recognition}: In combination with Recurrent Neural Networks (RNNs) or Transformers, CNNs can be utilized in speech recognition tasks, such as voice recognition or speech-to-text conversion, where they contribute to feature extraction and processing.
+\end{itemize}
+
+Through these applications, CNNs have proven to be a flexible and powerful tool in both traditional and emerging fields, providing a foundation for extracting robust features that can enhance the performance of complex neural networks.
 
 
 \section{Dataset}
@@ -654,138 +813,6 @@ The integration of data from both long-range and short-range cameras into a cohe
 Moreover, the BEV representation goes beyond simply providing a static overview of the environment; it captures the dynamic interactions of moving agents. By incorporating temporal data, the BEV can account for the predicted trajectories of pedestrians and other vehicles, allowing the autonomous system to make proactive decisions that mitigate potential risks (Paden et al., 2016). This predictive capability is essential for ensuring that the vehicle can navigate safely and efficiently, especially in complex urban settings where the behavior of other road users can be unpredictable.
 
 The significance of BEV representation in enhancing situational awareness cannot be overstated. By synthesizing a wealth of visual data from the six long-range and four short-range cameras, autonomous vehicles can achieve a nuanced understanding of their environment. This advanced level of situational awareness contributes directly to the vehicle's decision-making processes, ultimately paving the way for safer and more reliable autonomous driving systems (Hawkins et al., 2019). As the technology continues to advance, the integration of BEV representation will play a vital role in overcoming the challenges of real-world navigation, ensuring that autonomous vehicles can operate effectively while minimizing risks to both passengers and pedestrians.
-
-
-
-
-\section{Topological Map}
-
-----
-
-Da qualche parte si potrebbe andare a specificare che non viene utilizzato il topologico, spiegare quinid che cos'è e come funziona, quali sono i dati che potrebbe presentare. 
-E spiegare anche come si riesce a non utilizzare.
-
-----
-
-Topological maps play a crucial role in the field of autonomous driving by providing a simplified representation of the road network and surrounding environment. These maps highlight the connectivity between different road segments, intersections, and obstacles, allowing autonomous vehicles to understand and navigate their surroundings effectively. Rather than focusing on precise geographic details or distances, topological maps emphasize the relationships between various elements, which is essential for decision-making algorithms in self-driving cars. For instance, they can help the vehicle determine possible paths and maneuvers based on the connections between roads and obstacles. In your research, topological maps may not have been necessary if the focus was on real-time sensor data or detailed spatial analysis, as these aspects require precise measurements of distances and locations to ensure safe and efficient navigation. Instead, your work might have leveraged other mapping techniques that prioritize accuracy over abstract relationships.
-
-
-
-
-\section{Loss Functions}
-Loss Functions: L1 Loss, Smooth L1 Loss, and Mean Squared Error (MSE)
-Loss functions are essential components in machine learning models, as they quantify the difference between the predicted output and the actual target value. Among the most widely used loss functions are the L1 Loss, the Smooth L1 Loss, and the Mean Squared Error (MSE).
-
-\subsection{L1 Loss (Mean Absolute Error)}
-The L1 Loss, also known as the Mean Absolute Error (MAE), computes the sum of the absolute differences between the predicted values and the true values.
-Mathematically, for a dataset with n samples, the L1 Loss is defined as:
-\begin{equation}
-   \text{L1}(y, \hat{y}) = \frac{1}{N} \sum_{i=1}^{N} |y_i - \hat{y_i}|
-\end{equation}
-
-This loss function is robust to outliers, as it applies a linear penalty to errors, assigning equal weight to small and large deviations. Consequently, it is particularly useful in applications where robustness to extreme values is required. 
-
-\subsection{Smooth L1 Loss}
-The Smooth L1 Loss is a hybrid between the L1 and L2 losses (the latter being the basis for the MSE). It introduces a piecewise function that is quadratic for small errors and linear for larger errors. This helps reduce sensitivity to outliers without the steep quadratic growth of the MSE. The Smooth L1 Loss is defined as follows:
-\begin{equation}
-    \text{Smooth-L1}(y, \hat{y}) = 
-    \begin{cases} 
-        0.5 \times (y_i - \hat{y_i})^2 & \text{if} \ |y_i - \hat{y_i}| < 1 \\
-        |y_i - \hat{y_i}| - 0.5 & \text{otherwise}
-    \end{cases}
-\end{equation}
-
-
- 
-The smooth transition between the L1 and L2 behaviors ensures that moderate errors are not excessively penalized, contributing to a more stable training process in scenarios like deep neural network optimization. It is especially effective in problems where both small and large errors need to be handled gracefully.
-
-\subsection{Mean Squared Error (MSE)}
-The Mean Squared Error (MSE) is a widely adopted loss function that computes the average of the squared differences between predicted and actual values. It is given by:
-
-\begin{equation}
-    \text{MSE}(y, \hat{y}) = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y_i})^2
-\end{equation}
-
-
-
-Due to the squaring of errors, the MSE assigns a higher penalty to large errors compared to the L1 loss. This makes the MSE highly sensitive to outliers, as even small differences in large errors are amplified. MSE is particularly beneficial when large deviations from the target values need to be emphasized, such as in regression tasks where accuracy is critical.
-
-
-In summary, each loss function has its specific use case:
-
-L1 Loss is ideal when robustness to outliers is important, as it applies a linear penalty to errors.
-Smooth L1 Loss provides a balanced approach by offering a smooth transition between L1 and MSE, which can stabilize training in deep learning models.
-MSE is most useful when large errors should be penalized more significantly, but it can be prone to high sensitivity to outliers due to the quadratic growth of the penalty.
-Choosing the appropriate loss function depends on the nature of the task and the characteristics of the error distribution in the dataset.
-
-
-
-
-\begin{figure}
-    \centering
-    \includegraphics[width=1\linewidth]{LateX/figs/loss_functions_xkcd.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
-\end{figure}
-
-
----
-
-short 1920x ecc scala 1
-long  3840x ecc scala 2
-fare anche un sottopragrafo sulla BEV
-
-
-
-
-
-
-\section{Convolutional Neural Network (CNN)}
-
-Convolutional Neural Network (CNN) Architecture
-A Convolutional Neural Network (CNN), or ConvNet, is a specialized type of deep learning algorithm primarily designed for tasks requiring object recognition, such as image classification, detection, and segmentation. CNNs are widely employed in various practical applications, ranging from autonomous vehicles and medical imaging to security camera systems and facial recognition technologies.
-CNN Structure and Principles
-CNNs are architecturally distinct from traditional neural networks, as they take into account the spatial structure of data—usually images—by arranging neurons in a way that mimics the human visual cortex. The network's architecture is typically organized in layers, including convolutional layers, pooling layers, and fully connected layers, each playing a pivotal role in feature extraction and decision making.
-CNNs are designed to handle 2D data (images) more efficiently than fully connected networks by utilizing convolutional operations instead of traditional matrix multiplications. This allows CNNs to process image data in a way that captures spatial hierarchies of patterns, from low-level edges to high-level features like objects or faces.
-Key Components of CNNs
-The basic building blocks of CNNs include:
-    1. Convolutional Layers: These layers apply convolutional operations to the input data. In mathematical terms, a convolution operation is defined as:
-      
-       Here, f is the input and g is the kernel (or filter). For a 2D image, the convolution operation involves sliding a filter over the input image and computing the dot product between the filter and portions of the image, resulting in an activation map. The kernels are learnable parameters, allowing the CNN to automatically learn feature detectors for edges, textures, and higher-level patterns. Each filter responds to a particular feature within the input, like vertical edges or textures.
-    2. Rectified Linear Unit (ReLU): ReLU applies a non-linear transformation element-wise after the convolution operation. Its mathematical formulation is simple:
-       f(x)=max(0,x)
-       This non-linearity allows the network to learn more complex patterns and ensures the network does not behave like a linear classifier.
-    3. Pooling Layers: Pooling reduces the spatial dimensions of the activation maps while retaining important information. The most common form is max pooling, which selects the maximum value from each patch of the feature map. The formula for max pooling can be expressed as:
-      
-       Here, P is the pooling window, and x(i,j) represents the values within the window. Pooling contributes to translation invariance, which helps the network become more robust to variations in the input's position or scale.
-    4. Fully Connected Layers: In the final layers of a CNN, fully connected layers are used to perform the actual classification. These layers take the high-level features detected by previous layers and map them to the final output, such as class probabilities in image classification tasks. This is where the network "decides" based on the features it has learned through the previous layers.
-Learning and Feature Extraction
-A key advantage of CNNs over traditional machine learning models, such as Support Vector Machines (SVMs) or Decision Trees, is that CNNs do not require manual feature extraction. CNNs automatically learn hierarchical representations of the data by using multiple convolutional and pooling layers to extract features at different levels of abstraction.
-    • Translation Invariance: CNNs achieve translation invariance by applying the same convolutional filters across different parts of the image. This means that the network can recognize objects even if they appear in different locations within the image. This is a significant advantage over traditional methods, which often require the features to be manually engineered.
-    • Hierarchical Feature Learning: In the early layers, CNNs detect low-level features like edges, corners, or textures, while deeper layers capture more abstract concepts like shapes or object parts. This hierarchical learning process is akin to how the human visual cortex processes visual stimuli, starting from simple to complex.
-    • Efficiency: By using local connectivity, each neuron in the convolutional layers is connected only to a small region of the input (called the receptive field), not the entire input, making the computation much more efficient. Furthermore, the use of weight sharing in convolution layers—where the same filter is applied across different regions—reduces the number of parameters compared to fully connected networks.
-CNN Architectures
-Various CNN architectures have been developed to optimize performance for specific tasks. These architectures include:
-    1. VGG-16: Known for its simplicity, VGG-16 uses small (3x3) convolutional filters but stacks a large number of convolutional layers, followed by fully connected layers.
-    2. ResNet50: ResNet introduced the concept of residual learning, allowing the network to train very deep architectures by using skip connections that help prevent vanishing gradients.
-    3. Inception (GoogLeNet): The Inception network introduced a more complex architecture where convolutional layers of different sizes are applied in parallel, allowing the network to capture features at multiple scales.
-    4. EfficientNet: This model family scales both the width, depth, and resolution of networks to achieve higher accuracy with fewer parameters.
-Mathematical Framework of CNNs
-The core mathematical operations in CNNs can be summarized as follows:
-    • Convolution: The operation that applies learnable filters to input data, extracting meaningful features.
-    • Activation Function (ReLU): Introduces non-linearity after the convolution operation, allowing the network to learn complex mappings.
-    • Pooling: Reduces the spatial dimensions of the feature maps, making the computation more efficient and the network more robust to variations in input.
-    • Softmax Function: At the final layer, a softmax function is applied to generate the class probabilities:
-
-      where zj represents the output of the final fully connected layer for class j, and n is the number of classes.
-Applications Beyond Vision
-While CNNs were originally designed for image-related tasks, they have been adapted for use in other domains, including:
-    • Natural Language Processing (NLP): CNNs can be used for tasks like text classification by applying convolutional filters over word embeddings.
-    • Time Series Analysis: CNNs can be applied to temporal data, capturing local dependencies between data points in time.
-    • Speech Recognition: In conjunction with recurrent neural networks (RNNs) or transformers, CNNs can be employed for tasks like voice recognition or speech-to-text conversion.
-Conclusion
-CNNs represent a powerful tool in deep learning due to their ability to automatically and efficiently extract features from data, reducing the need for manual feature engineering. Their hierarchical, locally connected, and translation-invariant nature, coupled with their versatility across domains, make them indispensable in modern artificial intelligence applications. With advancements like ResNet and EfficientNet, CNNs continue to push the boundaries of what's possible in fields like computer vision, NLP, and beyond.
-
 
 \subsection{Transformers}
 The main challenge in multi-modal learning is that A first fundamental challenge is learning how to
