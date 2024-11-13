@@ -353,470 +353,6 @@ Self-attention, a crucial aspect of transformers, operates by transforming the i
 \end{figure}
 
 
-
-\section{Dataset}
-Descrivere qui come è composto il dataset, devo dire che ci sono diverse sequenze che sono state registrate in diverse zone della città. per ogni frame (immagine) ci sono associati anche i dati che arrivano dal superdag. forse sul sito di ambarella si riesce a trovare qualche informazione sul superdag e sul suo funziomento. 
-Il tutto viene impacchettato in un file .bin per gestire al meglio lo spazio. 
-I dati vengono raccolti tramite alcune delle auto su cui VISLAB/Ambarella stanno sviluppando il loro sistema di guida autonoma. 
-Ogni auto possiede una diversa sensor suite, che in generale è fornita da:
-- front cameras
-short cameras 
-radars 
-gps-gnsss che permette di localizzarsi nel mondo
-
-\subsection{Sensor Suite}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/sensor_suite2.pdf}
-    \caption{Enter Caption. ci sono due cose da correggere, la prima è che in BEV cnon ci deve essere il radar centrale dietro, la seocnda è che in rear view c'è RR che non è centrato}
-    \label{fig:enter-label}
-\end{figure}
-
-
-Descrivere qui le camere, magari aggiungere giusto qualche informazione sugli angoli di apertura ecc, anche qualche informazione sui radar e si potrebbe pensare di aggiungere quel grafico che era presente nelle slide in cui si vanno a vedere quelli che sono i pro e i contro delle svariate tecnologie. 
-
-alla fine si mostra quindi quello che viene creato -> coppia, immagine e dati provenienti dal superdag. 
-dire che cosa è il superdag: 
-
-
-
-
-A DAG is a Directed Acyclic Graph, a type of graph whose nodes are directionally related to each other and don’t form a directional closed loop. In the practice of analytics engineering, DAGs are often used to visually represent the relationships between your data models.
-
-While the concept of a DAG originated in mathematics and gained popularity in computational work, DAGs have found a home in the modern data world. They offer a great way to visualize data pipelines and lineage, and they offer an easy way to understand dependencies between data models.
-
-In questo caso, sono collegati tutti i dati che provengono dallo stesso frame, in questo modo si riesce facilmente a vedere quali sono gli otuput sincronizzati di tutti i sensori. Le latenze dei diversi sensori, in questo modo, appaiono invisibili all'utente finale che si ritrova con un pacchetto di dati già sincronizzato. 
-
-
-The Cflow processor is a hardware co-processor specially designed to execute
-DAG representations of computer vision / Al algorithms.
-• Directed acyclic graph (DAG) is a directed graph with no directed cycles. It consists of vertices and edges, with each edge directed from one vertex to another, such that following those directions will never form a closed loop.
-• Nodes in the graph represent the computational operations and links represent the flow of data between them.
-• Data is represented as multi-dimensional tensors:
-• Image is 2D vector.
-• No pointer, direct memory access, ....
-• Operations are performed in parallel by available hardware resources (datapath):
-E
-• Multiple instruction, multiple data architecture (MIMD).
-• Custom operations.
-
-https://hazelcast.com/glossary/directed-acyclic-graph/
-https://medium.com/@danthelion/core-data-engineering-dags-36ce241b32d5
-
-questo è altro che si è trovato sulle slide riguardo a quello. 
-
-Specificare quindi tutto quel che trovo riguardo a SuperDAG, cvflow ecc usando le pagine ambarella come fonte sicura. Guardare anche quelle slide che ci sono sul pc, magari possono essere utili. 
-
-creare una rappresentazione 
-
-
----
-giunti al termine, parlare delle vie della città in cui le sequenze che possiedo sono state registrate, fare un calcolo dei frame e parlare della divisione del dataaset tra parte di training e parte di validation. Parlare anche che, nel corso dello svilupoo del progetto, sono stati utilizzati due split diversi, per iniziare uno che utilizzava solo sequenze di una determinata zona (in modo da avere meno dapi e concentrarsi sulla struttura) e successivamente, una volta chiusa la quadra e trovato il modo giusto di lavorare, si è deciso di ampliare con tutte le sequenze registrate ottenute. 
-
-
-
-
-
-
-
-
-\subsection{Preprocessing}
-The BEVPreprocessor class is designed to perform preprocessing operations on inputs before passing them to the main model in a bird's-eye-view (BEV) perception pipeline. This preprocessor is particularly tailored for scenarios where multiple input features need to be aggregated and transformed into a unified format. Below is a detailed analysis of each section of the code.
-
-Initialization:
-
-The constructor $(__init__)$ initializes the BEVPreprocessor by accepting two arguments:
-
-cfg: A configuration object (CfgNode) that holds the settings for the dataset, including whether ego-related data should be included.
-$in_channels$: A dictionary that maps input feature names to their respective channel dimensions.
-During initialization, it retrieves the setting for EGO from the dataset configuration and sets up a 1x1 convolutional layer (conv1x1) to perform a channel transformation. This convolutional layer takes in an input tensor with 34 channels and outputs a tensor with 38 channels, adapting the input features to match the expected size for subsequent stages of the network.
-
-Forward Method:
-The forward function processes the input features, concatenates them along the channel dimension, and applies a transformation via the convolutional layer. The function:
-
-Takes a dictionary of input tensors as an argument, with keys corresponding to different types of input features.
-Accumulates the relevant feature maps ($cam2bev_feats$, rgb2bev, observations, topology, regulations, ego) into a list.
-The ego feature is only included if it is present in the input and the EGO flag is set to True in the configuration. The unsqueeze operation on the ego feature adjusts its dimensionality for concatenation.
-These features are concatenated along the channel dimension (i.e., the third dimension, indexed as -3).
-Finally, a 1x1 convolutional layer is applied to the concatenated tensor to produce the output with the desired number of channels.
-The method returns two values:
-
-x: The transformed tensor after concatenation and convolution.
-An empty dictionary {} as a placeholder for any additional outputs that may be required in future implementations.
-This preprocessing step ensures that input features from various modalities are efficiently combined and reshaped, allowing the main model to work with a consistent representation. The use of 1x1 convolution reduces computational complexity while enabling flexible channel transformations.
-
-\begin{algorithm}[H]
-\caption{BEVPreprocessor Forward Pass}
-\SetKwInOut{Input}{Input}
-\SetKwInOut{Output}{Output}
-
-\Input{Input features dictionary \texttt{input}, Configuration object \texttt{cfg}}
-\Output{Transformed tensor $x$, Optional outputs dictionary}
-
-\BlankLine
-\textbf{Initialize:} 
-\begin{itemize}
-  \item \texttt{ego} flag from configuration \texttt{cfg.DATASET.INPUT.EGO}
-  \item 1x1 Convolution layer \texttt{conv1x1}, with 34 input channels and 38 output channels
-\end{itemize}
-
-\BlankLine
-\textbf{Forward Pass:}
-
-1. Create an empty list $x$
-
-2. \ForEach{feature in \texttt{input} dictionary}{
-   Append feature to $x$ if available, from:
-   \begin{itemize}
-       \item \texttt{cam2bev\_feats}
-       \item \texttt{rgb2bev}
-       \item \texttt{observations}
-       \item \texttt{topology}
-       \item \texttt{regulations}
-       \item \texttt{ego} (only if \texttt{ego} flag is True, after adding an additional channel dimension)
-   \end{itemize}
-}
-
-3. Concatenate all features in $x$ along the channel dimension (-3)
-
-4. Apply 1x1 convolution: $x = \texttt{conv1x1}(x)$
-
-\BlankLine
-\Return{$x$, \{\}}
-
-\end{algorithm}
-
-
-\begin{verbatim}
-# Preprocessor configuration
-preprocessor_config = {
-    'name': 'BEVPreprocessor',
-    'normalize_output': False,
-    'grid_sample_mode': ['bilinear'],
-    'locnet_backbone_channels': [32, 64, 128, 256, 256]
-}
-\end{verbatim}
-
-Qui viene riportato direttamente il codice del preprocessore, in modo che si possa andare a capire esattamente quello che succede. 
-
-
-The following pseudocode outlines the structure and operations of a Bird’s Eye View (BEV) preprocessor used in autonomous driving systems. The preprocessor integrates different types of sensor inputs (e.g., camera, RGB, topology, and regulations) and combines them into a unified format for further processing. A key feature of this preprocessor is the use of a 1x1 convolution to adjust the number of input channels, which optimizes the data for subsequent layers in a neural network.
-
-\begin{algorithm}
-\caption{BEV Preprocessor Forward Pass}
-\begin{algorithmic}[1]
-\State \textbf{Input:} Configuration $cfg$, Input Channels $in\_channels$, Input Tensors $input$
-\State \textbf{Output:} Transformed Tensor $y$, Optional Outputs $out$
-
-\State \textbf{Initialize:} 
-\State \hspace{1cm} $ego \gets cfg.DATASET.INPUT.EGO$
-\State \hspace{1cm} $conv1x1 \gets \text{Conv2d}(in\_channels=34, out\_channels=38, kernel\_size=1)$
-\State $x \gets []$ \Comment{Initialize empty list to store features}
-
-\If{'cam2bev\_feats' in input}
-    \State Append $input['cam2bev\_feats']$ to $x$
-\EndIf
-\If{'rgb2bev' in input}
-    \State Append $input['rgb2bev']$ to $x$
-\EndIf
-\If{'observations' in input}
-    \State Append $input['observations']$ to $x$
-\EndIf
-\If{'topology' in input}
-    \State Append $input['topology']$ to $x$
-\EndIf
-\If{'regulations' in input}
-    \State Append $input['regulations']$ to $x$
-\EndIf
-\If{'ego' in input \textbf{and} $ego = \text{True}$}
-    \State Append $input['ego'].unsqueeze(-3)$ to $x$
-\EndIf
-
-\State $x \gets \text{Concatenate}(x, dim=-3)$ \Comment{Concatenate features along the channel dimension}
-\State $y \gets conv1x1(x)$ \Comment{Transform channel dimensions with 1x1 convolution}
-
-\State \Return $y, \{\}$ \Comment{Return transformed tensor and an empty dictionary}
-\end{algorithmic}
-\end{algorithm}
-
-
-\begin{figure}
-        \centering
-        \includegraphics[width=0.75\linewidth]{LateX//figs/download.png}
-        \caption{Enter Caption}
-        \label{fig:enter-label}
-\end{figure}
-
-
-
-
-
-
-\begin{verbatim}
-
-
-
-
-
-@PREPROC_REGISTRY.register()
-class BEVPreprocessor(Preprocessor):
-
-RICORDARSI CHE NEL MIO CONFIG QUEL DATASET EGO è FALSE, QUINDI TENERLO IN CONSIDERAZIONE
-
-  # Initialize with configuration and input channels
-  Initialize(cfg: CfgNode, in_channels: Dict[str, int]):
-    - Set ego as cfg.DATASET.INPUT.EGO
-    - Create conv1x1: Conv2d with 34 input channels and 38 output channels
-
-  # Define the forward pass
-  forward(input: Dict[str, Tensor]) -> Tuple[Tensor, Dict[str, Tensor]]:
-    - Initialize empty list x
-    - If 'cam2bev_feats' in input:
-        Append 'cam2bev_feats' to x
-    - If 'rgb2bev' in input:
-        Append 'rgb2bev' to x
-    - If 'observations' in input:
-        Append 'observations' to x
-    - If 'topology' in input:
-        Append 'topology' to x
-    - If 'regulations' in input:
-        Append 'regulations' to x
-    - If 'ego' in input and ego is enabled:
-        Append 'ego' (with an additional dimension) to x
-
-    - Concatenate x along the channel dimension (-3)
-    - Apply conv1x1 to x
-
-    - Return the transformed tensor and an empty dictionary
-\end{verbatim}
-
-
-\begin{verbatim}
-    @PREPROC_REGISTRY.register()
-class BEVPreprocessor(Preprocessor):
-  def __init__(self, cfg: CfgNode, in_channels: Dict[str, int]):
-    super().__init__(cfg, in_channels)
-
-    self.ego = cfg.DATASET.INPUT.EGO
-    self.conv1x1 = torch.nn.Conv2d(in_channels=34, out_channels=38, kernel_size=1)
-
-  def forward(self, input: Dict[str, Tensor]) -> Tuple[Tensor, Dict[str, Tensor]]:
-    """
-    Args:
-      input (Dict[str, Tensor]): tensors used to compute the transform.
-
-    Returns:
-      y   (Tensor)           : transformed input.
-      out (Dict[str, Tensor]): optional outputs of the preprocessor.
-    """
-    x = []
-    if 'cam2bev_feats' in input:
-      x.append(input['cam2bev_feats'])
-    if 'rgb2bev' in input:
-      x.append(input['rgb2bev'])
-    if 'observations' in input:
-      x.append(input['observations'])
-    if 'topology' in input:
-      x.append(input['topology'])
-    if 'regulations' in input:
-      x.append(input['regulations'])
-    if 'ego' in input and self.ego:
-      x.append(input['ego'].unsqueeze(-3))
-      
-    x = torch.cat(x, dim=-3)
-    x = self.conv1x1(x)  # transform the number of channels
-    
-    # print(x.shape, 'dimensioni di x alla fine del nuovo preoprocessor ')
-    return x, {}
-\end{verbatim}
-
-\subsection{Input Loaders}
-Qui per esempio potrei pensare di andare a definire tutti gli input loader che utilizzo, andando nel dettaglio di quelli più succosi o meglio quelli che mi interessano di più. 
-Io pensavo di metterli tutti, sia quelli utilizzati nelle prime run, sia quelli che vengono utilizzati solamente più tardi nel processo. Sarà poi mia premura, quando spiegherò come è avvenuta la prima parte del progetto, dire che solo alcuni degli input loader sono stati utilizzati.
-
-Parlare del fatto che la mappa viene rappresentata sull'immagine con una deterimanta precisione ecc. (si tratta di un pixel per 25cm)
-
-# Size of the map area to query
-_C.DATASET.MAP_SIZE = CN()
-_C.DATASET.MAP_SIZE.XMIN = -32.0
-_C.DATASET.MAP_SIZE.XMAX =  96.0
-_C.DATASET.MAP_SIZE.YMIN = -32.0
-_C.DATASET.MAP_SIZE.YMAX =  32.0
-_C.DATASET.MAP_SIZE.CONTOUR = 50.0
-
-_C.DATASET.MAP_COMPRESSION = CN()
-# Map compression type - Options: 0 (no compression), 1 (linear), 2 (quadratic), ...
-_C.DATASET.MAP_COMPRESSION.TYPE = 0
-# Map px per m resolution in the non compressed area
-_C.DATASET.MAP_COMPRESSION.X_STEP = 5.0
-_C.DATASET.MAP_COMPRESSION.Y_STEP = 5.0
-# Distance after which the map is compressed
-_C.DATASET.MAP_COMPRESSION.X_DIST = 50.0
-_C.DATASET.MAP_COMPRESSION.Y_DIST = 20.0
-
-parlare anche delle dimensioni generali dela query (forse specificare anche di che cosa si tratta).
-
-In the context of autonomous vehicle systems, the conversion of sensor data into a multi-channel tensor representation is critical for accurate environmental perception and decision-making. The sensors, such as LiDAR, radar, and cameras, capture real-time spatial and orientation data in the vehicle’s surrounding environment. This data is typically in a world-coordinate system, such as the East-North-Up (ENU) reference frame, and must be transformed into a structured format suitable for neural network processing. The conversion process involves mapping these spatial coordinates onto a 2D canvas, where each sensor’s output can be visualized on a dedicated channel of the tensor. This multi-channel tensor serves as the input to convolutional neural networks (CNNs), enabling the system to interpret the vehicle's surroundings with high precision. Key to this approach is the use of coordinate-to-canvas conversion techniques, which ensure the spatial data is accurately represented. Additionally, resampling methods are employed to create uniform and consistent point distributions, especially when dealing with data from multiple sensors with varying resolutions. By integrating sensor data in this manner, the system can effectively represent complex environmental features, such as object locations, trajectories, and orientations, enabling robust decision-making for tasks like obstacle detection, path planning, and motion prediction.
-
-QUI SOPRA POTREBBE ESSERCI UN'INTRODUZIONE ALLA COSA, SAREBBE ANCHE CARINO FARE UNO PSUDOCODE CHE FA CAPIRE COME TUTTI GLI INOUT LAODER PER CREARE QUESTA IMMAGINE FANNO PARTE DI UNA STESSA CLASSE PADRE DI APPARTENENZA CHE RICHIEDE LORO DETERMINATE CARATTERISTICHE. 
-
-Gli input loader(S) che ho usato sono:
-- BEVObservationsLoader, EgoLoader, BoundariesInputLoader, TextureLoader, HorizontalFOVLoader, BEVWarpLoader, CamPosLoader, AttAugmentedCooordLoader, DirVectorLoader
-
-partiamo dal
-
-\subsubsection{BevObservationsLoader}
-
-
-
-\subsubsection{EGOLoader}
-Questa parte di codice va a rappresentare, nello stesso tensore che stiamo indagando, un 5x2 vehicle con le sue ego-measures. 
-Viene chiamata una funzione che restituisce un rettangolo, e vengono passate le dimensioni del veicolo a seconda del quale è stato effettivamente utilizzato per registrare le sequenze del dataset, e anche le sue coordinate, tra cui i punti nello spazio e ele sue orientazioni (heading in particolar modo). 
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.75\linewidth]{LateX//figs/egoLoader.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
-\end{figure}
-
-\subsubsection{BoundariesInputLoader}
-Questo input loader si occupa di semantic segmantation. Va a creare un tensore che rappresenta i boundaries e prende in ingresso un solito dizionario con al'interno i dati della mappa dell'area di riferimento. Parlare anche della dimensione del riferimento, che viene gestita sempre dal file di configurazione. Ci sono infatti dei limiti sia per quanto riguarda l'altezza sia per quanto riguarda la larghezza della zona di cui si va a scaricare la mappa rispetto alla posizione corrente del veicolo. 
-
-Farsi spiegare esattamente il comportamente del codice, ma in linea di massa va a prendere i dati dalla mappa e li disegna. nella mapppa ci sono i boundaries che sono di varie categorie (magari mettere un'immagine di quelli che sono i boundaries). 
-In autonomous driving, "boundaries" refer to the limits or edges of a vehicle's operational environment. These can include physical elements like the edges of a road, curbs, walls, or even virtual markers in a mapped area that define where the vehicle is allowed to operate. Boundaries are broader than lanes, which specifically define the designated space within a road where a vehicle is supposed to travel. While lanes guide a vehicle along a path of travel, boundaries prevent the vehicle from leaving its safe operating area or driving into restricted zones. Essentially, boundaries are concerned with keeping the vehicle within the permitted environment, while lanes focus on its alignment within the road.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.75\linewidth]{LateX//figs/mappaHD.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
-\end{figure}
-
-\subsubsection{TextureLoader}
-Se non ricordo male, questo si occupa semplicemente di caricare tutte le immagini provienti dalle diverse camere viste nel paragrafo in cui parlo della sensors suite. 
-
-\begin{figure}
-    \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/Screenshot 2024-09-27 at 12.00.55.png}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
-\end{figure}
-
-\susubsection{HorizontalFOVLoader}
-da quanto riesco a capire, ma anche per questo sarà meglio farsi spiegare, crea the horizontal FOV mask of the camera projected on the BEV.
-
-Il codice che hai fornito definisce un loader di input per la FOV orizzontale (Horizontal FOV Loader), specificamente per un sistema che utilizza dati di telecamere per rappresentazioni bird's-eye view (BEV). Questo loader è utilizzato per caricare e calcolare campi di vista orizzontali delle telecamere (FOV, Field of View) e inserirli in un formato utile per un modello di apprendimento automatico. Qui ti spiego nel dettaglio le varie parti del codice:
-
-1. Inizializzazione della classe HorizontalFOVLoader
-Classe: La classe HorizontalFOVLoader estende BevInputLoader, che è presumibilmente un'altra classe che gestisce input per BEV.
-Configurazione: Il costruttore accetta un parametro cfg che rappresenta la configurazione del sistema, solitamente estratta da un file YAML.
-Vengono definite due liste di telecamere: $long_cams$ (telecamere con FOV lungo) e $short_cams$ (telecamere con FOV corto), in base alle specifiche nel file di configurazione.
-Si calcolano le dimensioni delle immagini generate dalle telecamere ($long_cam_h$, $long_cam_w$, $short_cam_h$, $short_cam_w$).
-Viene configurata la dimensione della vista dall’alto ($bev_h$, $bev_w$) e un parametro booleano $attend_invalid$, che indica se gestire o meno le regioni "non valide" nella proiezione.
-2. Metodo $__call__$
-Questo metodo viene chiamato quando si esegue un'istanza di HorizontalFOVLoader con dati di input.
-
-Input: $frame_data$ è un dizionario che contiene i dati da elaborare, presumibilmente caricato da un file di serializzazione.
-Output: Il risultato è un dizionario che contiene informazioni sul campo visivo orizzontale (FOV) per diverse telecamere:
-Calcola il campo visivo orizzontale per le telecamere "long" e, se ci sono telecamere "short", anche per queste.
-Se l'opzione $attend_invalid$ è attivata, gestisce i pixel non validi all'interno dei dati.
-Il risultato finale è un dizionario contenente i tensori con i campi visivi (FOV) elaborati.
-
-3. Metodo $load_hfov$
-Questo metodo carica i campi visivi orizzontali (FOV) da dati specifici della telecamera e li prepara per l'elaborazione.
-
-Seleziona i dati delle telecamere (a seconda che siano "long" o "short").
-Per ogni telecamera, chiama $create_cam_hfov$ per generare una maschera del FOV (basata sui dati di calibrazione e sulla dimensione dell'immagine).
-Ridimensiona il FOV per adattarsi alla dimensione della vista dall’alto e restituisce il risultato come un tensore.
-4. Metodo $create_cam_hfov$
-Questo metodo crea un tensor di FOV per una telecamera specifica.
-
-Inizializza un array numpy di zeri ($hfov_tensor$) che rappresenta l'immagine BEV per il campo visivo.
-Se sono disponibili sia la calibrazione della telecamera che le dimensioni dell'immagine, viene chiamato $draw_fov$ per disegnare effettivamente il campo visivo sul tensor.
-L'array viene convertito in un tensore torch di tipo booleano.
-5. Metodo $draw_fov$
-Questo metodo effettua il calcolo geometrico per disegnare il campo visivo orizzontale (FOV) di una telecamera sulla proiezione BEV.
-
-Calcola l'angolo di FOV della telecamera usando i parametri di calibrazione (come ku e kv, che probabilmente rappresentano fattori di scala ottica).
-Calcola due direzioni che delimitano il campo visivo, rappresentate da vettori.
-Disegna il campo visivo proiettando i raggi dalle direzioni calcolate e riempiendo l'area tra questi raggi in una maschera (nel caso di telecamere "long").
-Per telecamere "short", il campo visivo viene disegnato come un'ellisse.
-6. Struttura generale e utilizzo
-Il loader calcola maschere che rappresentano le aree visibili (in termini di campo visivo) per ogni telecamera "long" e "short". Queste maschere vengono poi passate ad altre parti del sistema, probabilmente per essere utilizzate in compiti di percezione, come il rilevamento di ostacoli o l'identificazione di segnaletica stradale in un ambiente di guida.
-
-Riassunto delle funzioni principali:
-Configurazione delle telecamere: Seleziona le telecamere attive e determina la dimensione della proiezione BEV.
-Caricamento dei dati delle telecamere: Per ogni telecamera, carica e calcola i campi visivi orizzontali (FOV).
-Proiezione e disegno del FOV: Usa geometria per proiettare i campi visivi delle telecamere sulla mappa BEV.
-
-\subsubsection{BEVWarpLoader}
-
-
-quello che fa questa parte di codice alla fine non è altro che andare ad applicare augmentation quando è richiesta, altrimenti non viene neanche considerato. Essenzialmente quinid applica una traslazione ai dati che hanno formato la BEV. 
-
-\subsubsection{CamPosLoader}
-si tratta di un loader che in sintesi carica tutti i dati di calibrazione delle camere, tra cui gli intrinseci e gli estrinseci. 
-Magari fare un piccolo accenno a che parametri sono gli estrinseci e gli intrinseci in modo da sapere esattamente il loro funzionamento all'interno della ricostruzione BEV.
-
-
-\subsubsection{DirVectorLoader}
-Unprojected image coordinates
-(i.e. direction vector from origin of camera to the image plane at depth 1)
-In other words, there are the world coordinates of pixels projected with depth=1
-
-\subsubsection{Merge}
-Merging everything together, we can obtain this image which is the real input of the network. It has to be considered that there are a lot of channels each one representing information coming from different sensors. 
-\begin{figure}
-    \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/inputt.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
-\end{figure}
-
-
-\section{BEV representation}
-As depicted in (insert here the section in which the sensor suite is presented), the sensor suite is composed by 10 different cameras such as 6 long range and 4 short range. 
-
-Bird’s Eye View (BEV) map prediction is essential for downstream autonomous driving tasks like trajectory
-prediction. In the past, this was accomplished through the
-use of a sophisticated sensor configuration that captured a
-surround view from multiple cameras. However, in large-scale
-production, cost efficiency is an optimization goal, so that using
-fewer cameras becomes more relevant. But the consequence
-of fewer input images correlates with a performance drop.
-This raises the problem of developing a BEV perception
-model that provides a sufficient performance on a low-cost
-sensor setup. Although, primarily relevant for inference time
-on production cars, this cost restriction is less problematic on
-a test vehicle during training. Therefore, the objective of our
-approach is to reduce the aforementioned performance drop
-as much as possible using a modern multi-camera surround
-view model reduced for single-camera inference. The approach
-includes three features, a modern masking technique, a cyclic
-Learning Rate (LR) schedule, and a feature reconstruction
-loss for supervising the transition from six-camera inputs to
-one-camera input during training. Our method outperforms
-versions trained strictly with one camera or strictly with sixcamera surround view for single-camera inference resulting in
-reduced hallucination and better quality of the BEV map.
-FONTE:
-https://arxiv.org/pdf/2409.02676
-
-
-The Role of Behavioral Environment View (BEV) Representation in Autonomous Driving
-In the rapidly evolving field of autonomous driving, the Behavioral Environment View (BEV) representation has emerged as a crucial component in facilitating safe and efficient navigation through complex environments. The BEV serves as a holistic framework that allows vehicles to interpret and respond to their surroundings by synthesizing data from various sensors. This approach is particularly significant given the challenges posed by dynamic urban landscapes, where the interaction of multiple agents—such as vehicles, pedestrians, and cyclists—creates a complex decision-making environment (Shalev-Shwartz & Shammah, 2020).
-
-The effectiveness of BEV representation is substantially augmented by a comprehensive sensor suite, which in this context includes six long-range cameras and four short-range cameras. The long-range cameras are positioned to provide a wide field of view, typically covering distances of several hundred meters. This capability is vital for early detection of distant obstacles, such as vehicles, traffic signals, and road signs. The long-range cameras allow the vehicle to make informed decisions about trajectory planning, speed adjustments, and potential lane changes (Feng et al., 2021). For instance, detecting a red traffic light or a stop sign from a distance enables the vehicle to initiate deceleration well in advance, thus enhancing safety and passenger comfort.
-
-On the other hand, the short-range cameras play a crucial role in capturing detailed information about nearby objects within a range of approximately 30 meters. This proximity is essential for detecting immediate threats, such as pedestrians who may suddenly enter the vehicle's path or cyclists maneuvering closely beside the vehicle. Moreover, short-range cameras are invaluable during low-speed maneuvers, such as parking and navigating tight spaces. They enable the vehicle to accurately assess distances to surrounding objects, significantly reducing the risk of collisions (Krause et al., 2017).
-
-The integration of data from both long-range and short-range cameras into a cohesive BEV representation is achieved through advanced algorithms that leverage machine learning and computer vision techniques. These algorithms facilitate improved object detection, classification, and tracking, allowing the vehicle to dynamically adapt to changes in the environment. For example, the fusion of visual data with information from other sensors, such as LIDAR and radar, enhances the robustness of the BEV, leading to more accurate interpretations of the driving scene (Li et al., 2022). Such multi-sensor fusion enables the vehicle to create a comprehensive 3D model of its surroundings, which is crucial for understanding the spatial relationships between various elements.
-
-Moreover, the BEV representation goes beyond simply providing a static overview of the environment; it captures the dynamic interactions of moving agents. By incorporating temporal data, the BEV can account for the predicted trajectories of pedestrians and other vehicles, allowing the autonomous system to make proactive decisions that mitigate potential risks (Paden et al., 2016). This predictive capability is essential for ensuring that the vehicle can navigate safely and efficiently, especially in complex urban settings where the behavior of other road users can be unpredictable.
-
-The significance of BEV representation in enhancing situational awareness cannot be overstated. By synthesizing a wealth of visual data from the six long-range and four short-range cameras, autonomous vehicles can achieve a nuanced understanding of their environment. This advanced level of situational awareness contributes directly to the vehicle's decision-making processes, ultimately paving the way for safer and more reliable autonomous driving systems (Hawkins et al., 2019). As the technology continues to advance, the integration of BEV representation will play a vital role in overcoming the challenges of real-world navigation, ensuring that autonomous vehicles can operate effectively while minimizing risks to both passengers and pedestrians.
-
 \subsection{Transformers}
 The main challenge in multi-modal learning is that A first fundamental challenge is learning how to
 represent and summarise multimodal data in a way that exploits the
@@ -957,22 +493,7 @@ long-range dependencies.
 QUI IL RESTO DELLE FONTI:
 https://elly2023.dia.unipr.it/pluginfile.php/947/course/section/11808/lecture_14_2x1.pdf?time=1699954746673
 
-
-\subsection{Architecture}
-
-[TrainingEngine]: Preprocessor (BEVPreprocessor) has 0.0013M parameters                                                                                             │exiting
-                  Backbone (BiSeNetV1) has 12.6314M parameters                                                                                                      │Client handler closed
-                  Decoder (MultiUpsampleDecoder) has 0.0924M parameters                                                                                             │Client handler closed
-                  Pose_seg_head (Head) has 0.0043M parameters                                                                                                       │The client is not connected anymore - 
-                  Cam2bev (Cam2BEVUpNetSRM) has 26.4633M parameters                                                                                                 │exiting
-                  Posnet (PoseNet4) has 12.7626M parameters                                                                                                         │The client is not connected anymore - 
-                  Transform (Conv2d) has 0.0022M parameters                                                                                                         │exiting
-                  Architecture (PoseNetBEV) has 51.9576M parameters
-
-
-
-
-\subsection{MapAlign: Architecture description}
+\section{MapAlign: Architecture description}
 This section introduces MapAlign, the neural network developed in this thesis, following an initial overview of neural networks. The purpose of MapAlign is to integrate seamlessly into the pipeline of RTMG, a neural network introduced in (INSERIRE CAPITOLO) that is able to generate HD maps in real time. 
 MapAlign would be positioned in the pipeline specifically at the dataset creation stage, where it addresses a crucial requirement for RTMG: achieving perfect alignment between data from the vehicle's sensor suite and the HD map, which serves as the RTMG network’s target.
 One of MapAlign’s key contributions is automating the creation of ground-truth data by significantly reducing the need for traditional optimization methods and, most importantly, by removing the necessity for manual alignment, a step previously required to ensure data precision. This integration allows the entire system to operate with greater autonomy, enabling faster and more reliable dataset creation. 
@@ -994,7 +515,7 @@ The objective of the model is to output values to populate a rotation-translatio
 
 The model aims to predict the values of the three coordinates \( (x, y, z) \) and the heading angle \( \theta \), while contributions from pitch and roll are disregarded, as they are unnecessary for this alignment task.
 
-\subsubsection*{Input Loaders}
+\subsection{Input Loaders}
 In this subsection, all input loaders utilized in the system will be analyzed. This includes any data that the network must process. Since the network is designed to handle sensor data represented as tensors, each input is organized into tensors that construct a multi-channel image. Each channel contains data from a specific sensor, allowing for a comprehensive and layered view of the input environment.
 
 The primary input loaders are:
@@ -1035,6 +556,10 @@ The primary input loaders are:
         \label{fig:hd-map-boundaries}
     \end{figure}
     In autonomous driving, \textit{boundaries} define the edges or limits of the vehicle's operational area. These include physical elements such as road edges, curbs, walls, or even virtual markers within a mapped area, all designed to constrain the vehicle’s movement within a safe and permissible space. Boundaries differ from lane markers: while lanes guide the vehicle along its intended travel path, boundaries prevent it from straying outside its permitted area or entering restricted zones. Essentially, boundaries provide containment for safe navigation, while lanes offer directional alignment within the road structure.
+    The map data is represented with a fixed spatial resolution to ensure accurate alignment with the vehicle’s position. Specifically, each pixel corresponds to $25$ centimeters in the real world, providing a detailed, high-resolution representation suitable for tasks requiring precise localization. 
+    To focus on the relevant area around the vehicle, the map is queried within a predefined spatial boundary. The queried map area extends from $-32$ meters to $96$ meters along the x-axis and from $-32$ meters to $32$ meters along the y-axis, effectively covering the area surrounding the vehicle’s operational zone.
+    Additionally, the map compression settings help manage data density based on distance. Within a set proximity, the map’s resolution is maintained at a step of 5 meters per pixel in both x and y directions. Beyond specific distances (50 meters in x, 20 meters in y), compression is applied, reducing the map's data density to improve computational efficiency while retaining essential detail near the vehicle.
+    This balance between map precision and computational efficiency ensures the network receives high-quality spatial data, which supports accurate and efficient map-based localization and alignment.
     Using OpenCV’s \texttt{draw\_polyline} function, boundaries are traced onto the tensor, with each boundary rendered as an anti-aliased line (of type \texttt{LINE\_AA}) with a thickness of 3 pixels. This line type provides smooth and visually clear boundary representations, ensuring that boundaries are accurately depicted in the tensor, as it can be seen in the Figure below.
     \begin{figure}[H]
         \centering
@@ -1042,7 +567,7 @@ The primary input loaders are:
         \caption{IMMAGINE DA SISTEMARE}
         \label{fig:enter-label}
     \end{figure}
-    
+
     \item \textit{Texture Loader}: this loader is responsible for loading all images from the various cameras included in the sensor suite (as discussed in the relevant section). Each camera provides a unique view of the environment, capturing distinct visual information that the network can utilize for perception tasks.
     Historically, the term \textit{texture} was used in computer graphics to refer to images applied to 3D models or surfaces, giving them realistic visual details, such as color, pattern, and surface irregularities. 
     \begin{figure}[H]
@@ -1093,7 +618,7 @@ To project a 3D point from the world coordinate system onto the 2D image plane, 
 
 By loading and utilizing these matrices, the \textit{CamPosLoader} ensures that each camera’s view is correctly projected and aligned in the BEV tensor, creating an accurate unified view of the environment around the vehicle.
 
-\item DirVector Loader:\item \textit{DirVector Loader}: This loader calculates and provides the unprojected image coordinates, specifically the direction vectors from the camera origin to the image plane at a normalized depth of 1. These direction vectors represent the world coordinates of each pixel as if they were projected onto the image plane with a depth of 1, creating a unit depth field.
+\item \textit{DirVector Loader}: This loader calculates and provides the unprojected image coordinates, specifically the direction vectors from the camera origin to the image plane at a normalized depth of 1. These direction vectors represent the world coordinates of each pixel as if they were projected onto the image plane with a depth of 1, creating a unit depth field.
 
 ### Concept
 In computer vision, a direction vector describes the line of sight from the camera’s focal point (origin) to each pixel on the image plane. These vectors are normalized to a unit depth of 1, meaning they extend to a hypothetical plane one unit away from the camera. By storing these direction vectors, the \textit{DirVector Loader} allows the network to back-project or unproject image coordinates into the 3D world, facilitating depth-based calculations.
@@ -1105,7 +630,7 @@ This loader is particularly useful in 3D reconstruction tasks, as it enables the
 
 \end{itemize}
 
-\subsubsection*{Data Augmentation} 
+\subsection{Data Augmentation} 
 
 Data augmentation is a technique used to artificially increase the diversity of training data by applying random transformations. This enhances the model’s ability to generalize to real-world variations not fully captured in the original dataset, making it more robust to unexpected changes in the input data \cite{MUMUNI2022100258}.
 
@@ -1123,3 +648,83 @@ Directly using GNSS (Global Navigation Satellite System) data to align the map a
 
 Using optimized positioning data that has been corrected through standard methods, a consistent and reliable ground-truth alignment is achieved, after which the previously described augmentation is applied, in order to get the most effective and well-balanced dataset possible.
 
+In conclusion, all input loaders and data augmentation techniques have been described, detailing how each component contributes to the model's input preparation process. With these loaders and transformations in place, the network ultimately receives a well-structured and comprehensive input representation. This input integrates data from various sensors and includes augmented variations to ensure robustness, as illustrated in the figure below. The combined effect of these processes equips the network with diverse and realistic data, enhancing its ability to generalize in real-world applications.
+
+\subsection{Target Loader}
+The target loader is responsible for providing the target values that the network aims to predict. As previously described, these target values represent the transformations applied by the data augmentation block. Specifically, the network is trained to predict the roto-translation parameters: the translations along the three spatial axes and the rotation around the heading axis.
+
+This loader prepares the ground-truth values for these transformations, giving the network a reference for learning to estimate spatial adjustments. In this context, the four values the network must predict include:
+\begin{enumerate}
+    \item Translation along the x-axis,
+    \item Translation along the y-axis,
+    \item Translation along the z-axis, 
+    \item Rotation around the heading (yaw) axis.
+\end{enumerate}
+By learning these values, the network can effectively align the augmented data back to its original position, enhancing its robustness and accuracy in spatial localization.
+
+\section{Dataset}
+The dataset consists of multiple sequences recorded in various urban areas, capturing diverse driving conditions and environments. Each frame in these sequences includes not only the visual data but also synchronized information from all sensors mounted on the vehicle. This data packaging is managed by SuperDAG\footnote{Superdag is the system employed by Vislab and Ambarella for synchronizing and packaging sensor data from the perception suite on autonomous test vehicles. Leveraging CVflow, a specialized hardware co-processor, Superdag processes data using a Directed Acyclic Graph (DAG) representation, where nodes are directionally connected without forming cycles. This approach efficiently models dependencies among data components, aiding in data synchronization and alignment. CVflow directly accesses data stored as multi-dimensional tensors, maximizing memory efficiency and processing speed. The DAG structure itself visually represents and organizes data pipelines, making it ideal for managing complex relationships and dependencies in real-time perception data.}, a system designed by Vislab and Ambarella, which ensures synchronized data processing from the full perception suite.
+
+All data is packaged into a \texttt{.bin} file format to optimize storage and facilitate efficient data handling. The dataset is collected from autonomous test vehicles equipped with varying sensor suites, typically including:
+- Long-range cameras,
+- Short-range cameras,
+- Radars, and
+- GPS/GNSS sensors.
+\subsection{Sensor Suite}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{LateX/figs/sensor_suite2.pdf}
+    \caption{Illustration of the Sensor Suite Configuration. Note: Two corrections are needed in this figure—first, the central rear radar should not be present in the BEV; second, the RR (Rear Right) label in the rear view is not centered.}
+    \label{fig:sensor-suite}
+\end{figure}
+
+The long-range cameras can be utilized either as stereo cameras or mono cameras, depending on the type of test being conducted. In the specific sequences used for this project, data is sourced from six stereo cameras with a $120$-degree field of view. These cameras capture images at a resolution of $3840 \times 2160$ pixels and are used at a scale of $2$ (i.e., their dimensions are halved through pyramid scaling). This down-scaling facilitates faster inference operations by reducing computational load while retaining essential visual information.
+
+Short-range cameras are positioned lower on the vehicle to enable a 360-degree reconstruction of the environment around the car. These cameras capture images at a resolution of $1920 \times 1080$ pixels and are used at full scale. Like the long-range cameras, they are stereo cameras but with a smaller baseline. This configuration allows for deterministic and traditional depth measurements of objects, making it easier to accurately position them within the world coordinates.
+
+Pros of Using Stereo Cameras:
+\begin{itemize}
+    \item 3D Reconstruction: Stereo cameras enable the creation of 3D models and depth maps, providing a more comprehensive understanding of the scene by capturing spatial relationships between objects.
+    \item Classification: The depth and location information from stereo images assist in classifying objects based on their three-dimensional positioning, enhancing object recognition capabilities.
+\end{itemize}
+
+Cons of Using Stereo Cameras:
+\begin{itemize}
+    \item Cost: Implementing stereo cameras requires double the hardware compared to mono cameras, and they demand powerful processing units to handle the increased data volume.
+    \item Calibration Maintenance: Regular calibration is necessary to ensure accurate depth perception and alignment between the cameras. Any misalignment can lead to errors in depth estimation.
+    \item Mechanical Challenges: Higher sensor resolutions in stereo setups can introduce mechanical complexities, such as the need for auto-calibration mechanisms to maintain alignment over time.
+\end{itemize}
+
+Another crucial set of sensors are radars, which offer different advantages and disadvantages compared to stereo cameras. Radars are less dependent on external lighting conditions, allowing for reliable object detection in various weather and lighting scenarios.
+
+**Radio Detecting and Ranging (RADAR)** is a system used to detect the distance, angle, and speed of objects relative to the sensor. It operates by emitting radio or microwave signals using an array of antennas and capturing the signals that bounce back from objects in the environment. By processing these received signals, the system can extract the position, angle, and speed of targets.
+
+The signal frequency used by radar systems can range from 1 to 110 GHz. Air traffic control applications require higher precision and thus use higher frequencies, while automotive applications typically use frequencies between 40 and 77 GHz. The time of flight for radar signals is approximately 6 microseconds per kilometer, allowing for rapid distance calculations. A frequency shift in the returned signal, known as the Doppler effect, is related to the speed of the target object.
+
+Radar systems often employ a chirp or sweep signal—where the frequency increases or decreases over time—to improve the separation of targets and enhance resolution. Radars have been a consolidated technology in automotive applications for over 30 years, offering reliable performance even in adverse weather conditions. However, they may face challenges in detecting two closely spaced objects due to separation limitations.
+
+Types of Automotive Radars:
+\begin{itemize}
+    \item Long-Range Radars: Capable of detecting objects up to 300 meters away, suitable for Adaptive Cruise Control (ACC) and highway driving scenarios.
+    \item Medium-Range Radars: With a range of about 100 meters, these are effective for detecting cross traffic, aiding in lane changes, and merging maneuvers.
+    \item Short-Range Radars: Effective up to 30 meters, ideal for low-speed maneuvers such as parking and navigating in tight spaces.
+\end{itemize}
+
+On the test vehicle, multiple radars are installed, including one long-range radar positioned at the front of the vehicle and several medium-range radars strategically placed to cover the surrounding environment.
+
+At the conclusion of the dataset description, it is pertinent to highlight the specific areas of the city where the recorded sequences were collected. The data was gathered in various locations around Parma, including Via Langhirano, the train station area, and the Parma Fairgrounds. These sequences comprise a total of [insert total frame count] frames, which were divided into training and validation sets to facilitate the model's development and evaluation.
+
+During the project's development, two different dataset splits were utilized. Initially, only sequences from a specific area were used to reduce data volume and focus on refining the model's structure and functionality. This approach allowed for rapid iteration and debugging without the complexity of a large, diverse dataset. Once the foundational methodology was established and the optimal workflow was determined, the dataset was expanded to include all available recorded sequences. This expansion introduced greater diversity and complexity, enhancing the model's ability to generalize across different environments.
+
+The sequences are varied, captured under diverse weather conditions and traffic scenarios, including both well-lit days and nighttime recordings with varying illumination levels. Some sequences were recorded in adverse weather conditions, contributing to the dataset's robustness. Additionally, certain sequences lack data from some cameras (referred to as "missing modalities"). This variation is advantageous, as it trains the model to be robust against different sensor suite configurations and to handle scenarios where some sensor data may be unavailable.
+
+\section{Methodology}
+
+This section outlines the methodology employed to solve the task. After defining all the inputs and targets for the network and deserializing the required data, it is essential to describe the tools and frameworks utilized in the project. The model's detailed description and the various attempts made will be presented in the subsequent section.
+
+The entire code-base was developed in Python, chosen for its compatibility with PyTorch, the primary tool used for the neural network implementation. **PyTorch** is an open-source machine learning library developed by Facebook's AI Research lab (FAIR) in 2016. It provides a flexible platform for deep learning research and production, emphasizing dynamic computation graphs and efficient tensor computations. PyTorch's use of tensors—multi-dimensional arrays similar to NumPy arrays but with support for GPU acceleration—makes it well-suited for the computational demands of deep learning tasks.
+
+For training the neural network, \textit{CUDA} (Compute Unified Device Architecture) was employed to leverage GPU acceleration. CUDA is a parallel computing platform and programming model developed by NVIDIA, enabling dramatic increases in computing performance by harnessing the power of graphics processing units (GPUs). By utilizing CUDA, the code can perform parallel computations efficiently, significantly reducing training time and improving performance.
+
+The training phase was conducted on a dedicated server equipped with three NVIDIA Tesla V100 GPUs, each with 32 GB of memory, 256 GB of RAM, and a 64-core processor. Despite the availability of multiple GPUs, most of the training utilized a single GPU due to concurrent tasks that needed to be managed simultaneously. This setup provided the necessary computational resources to handle the intensive processing requirements of training deep neural networks.
