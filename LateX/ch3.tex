@@ -999,7 +999,7 @@ In this subsection, all input loaders utilized in the system will be analyzed. T
 
 The primary input loaders are:
 \begin{itemize}
-    \item \textit{BevObservation Loader}: This loader generates a tensor representing all Bird's-Eye View (BEV) measurements. It extracts data from the binary serialization file, creating a tensor with distinct channels for each data type, such as lane markings, road boundaries, free spaces, traffic signs, obstacles, stixels, parking, and instances. The configuration file determines which specific elements are included in the tensor.
+    \item \textit{BevObservation Loader}: this loader generates a tensor representing all Bird's-Eye View (BEV) measurements. It extracts data from the binary serialization file, creating a tensor with distinct channels for each data type, such as lane markings, road boundaries, free spaces, traffic signs, obstacles, stixels, parking, and instances. The configuration file determines which specific elements are included in the tensor.
 
     In this architecture, the focus is primarily on \textit{road boundaries}\footnote{Road boundaries refer to the edges of the roadway, such as lane markings, curbs, and other elements that define the travel lanes and guide vehicle movement. These are also present in HD maps, making them essential for aligning sensor data with map information.}. These are critical as they correspond with features present in high-definition (HD) maps.
 
@@ -1017,7 +1017,7 @@ The primary input loaders are:
         \label{fig:bev-loader}
     \end{figure}
 
-    \item \textit{Ego Loader}: This component represents the ego vehicle within the same tensor used for other sensor data, specifically representation containing its ego-measures. A function is called to generate a rectangular outline representing the vehicle's physical dimensions. These dimensions correspond to the actual vehicle used to record the dataset sequences, ensuring accurate alignment in the scene. 
+    \item \textit{Ego Loader}: this component represents the ego vehicle within the same tensor used for other sensor data, specifically representation containing its ego-measures. A function is called to generate a rectangular outline representing the vehicle's physical dimensions. These dimensions correspond to the actual vehicle used to record the dataset sequences, ensuring accurate alignment in the scene. 
     The function takes as input the vehicle's specific coordinates, including key spatial points and orientations, particularly the heading angle, which defines the vehicle's facing direction relative to the map or environment frame. The resulting rectangular representation helps the network integrate the ego vehicle's precise location and orientation into the BEV tensor, serving as a reference point for other sensory data layers.
     \begin{figure}[H]
         \centering
@@ -1026,25 +1026,100 @@ The primary input loaders are:
         \label{fig:ego-loader}
     \end{figure}
 
-    \item \textit{Boundaries Loader}: 
-\subsubsection{BoundariesInputLoader}
-Questo input loader si occupa di semantic segmantation. Va a creare un tensore che rappresenta i boundaries e prende in ingresso un solito dizionario con al'interno i dati della mappa HD dell'area di riferimento. Parlare anche della dimensione del riferimento, che viene gestita sempre dal file di configurazione. 
-Ovvero si vanno a scaricare i boundaries presenti nella mappa in un determinato rettangolo attorno alla posizione del veicolo. Ci sono infatti dei limiti sia per quanto riguarda l'altezza sia per quanto riguarda la larghezza della zona di cui si va a scaricare la mappa rispetto alla posizione corrente del veicolo. 
-
-il codice, ma in linea di massa va a prendere i dati dalla mappa e li disegna. nella mapppa ci sono i boundaries che sono di varie categorie 
-In autonomous driving, "boundaries" refer to the limits or edges of a vehicle's operational environment. These can include physical elements like the edges of a road, curbs, walls, or even virtual markers in a mapped area that define where the vehicle is allowed to operate. Boundaries are broader than lanes, which specifically define the designated space within a road where a vehicle is supposed to travel. While lanes guide a vehicle along a path of travel, boundaries prevent the vehicle from leaving its safe operating area or driving into restricted zones. Essentially, boundaries are concerned with keeping the vehicle within the permitted environment, while lanes focus on its alignment within the road.
-Dire anche, sempre riferito a questo, che vengono tracciati sul tensore attraverso draw_polyline function di opencv, e in particolar modo si tratta della categoria 16 e uno spessore di 3. 
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.75\linewidth]{LateX//figs/mappaHD.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
-\end{figure}
-
-\end{itemize}
-
+    \item \textit{Boundaries Loader}: this data-loader is responsible for semantic segmentation of the operational environment’s boundaries. This loader creates a tensor representing these boundaries, taking as input a dictionary containing HD map data of the relevant area. The reference area’s dimensions are configured in the settings file, which specifies the rectangular region around the vehicle’s position from which boundaries are extracted.
+    Boundaries are downloaded from the HD map within a specified height and width limit around the vehicle's current location. This bounding box approach ensures that only the necessary map data is loaded, enhancing efficiency while focusing on the immediate environment.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.75\linewidth]{LateX//figs/mappaHD.pdf}
+        \caption{Boundaries on HD Map}
+        \label{fig:hd-map-boundaries}
+    \end{figure}
+    In autonomous driving, \textit{boundaries} define the edges or limits of the vehicle's operational area. These include physical elements such as road edges, curbs, walls, or even virtual markers within a mapped area, all designed to constrain the vehicle’s movement within a safe and permissible space. Boundaries differ from lane markers: while lanes guide the vehicle along its intended travel path, boundaries prevent it from straying outside its permitted area or entering restricted zones. Essentially, boundaries provide containment for safe navigation, while lanes offer directional alignment within the road structure.
+    Using OpenCV’s \texttt{draw\_polyline} function, boundaries are traced onto the tensor, with each boundary rendered as an anti-aliased line (of type \texttt{LINE\_AA}) with a thickness of 3 pixels. This line type provides smooth and visually clear boundary representations, ensuring that boundaries are accurately depicted in the tensor, as it can be seen in the Figure below.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\linewidth]{LateX//figs/polyline.png}
+        \caption{IMMAGINE DA SISTEMARE}
+        \label{fig:enter-label}
+    \end{figure}
     
+    \item \textit{Texture Loader}: this loader is responsible for loading all images from the various cameras included in the sensor suite (as discussed in the relevant section). Each camera provides a unique view of the environment, capturing distinct visual information that the network can utilize for perception tasks.
+    Historically, the term \textit{texture} was used in computer graphics to refer to images applied to 3D models or surfaces, giving them realistic visual details, such as color, pattern, and surface irregularities. 
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.95\linewidth]{LateX//figs/Screenshot 2024-09-27 at 12.00.55.png}
+        \caption{Camera Textures: Images from Multiple Views}
+        \label{fig:texture-loader}
+    \end{figure}
 
+    \item \textit{CamPosLoader}: this is responsible for loading all camera calibration data, including both intrinsic and extrinsic parameters. These parameters are fundamental for accurately projecting the 3D environment onto a 2D image plane and aligning the images in BEV (Bird's-Eye View) reconstruction.
+
+### Intrinsic Parameters
+The intrinsic parameters define the camera’s internal properties, which govern how it captures and transforms 3D points into 2D pixel coordinates. These parameters are represented by the intrinsic matrix \( A \), defined as:
+\begin{equation}
+    A = \begin{bmatrix}
+    f_x & 0 & c_x \\
+    0 & f_y & c_y \\
+    0 & 0 & 1 
+    \end{bmatrix}
+\end{equation}
+where:
+\begin{itemize}
+    \item \( f_x \) and \( f_y \) are the focal lengths in the \( x \) and \( y \) directions, typically measured in pixels.
+    \item \( c_x \) and \( c_y \) are the coordinates of the principal point (optical center) on the image plane.
+\end{itemize}
+This matrix \( A \) transforms 3D points in the camera’s local coordinate system into 2D pixel coordinates. Intrinsic parameters also include distortion coefficients that correct lens distortions, which are essential for ensuring that the BEV projection remains undistorted.
+
+### Extrinsic Parameters
+The extrinsic parameters describe the camera's position and orientation relative to a fixed reference frame (often the vehicle's coordinate system). These are represented by the rotation matrix \( R \) and the translation vector \( T \), which together form the extrinsic matrix \( [R | T] \):
+\begin{equation}
+    [R | T] = \begin{bmatrix}
+    r_{11} & r_{12} & r_{13} & t_x \\
+    r_{21} & r_{22} & r_{23} & t_y \\
+    r_{31} & r_{32} & r_{33} & t_z 
+    \end{bmatrix}
+\end{equation}
+where:
+\begin{itemize}
+    \item \( R \) is a \( 3 \times 3 \) rotation matrix that orients the camera relative to the reference frame.
+    \item \( T = \begin{bmatrix} t_x & t_y & t_z \end{bmatrix}^T \) is the translation vector, which provides the camera’s position within the reference frame.
+\end{itemize}
+
+### Application in BEV Reconstruction
+To project a 3D point from the world coordinate system onto the 2D image plane, the transformation follows:
+\begin{equation}
+    \text{Pixel Coordinates} = A \cdot [R | T] \cdot \text{World Coordinates}
+\end{equation}
+
+By loading and utilizing these matrices, the \textit{CamPosLoader} ensures that each camera’s view is correctly projected and aligned in the BEV tensor, creating an accurate unified view of the environment around the vehicle.
+
+\item DirVector Loader:\item \textit{DirVector Loader}: This loader calculates and provides the unprojected image coordinates, specifically the direction vectors from the camera origin to the image plane at a normalized depth of 1. These direction vectors represent the world coordinates of each pixel as if they were projected onto the image plane with a depth of 1, creating a unit depth field.
+
+### Concept
+In computer vision, a direction vector describes the line of sight from the camera’s focal point (origin) to each pixel on the image plane. These vectors are normalized to a unit depth of 1, meaning they extend to a hypothetical plane one unit away from the camera. By storing these direction vectors, the \textit{DirVector Loader} allows the network to back-project or unproject image coordinates into the 3D world, facilitating depth-based calculations.
+
+### Arguments
+- \texttt{frame\_data} (Dict): This dictionary contains the image frame data required to calculate direction vectors, including intrinsic parameters and the camera’s position and orientation.
+
+This loader is particularly useful in 3D reconstruction tasks, as it enables the conversion of 2D pixel data into direction vectors in 3D space, which can later be scaled to match actual object distances from the camera.
 
 \end{itemize}
+
+\subsubsection*{Data Augmentation} 
+
+Data augmentation is a technique used to artificially increase the diversity of training data by applying random transformations. This enhances the model’s ability to generalize to real-world variations not fully captured in the original dataset, making it more robust to unexpected changes in the input data \cite{MUMUNI2022100258}.
+
+In this project, data augmentation is applied to simulate variations in the vehicle's position and orientation relative to the map. Using the optimized ground-truth position, known as \texttt{opt\_pose}, as the reference, augmentation introduces random rotations and shifts to mimic changes in the vehicle’s pose. This method accounts for slight discrepancies between the map alignment and the vehicle’s sensor data, preparing the model to handle similar disarrange during real-world application.
+
+Specifically, the data augmentation involves:
+\begin{itemize}
+    \item Rotation: The map is randomly rotated within a range of -30 to 30 degrees to simulate orientation variations between the map and the vehicle.
+    \item The map is shifted horizontally and vertically by up to 10\% of the image’s width and height, respectively, to account for minor lateral and vertical misalignments.
+\end{itemize}
+
+This augmentation strategy, applied during the training phase, helps the model generalize to various possible misalignments between the map and vehicle data, thereby improving robustness.
+
+Directly using GNSS (Global Navigation Satellite System) data to align the map and vehicle pose can be problematic due to variability in GNSS accuracy. In some cases, GNSS data is highly accurate, providing near-perfect alignment with minimal adjustment effort. However, in other cases, GNSS data can be significantly inaccurate due to environmental factors like signal obstruction, leading to substantial misalignments. Relying solely on GNSS data would result in an imbalanced dataset, with some examples well-aligned and others poorly aligned, which could negatively impact the training process.
+
+Using optimized positioning data that has been corrected through standard methods, a consistent and reliable ground-truth alignment is achieved, after which the previously described augmentation is applied, in order to get the most effective and well-balanced dataset possible.
+
