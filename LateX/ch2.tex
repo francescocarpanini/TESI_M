@@ -83,12 +83,38 @@ The model's behavior during evaluation aligned with expectations, and the traini
     \label{fig:evaluation-results}
 \end{figure}
 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{>{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{3.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm}}
+        \toprule
+        \textbf{Iteration} & \textbf{$\Delta$ Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta h$} \\
+        & \text{[m]} & \text{[rad] $\rightarrow$ [deg]} & \text{[m]} & \text{[m]} \\
+        \midrule
+        \num{20000} & 2.02 & 0.05 $\rightarrow$ 2.86 & 1.94 & 0.08 \\
+        \num{40000} & 1.43 & 0.22 $\rightarrow$ 12.6 & 1.37 & 0.06 \\
+        \num{60000} & 1.42 & 0.04 $\rightarrow$ 2.29 & 1.39 & 0.02 \\
+        \num{80000} & 1.99 & 0.02 $\rightarrow$ 1.15 & 1.99 & 0.00 \\
+        \num{100000} & 1.54 & 0.02 $\rightarrow$ 1.15 & 1.54 & 0.00 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Variations in pose, angle, xy, and height across different iterations.}
+    \label{tab:pose_variations}
+\end{table}
+
+
 \textbf{Comment on Results:} Despite the loss functions decreasing and reaching very low values, indicating potential generalization and effective learning, the evaluation process reveals that the results are still not optimal or acceptable. The positional error exceeds one meter, which is not sufficient for HD map alignment applications, as discussed in Chapter 1. Consequently, we decided to test alternative loss functions to determine if a different loss could improve the model’s learning process.
 
 \subsection*{L1 Loss}
 Using the L1 loss, defined similarly to the previous setup, the total loss was supplemented by two specific auxiliary losses. The results with L1 loss are consistent with previous observations. As shown in the results table below, the behavior was similar to the prior experiments, although with slightly lower values.
 
 Since the specific loss graphs did not reveal significant differences, only the results table is provided for this experiment.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{LateX//figs/IMMAGINI_L1_rete.pdf}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -114,6 +140,24 @@ In this experiment, the Smooth L1 loss, similar to L1 but less sensitive to outl
     \label{fig:smooth-l1-total-loss}
 \end{figure}
 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{>{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{3.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm}}
+        \toprule
+        \textbf{Iteration} & \textbf{$\Delta$ Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta h$} \\
+        & \text{[m]} & \text{[rad] $\rightarrow$ [deg]} & \text{[m]} & \text{[m]} \\
+        \midrule
+        \num{20000} & 2.00 & 0.11 $\rightarrow$ 6.31 & 1.98 & 0.02 \\
+        \num{40000} & 1.89 & 0.13 $\rightarrow$ 7.45 & 1.84 & 0.05 \\
+        \num{60000} & 1.45 & 0.04 $\rightarrow$ 2.29 & 1.43 & 0.02 \\
+        \num{80000} & 1.42 & 0.04 $\rightarrow$ 2.29 & 1.40 & 0.02 \\
+        \num{100000} & 1.40 & 0.03 $\rightarrow$ 1.72 & 1.40 & 0.00 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Variations in pose, angle, xy, and height across different iterations.}
+    \label{tab:pose_variations}
+\end{table}
+
 A summary of the evaluation results during training is shown below:
 
 \begin{figure}[H]
@@ -122,6 +166,24 @@ A summary of the evaluation results during training is shown below:
     \caption{Summary of Evaluation Results for Smooth L1 Loss (Table to be updated)}
     \label{fig:smooth-l1-evaluation}
 \end{figure}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{>{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{3.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm}}
+        \toprule
+        \textbf{Iteration} & \textbf{$\Delta$ Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta h$} \\
+        & \text{[m]} & \text{[rad] $\rightarrow$ [deg]} & \text{[m]} & \text{[m]} \\
+        \midrule
+        \num{20000} & 1.75 & 0.14 $\rightarrow$ 8.02 & 1.72 & 0.02 \\
+        \num{40000} & 1.81 & 0.14 $\rightarrow$ 8.02 & 1.72 & 0.02 \\
+        \num{60000} & 1.35 & 0.02 $\rightarrow$ 1.15 & 1.36 & 0.01 \\
+        \num{80000} & 1.46 & 0.02 $\rightarrow$ 1.15 & 1.46 & 0.00 \\
+        \num{100000} & 1.38 & 0.02 $\rightarrow$ 1.15 & 1.28 & 0.00 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Variations in pose, angle, xy, and height across different iterations.}
+    \label{tab:pose_variations}
+\end{table}
 
 As indicated in the table, the Smooth L1 loss yielded the best results. This outcome aligns with the characteristics of Smooth L1 loss, which merges the benefits of L1 and L2 losses. It reduces sensitivity to outliers more effectively than MSE loss, while balancing convergence speed and stability. This makes it particularly suitable for regression tasks involving spatial transformations.
 
@@ -141,6 +203,25 @@ These findings highlight the importance of consistent value scales across predic
 Given these findings, when the full dataset was utilized by merging all sequences from the three streets, only the best-performing model from the preliminary analysis (using Smooth L1 loss) was tested. The results are shown and discussed below.
 
 \textbf{Full Dataset Results:} The graphs below show improvements in angle prediction, aided by the increased data volume, Smooth L1 loss, and the angle conversion to degrees. However, the main issue remains with translation error. Despite improvements, further refinement or the use of a more precise optimization method is needed to achieve accurate HD map alignment. This model version could potentially assist in challenging scenarios but does not fully solve the alignment problem.
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{LateX//figs/l1sDEG_pose_heading_loss_comparison.png}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{loss_total_l1sDEG_progression_comparison.png}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
 
 \subsection{Inference}
 Inference was also tested on an unseen sequence that was not part of the training dataset. This sequence contained long stretches of straight road, with few distinctive textures or reference points. During inference, it appeared that the network attempted to minimize the distance but from the wrong boundary, creating good alignment for the angle but misaligning the translation by an entire lane width. An example of this behavior is shown below:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Untitled 2.pdf}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
