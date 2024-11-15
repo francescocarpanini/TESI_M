@@ -38,22 +38,14 @@ Maps are essentials to the development and implementation of autonomous driving 
 \subsection{SD Maps}
 The simplest of these are Standard-Definition (SD) maps, which are typically used in conventional GPS-based navigation systems. SD maps show a complete map of the roads, points of interest (POIs) like landmarks and businesses, basic journey information, and sometimes also traffic data. They are the digital equivalent to traditional paper maps, containing essential details needed to navigate from point A to point B, such as road networks with basic shapes and directions, addresses, and notable locations \cite{Mudduluru_SD_vs_HD_Maps, Chiang2021}.
 However SD maps alone are not enough for autonomous driving, where a vehicle must take decisions independently and requires a clear sense of its environment, they lack the fine-grained detail and real-time data necessary for the complex decision-making involved in this field.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.65\linewidth]{LateX//figs/SD_MAP.png}
-    \caption{Brevissima descrizione e indicare anche la fonte -> AppleMaps, provided by TomTom}
-    \label{fig:enter-label}
-\end{figure}
+
+***
 
 \subsection{Topological Maps}
 Topological maps, which are representations of the environment focusing on the connectivity of locations rather than geometric details, began to be explored in autonomous driving (AD) around the 2000s. They introduce a layer of connectivity that can be helpful in robot navigation. These maps represent environments through a graph structure, where intersections, pathways, and connections between road segments are shown without needing precise geometric data \cite{li2020survey}. For example, a topological map of a subway system uses nodes to represent stations, with edges representing navigable paths between them. \cite{8105770}
 Topological maps provide advantages by saving only relevant information at points called nodes, which represent specific situations, places, or landmarks. They require less memory than metric maps, which memorizes every pixel in the environment. These nodes are connected by edges, defining navigable paths between locations, and can store useful data, such as poses and scans, to aid in localization \cite{murciego2021topological}.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.75\linewidth]{LateX//figs/TOPOLOGICAL_MAP.png}
-    \caption{Brevissima descrizione e indicare anche la fonte -> in questo caso OSM}
-    \label{fig:enter-label}
-\end{figure}
+
+***
 
 \subsection{HD Maps}
 Semantic maps advance navigation by including labeled features like lanes, traffic signals, and pedestrian zones. This adds functional context to help autonomous vehicles understand road rules and identify specific areas on the road. Maps designed for this purpose are often called High-Definition (HD) Maps. These maps provide extremely high precision, down to the centimeter level \cite{geospatialworld_hd_maps}.
@@ -62,7 +54,7 @@ The idea of HD Maps began with Mercedes-Benz in 2010 and gained attention in 201
 HD Maps are crucial for autonomous driving because they allow vehicles to pinpoint their position on the road, even in busy urban areas where satellite signals might be weak, due to multi-path fading issues, or inaccurate.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\linewidth]{LateX//figs/CAP1_MERGE_HD_MAP.pdf}
+    \includegraphics[width=1\linewidth]{LateX//figs/CAP1_MERGE_HD_MAP.pdf}
     \caption{Enter Caption}
     \label{fig:enter-label}
 \end{figure}
@@ -96,19 +88,8 @@ The main advantages of HD maps are:
 
 However, the main drawback is that HD maps are hard to maintain and expensive to update. Mapping an entire continent, especially the extensive highway networks needed for mainstream vehicles, is costly, requiring millions of dollars. For automakers, the per-vehicle cost can be significant, impacting profit margins, as large fleets need up-to-date maps to function effectively \cite{gitlin2017detailedmaps}.
 The highway networks in places like Central and Western Europe add up to hundreds of thousands of kilometers, and even after completing the initial maps, parts of them quickly become outdated due to road changes and construction. Autonomous systems that rely on these maps need frequent updates—ideally within weeks, a much faster turnaround than the months typically required for standard-definition maps used by humans.
-So, HD map providers need solutions that can not only map large road networks but also update them frequently without sacrificing quality or driving up costs. Most HD mapping companies currently use specialized survey vehicles equipped with expensive, high-end sensor hardware, often costing between $200,000 and $300,000 each. To justify these high costs, these vehicles need to be in constant use. However, deploying enough of them to re-map small road sections across large regions, like the U.S. or Europe, isn’t economically feasible \cite{dahlstrom2021hdmaps}.
+So, HD map providers need solutions that can not only map large road networks but also update them frequently without sacrificing quality or driving up costs. Most HD mapping companies currently use specialized survey vehicles equipped with expensive, high-end sensor hardware, often costing between $200000\$$ and $300000\$$ each. To justify these high costs, these vehicles need to be in constant use. However, deploying enough of them to re-map small road sections across large regions, like the U.S. or Europe, isn’t economically feasible \cite{dahlstrom2021hdmaps}.
 
-\subsection{Localization on HD Maps}
+\section{Localization on HD Maps}
 
-
-
-
-https://arstechnica.com/cars/2017/03/the-most-detailed-maps-of-the-world-will-be-for-cars-not-humans/
-
-
-
-https://www.autonomousvehicleinternational.com/features/the-road-to-everywhere-are-hd-maps-for-autonomous-driving-sustainable.html
-
-
-https://www.cambridge.org/core/services/aop-cambridge-core/content/view/7FFB4F68B9C27F4312AF8DCD553205FE/S0373463319000638a.pdf/high-definition-map-for-automated-driving-overview-and-analysis.pdf
-
+\section{State of the art}
