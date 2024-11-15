@@ -1,49 +1,45 @@
 \NoBgThispage
 \chapter{MapAlign: Training and Model Approaches}
 
-This chapter provides a detailed examination of the developed architecture throughout its various phases, focusing particularly on the two approaches that yielded the most promising results.
+This chapter provides a detailed and comprehensive analysis of the developed architecture throughout its various phases, focusing particularly on the two approaches that reached the most promising results.
 
 \section{First Approach}
 
-The initial approach involved designing a model to perform the task described in previous chapters without reconstructing a complete Bird's-Eye View (BEV) from the camera images. Rather than using raw images, the model directly worked with features extracted from them, focusing on the pre-existing obstacle reconstructions.
+The initial approach involved designing a model to perform the task described in previous chapters without directly using the images. Instead of using raw images, the model directly worked with features extracted from them, focusing on the pre-existing obstacle reconstructions, by resulting in a significantly lighter input tensor, as all the data from the images was missing.
 
-In this approach, the network aimed to estimate the translation along the three spatial axes (\( x, y, z \)) and the heading angle in radians.
+The \textit{BEVPreprocessor} prepares the input data with a simple structure consisting of a single convolutional layer with just $0.0013$ million parameters, keeping it efficient. 
+The \textit{Backbone}, based on the BiSeNetV1 architecture \cite{DBLP:journals/corr/abs-1808-00897}, is the most complex component, with $12.63$ million parameters. The backbone uses two paths: 
+\begin{enumerate}
+    \item Spatial Path: Designed with a small stride to preserve spatial details, this path captures high-resolution features through several convolutional layers, emphasizing fine-grained spatial information.
+    \item Context Path: This path quickly down-samples the input to expand the receptive field, helping the model capture broader context. It utilizes Attention Refinement Modules (ARMs) and additional convolutional layers. ARMs allow the model to focus on important regions within the image, significantly contributing to the model's parameter count.
+\end{enumerate}
+A Feature Fusion Module is used to efficiently combine the features from the Spatial and Context Paths.
 
-This model, named PoseNet, processes data using input from the loader described earlier. All inputs are combined to create an 11-channel tensor optimized for pose estimation tasks. PoseNet has several key components: a preprocessor, a backbone, a decoder, and output layers. 
+The \textit{Decoder} then up-samples these features to restore them to the original input resolution, with a parameter count of $0.0924$ million. The role of the decoder is to convert high-level, low-resolution features back into the detailed, high-resolution format needed for accurate output. This component ensures that the model’s outputs match the input image's scale, making the model suitable for precise localization tasks.
 
-The **BEVPreprocessor** prepares the input data with a simple structure consisting of a single convolutional layer with just 0.0013 million parameters, keeping it efficient. The **Backbone**, based on the BiSeNetV1 architecture \cite{DBLP:journals/corr/abs-1808-00897}, is the most complex component, with 12.63 million parameters. The backbone uses two paths: 
+The head, called \textit{PoseSegHead}, generates the segmentation output, while a fully connected (Fc) layer finalizes the pose estimation. This design enables efficient and accurate pose analysis. The model’s total parameter count is optimized to balance processing efficiency and accuracy.
 
-- **Spatial Path**: Designed with a small stride to preserve spatial details, this path captures high-resolution features through several convolutional layers, emphasizing fine-grained spatial information.
-- **Context Path**: This path quickly down-samples the input to expand the receptive field, helping the model capture broader context. It utilizes Attention Refinement Modules (ARMs) and additional convolutional layers. ARMs allow the model to focus on important regions within the image, significantly contributing to the model's parameter count.
-
-A **Feature Fusion Module** is used to efficiently combine the features from the Spatial and Context Paths.
-
-The **Decoder** then upsamples these features to restore them to the original input resolution, with a parameter count of 0.0924 million. The role of the decoder is to convert high-level, low-resolution features back into the detailed, high-resolution format needed for accurate output. This component ensures that the model’s outputs match the input image's scale, making the model suitable for precise localization tasks.
-
-The head, called **PoseSegHead**, generates the segmentation output, while a fully connected (Fc) layer finalizes the pose estimation. This design enables efficient and accurate pose analysis. The model’s total parameter count is optimized to balance processing efficiency and accuracy.
-
-Figure \ref{fig:enter-label} illustrates the complete model structure.
-
-\begin{figure}
+Figure \ref{fig:enter-label12} illustrates the complete model structure.
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{LateX//figs/modello_POSENET.pdf}
-    \caption{Structure of the PoseNet Model}
-    \label{fig:enter-label}
+    \caption{Structure of the PoseNet Model INSERIRE SCHEMA}
+    \label{fig:enter-label12}
 \end{figure}
 
-The primary goal was to accurately predict the four values: translations along the \( x, y, z \) axes and the heading angle. Alongside model design, appropriate loss functions were also defined. As described in Chapter 1, the three loss functions used were L1, L1-smooth, and MSE.
-
-The main loss function encompassed all four parameters, with two additional specialized losses for the translation and heading angle. The heading angle was especially critical and challenging to learn accurately, so this structure was consistent across different model versions.
+The primary goal was to accurately predict the four values that allow the alignmente between the car pose and the HD map: translations along the \( x, y, z \) axes and the heading angle. Alongside model design, appropriate loss functions were also defined. As described in Chapter 1, the three loss functions used were L1, L1-smooth, and MSE.
+It is advantageous to employ a single loss function that accounts for all parameters collectively, as this ensures the network learns to optimize the relationships and trade-offs between them in a holistic manner. However, incorporating individual loss components for each parameter can further enhance the model's performance by encouraging it to focus on specific prediction tasks. This approach can improve interpretability, as it allows the network to account for parameter-specific nuances, and promote generalization by preventing the dominance of any single parameter in the optimization process. For this reason two additional specialized losses for the translation and heading angle were added. 
+The heading angle was especially critical and challenging to learn accurately, so this structure was consistent across different model versions.
 
 The initial iterations used the following high-level parameters:
-
-- **Data augmentation** included body rotations between -30° and 30° and horizontal and vertical shifts up to 10%.
-- **Optimizer**: Training used the SGD optimizer with a base learning rate of 0.1 and a batch size of 64.
-- **Learning Rate Scheduler**: The scheduler was WarmupPolyLR with a warm-up period of 5,000 iterations, capped at a maximum of 100,000 iterations.
-- **Automatic Mixed Precision (AMP)** was enabled to improve training speed and resource use.
+\begin{itemize}
+    \item Data augmentation: Included body rotations between $-30^\circ$ and $30^\circ$, and horizontal and vertical shifts up to $10\%$.
+    \item Optimizer: Training used the SGD optimizer with a base learning rate of \textit{0.1} and a batch size of \textit{64}.
+    \item Learning Rate Scheduler: The scheduler was WarmupPolyLR \cite{kalra2024warmuplearningrateunderlying} with a warm-up period of $5000$ iterations, capped at a maximum of $100000$ iterations.
+    \item Automatic Mixed Precision (AMP) was enabled to improve training speed and resource use.
+\end{itemize}
 
 The learning rate demonstrated the following behavior during training:
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{LateX//figs/learning_rate_progression.png}
@@ -51,13 +47,18 @@ The learning rate demonstrated the following behavior during training:
     \label{fig:learning-rate-progression}
 \end{figure}
 
-Checkpoints were saved every 100 iterations, and evaluations were conducted every 5,000 iterations using the PoseEvaluator. The evaluator calculated an L1 loss on a validation set to objectively assess the model’s performance.
+Checkpoints were saved every $100$ iterations, and evaluations were performed every $5000$ iterations using the \textit{PoseEvaluator}. The evaluator calculated the L1 loss on a validation set to objectively assess the model’s performance. The loss was computed as the absolute difference between the ground truth and predicted values for position and heading, as shown below:
+\begin{align}
+    \text{eval}_x &= |x_{\text{gt}} - x_{\text{pred}}|, \\
+    \text{eval}_y &= |y_{\text{gt}} - y_{\text{pred}}|, \\
+    \text{eval}_z &= |z_{\text{gt}} - z_{\text{pred}}|, \\
+    \text{eval}_{\theta} &= |\theta_{\text{gt}} - \theta_{\text{pred}}|.
+\end{align}
 
 Training was accelerated with CUDA, using CuDNN benchmarking for improved speed. Initial training sessions utilized only a portion of the dataset to refine the model’s structure and functionality before scaling to the full dataset.
 
 \subsubsection*{MSE}
-The first training session used MSE as the loss function, along with the parameters described above. This approach resulted in a steadily decreasing loss, as shown in the figure below:
-
+The first training session of the architecture described used MSE as the loss function, along with the parameters described above. This approach resulted in a steadily decreasing loss, as shown in the figure below:
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/loss_total_mse_progression_comparison.png}
@@ -66,7 +67,6 @@ The first training session used MSE as the loss function, along with the paramet
 \end{figure}
 
 Focusing on specific losses for the pose and heading angle, the following behavior was observed:
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/mse_pose_heading_loss_comparison.png}
@@ -75,14 +75,6 @@ Focusing on specific losses for the pose and heading angle, the following behavi
 \end{figure}
 
 The model's behavior during evaluation aligned with expectations, and the training evaluations yielded the following results:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.75\linewidth]{LateX//figs/tabella_iteration1.png}
-    \caption{Evaluation Results for Initial Iterations (Table to be updated)}
-    \label{fig:evaluation-results}
-\end{figure}
-
 \begin{table}[H]
     \centering
     \begin{tabular}{>{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{3.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm}}
@@ -101,27 +93,44 @@ The model's behavior during evaluation aligned with expectations, and the traini
     \label{tab:pose_variations}
 \end{table}
 
-
-\textbf{Comment on Results:} Despite the loss functions decreasing and reaching very low values, indicating potential generalization and effective learning, the evaluation process reveals that the results are still not optimal or acceptable. The positional error exceeds one meter, which is not sufficient for HD map alignment applications, as discussed in Chapter 1. Consequently, we decided to test alternative loss functions to determine if a different loss could improve the model’s learning process.
+Despite the loss functions decreasing and reaching very low values, indicating potential generalization and effective learning, the evaluation process reveals that the results are still not optimal or acceptable. The positional error exceeds one meter, which is insufficient for HD map alignment applications, as discussed in Chapter 1. This could be acceptable if iterative optimization is still included in the desired pipeline of the dataset generator. This approach could simply eliminate the part where the sequences had to be manually aligned. However, it was not sufficient, so other attempts were made and will be further demonstrated. 
 
 \subsection*{L1 Loss}
-Using the L1 loss, defined similarly to the previous setup, the total loss was supplemented by two specific auxiliary losses. The results with L1 loss are consistent with previous observations. As shown in the results table below, the behavior was similar to the prior experiments, although with slightly lower values.
+In this other example, the total loss was supplemented by two specific auxiliary losses using the L1 loss, defined similarly to the previous set-up. The results with the L1 loss are consistent with previous observations. 
+The figure below illustrates the behavior of the neural network. Vertically, the first three images represent the inputs: obstacles extracted directly on the car, associated HD maps, and the fusion of the two. The fourth image represents the target, which is the perfect alignment that the network aims to achieve. The last image represents the prediction by the network. As can be seen, this time, the prediction is post-processed to perform a roto-translation of the car and its world reconstruction.
 
-Since the specific loss graphs did not reveal significant differences, only the results table is provided for this experiment.
-
-\begin{figure}
+As the results demonstrate, although the measurements were taken at two distinct points during training, one at the beginning and one at the end, they are not entirely accurate. Nevertheless, a noticeable improvement in the heading angle can be observed. 
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/IMMAGINI_L1_rete.pdf}
     \caption{Enter Caption}
     \label{fig:enter-label}
 \end{figure}
 
+Since the specific loss graphs did not reveal significant differences, only the results table is provided for this experiment.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{LateX//figs/tabella_l1.png}
-    \caption{Evaluation Results for L1 Loss (Table to be updated)}
+    \caption{Evaluation Results with L1 Loss-function}
     \label{fig:l1-loss-results}
 \end{figure}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{>{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{3.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm}}
+        \toprule
+        \textbf{Iteration} & \textbf{$\Delta$ Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta h$} \\
+        & \text{[m]} & \text{[rad] $\rightarrow$ [deg]} & \text{[m]} & \text{[m]} \\
+        \midrule
+        \num{20000} & 2.00 & 0.11 $\rightarrow$ 6.31 & 1.98 & 0.02 \\
+        \num{40000} & 1.89 & 0.13 $\rightarrow$ 7.45 & 1.84 & 0.05 \\
+        \num{60000} & 1.45 & 0.04 $\rightarrow$ 2.29 & 1.43 & 0.02 \\
+        \num{80000} & 1.42 & 0.04 $\rightarrow$ 2.29 & 1.40 & 0.02 \\
+        \num{100000} & 1.40 & 0.03 $\rightarrow$ 1.72 & 1.40 & 0.00 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Variations in pose, angle, xy, and height across different iterations.}
+    \label{tab:pose_variations}
+\end{table}
 
 \subsection*{Smooth L1 Loss}
 In this experiment, the Smooth L1 loss, similar to L1 but less sensitive to outliers, was used. The training results remained consistent with expectations, but this time some interesting differences emerged, as the results showed slight improvements over previous attempts. Both loss graphs and the evaluation table are provided below to illustrate this behavior.
@@ -140,23 +149,7 @@ In this experiment, the Smooth L1 loss, similar to L1 but less sensitive to outl
     \label{fig:smooth-l1-total-loss}
 \end{figure}
 
-\begin{table}[H]
-    \centering
-    \begin{tabular}{>{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{3.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm}}
-        \toprule
-        \textbf{Iteration} & \textbf{$\Delta$ Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta h$} \\
-        & \text{[m]} & \text{[rad] $\rightarrow$ [deg]} & \text{[m]} & \text{[m]} \\
-        \midrule
-        \num{20000} & 2.00 & 0.11 $\rightarrow$ 6.31 & 1.98 & 0.02 \\
-        \num{40000} & 1.89 & 0.13 $\rightarrow$ 7.45 & 1.84 & 0.05 \\
-        \num{60000} & 1.45 & 0.04 $\rightarrow$ 2.29 & 1.43 & 0.02 \\
-        \num{80000} & 1.42 & 0.04 $\rightarrow$ 2.29 & 1.40 & 0.02 \\
-        \num{100000} & 1.40 & 0.03 $\rightarrow$ 1.72 & 1.40 & 0.00 \\
-        \bottomrule
-    \end{tabular}
-    \caption{Variations in pose, angle, xy, and height across different iterations.}
-    \label{tab:pose_variations}
-\end{table}
+
 
 A summary of the evaluation results during training is shown below:
 
