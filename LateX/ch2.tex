@@ -59,7 +59,7 @@ Neural networks are generally organized in layers:
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\linewidth]{LateX//figs/nn_intro_def.pdf}
+    \includegraphics[width=0.75\linewidth]{LateX//figs/nn_intro_def.pdf}
     \caption{Enter Caption}
     \label{fig:enter-label}
 \end{figure}
@@ -328,6 +328,33 @@ While CNNs were originally designed for image-related tasks, their versatility h
 Through these applications, CNNs have proven to be a flexible and powerful tool in both traditional and emerging fields, providing a foundation for extracting robust features that can enhance the performance of complex neural networks.
 
 \subsection{Transformers}
+The main challenge in multimodal learning is representing and summarizing multimodal data to exploit the complementarity and redundancy of multiple modalities. The heterogeneity of multimodal data adds complexity to constructing such representations. For instance, language is often symbolic, while audio and visual modalities are represented as signals \cite{baltruvsaitis2018multimodal}.
+
+Another significant challenge involves mapping data from one modality to another. Multimodal data relationships are often open-ended or subjective; for example, there can be multiple correct descriptions for an image, and a single perfect translation may not exist. Similarly, fusing information from multiple modalities to make predictions introduces further difficulties. For instance, in audio-visual speech recognition, visual lip motion must be combined with audio signals to predict spoken words, despite varying predictive power, noise levels, and the possibility of missing data \cite{baltruvsaitis2018multimodal}.
+
+Transformers were initially developed to solve sequence transduction tasks, such as neural machine translation, where an input sequence is transformed into an output sequence. Examples include speech recognition and text-to-speech transformation. Unlike Recurrent Neural Networks (RNNs), which struggle with long-range dependencies due to information loss across long chains, transformers address these limitations by introducing self-attention mechanisms \cite{vaswani2017attention}.
+
+The attention mechanism, introduced to overcome the bottleneck of fixed-length encoding vectors, enhances model capacity for handling long or complex sequences \cite{DBLP:journals/corr/VaswaniSPUJGKP17}. Attention can be formulated as:
+\begin{equation}
+\text{Attention} = f(g(x), x)
+\end{equation}
+where \( g(x) \) generates attention, corresponding to identifying discriminative regions, and \( f(g(x), x) \) processes input \( x \) based on attention \( g(x) \).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{LateX/figs/attention_transformer_architecture.pdf}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+Attention mechanisms can be categorized by their data domains:
+\begin{itemize}
+    \item \textit{What to attend to (channel):} Highlights specific features.
+    \item \textit{Where to attend to (spatial):} Focuses on spatial regions.
+    \item \textit{When to attend to (temporal):} Captures temporal dynamics.
+\end{itemize}
+
+Self-attention, the core of transformers, operates by transforming the input sequence into three vectors: queries, keys, and values. These are computed through linear transformations. The attention mechanism then calculates a weighted sum of the values based on the similarity between queries and keys. The weighted sum, combined with the original input, is processed through a feed-forward network to produce the output, enabling the model to capture long-range dependencies effectively \cite{ramachandran2019standalone}.
+
 
 
 \section{MapAlign: Architecture description}
@@ -353,7 +380,9 @@ The objective of the model is to output values to populate a rotation-translatio
 The model aims to predict the values of the three coordinates \( (x, y, z) \) and the heading angle \( \theta \), while contributions from pitch and roll are disregarded, as they are unnecessary for this alignment task.
 
 \subsection{Input Loaders}
-In this subsection, all input loaders utilized in the system will be analyzed. This includes any data that the network must process. Since the network is designed to handle sensor data represented as tensors, each input is organized into tensors that construct a multi-channel image. Each channel contains data from a specific sensor, allowing for a comprehensive and layered view of the input environment.
+The developed neural network requires data, which is mostly stored in Python dictionaries or in binary files generated directly during the sequence capture by the autonomous car.
+This subsection examines all input loaders used in the system, focusing on the data the network processes. The network is designed to work with sensor data formatted as tensors, which are structured to form multi-channel images.
+In simpler terms, each input is represented as a tensor, similar to an image, where each point—essentially a pixel—carries specific information. Each channel corresponds to data from a particular sensor, providing a detailed and layered representation of the input environment.
 
 The primary input loaders are:
 \begin{itemize}
@@ -377,6 +406,7 @@ The primary input loaders are:
 
     \item \textit{Ego Loader}: this component represents the ego vehicle within the same tensor used for other sensor data, specifically representation containing its ego-measures. A function is called to generate a rectangular outline representing the vehicle's physical dimensions. These dimensions correspond to the actual vehicle used to record the dataset sequences, ensuring accurate alignment in the scene. 
     The function takes as input the vehicle's specific coordinates, including key spatial points and orientations, particularly the heading angle, which defines the vehicle's facing direction relative to the map or environment frame. The resulting rectangular representation helps the network integrate the ego vehicle's precise location and orientation into the BEV tensor, serving as a reference point for other sensory data layers.
+    It is used especially for visual representations. 
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.75\linewidth]{LateX//figs/egoLoader.pdf}
@@ -384,27 +414,38 @@ The primary input loaders are:
         \label{fig:ego-loader}
     \end{figure}
 
-    \item \textit{Boundaries Loader}: this data-loader is responsible for semantic segmentation of the operational environment’s boundaries. This loader creates a tensor representing these boundaries, taking as input a dictionary containing HD map data of the relevant area. The reference area’s dimensions are configured in the settings file, which specifies the rectangular region around the vehicle’s position from which boundaries are extracted.
-    Boundaries are downloaded from the HD map within a specified height and width limit around the vehicle's current location. This bounding box approach ensures that only the necessary map data is loaded, enhancing efficiency while focusing on the immediate environment.
+    \item \textit{Boundaries Loader}: This data-loader is responsible for generating a semantic representation of the operational environment's boundaries. It creates a tensor that encodes these boundaries, taking as input a dictionary containing HD map data of the relevant area. The dimensions of the reference area are specified in the settings file, which defines the rectangular region around the vehicle’s position used for boundary extraction.
+    
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.75\linewidth]{LateX//figs/mappaHD.pdf}
         \caption{Boundaries on HD Map}
         \label{fig:hd-map-boundaries}
     \end{figure}
-    In autonomous driving, \textit{boundaries} define the edges or limits of the vehicle's operational area. These include physical elements such as road edges, curbs, walls, or even virtual markers within a mapped area, all designed to constrain the vehicle’s movement within a safe and permissible space. Boundaries differ from lane markers: while lanes guide the vehicle along its intended travel path, boundaries prevent it from straying outside its permitted area or entering restricted zones. Essentially, boundaries provide containment for safe navigation, while lanes offer directional alignment within the road structure.
-    The map data is represented with a fixed spatial resolution to ensure accurate alignment with the vehicle’s position. Specifically, each pixel corresponds to $25$ centimeters in the real world, providing a detailed, high-resolution representation suitable for tasks requiring precise localization. 
-    To focus on the relevant area around the vehicle, the map is queried within a predefined spatial boundary. The queried map area extends from $-32$ meters to $96$ meters along the x-axis and from $-32$ meters to $32$ meters along the y-axis, effectively covering the area surrounding the vehicle’s operational zone.
-    Additionally, the map compression settings help manage data density based on distance. Within a set proximity, the map’s resolution is maintained at a step of 5 meters per pixel in both x and y directions. Beyond specific distances (50 meters in x, 20 meters in y), compression is applied, reducing the map's data density to improve computational efficiency while retaining essential detail near the vehicle.
-    This balance between map precision and computational efficiency ensures the network receives high-quality spatial data, which supports accurate and efficient map-based localization and alignment.
-    Using OpenCV’s \texttt{draw\_polyline} function, boundaries are traced onto the tensor, with each boundary rendered as an anti-aliased line (of type \texttt{LINE\_AA}) with a thickness of 3 pixels. This line type provides smooth and visually clear boundary representations, ensuring that boundaries are accurately depicted in the tensor, as it can be seen in the Figure below.
+    
+    In autonomous driving, \textit{boundaries} refer to the edges or limits of the vehicle's navigable space. These can include physical elements such as road edges, curbs, and walls, as well as virtual markers within a mapped area. Boundaries ensure the vehicle remains within a safe, designated area and prevent it from entering restricted zones. Unlike lane markers, which guide the vehicle along a travel path, boundaries provide containment and prevent deviations from the permitted space.
+    
+    The map data uses a fixed spatial resolution to ensure precise alignment with the vehicle’s position. Each pixel corresponds to $25$ centimeters in the real world, providing high-resolution detail. To focus on the relevant area, the map is queried within a predefined region extending from $-32$ meters to $96$ meters along the x-axis and from $-32$ meters to $32$ meters along the y-axis, effectively covering the vehicle’s operational zone.
+    
+    Map compression further optimizes data density based on distance. Within a close proximity, the map’s resolution is preserved, instead beyond a specific threshold ($50$ meters along the x-axis and $20$ meters along the y-axis), data density is reduced to enhance computational efficiency while maintaining essential detail near the vehicle. This balance between precision and efficiency ensures high-quality spatial data is available for accurate map-based localization and alignment.
+    
+    The initial tensor is filled with zeros, representing the absence of boundaries. The loader determines whether boundaries are present, using binary indexing based on their positions. Only binary boundaries are loaded, without any specific thickness. Since HD map data provides boundary points, these are drawn onto the tensor using OpenCV’s \texttt{polylines} function \cite{itseez2015opencv}. Specifically, anti-aliasing polylines (\texttt{LINE\_AA}) are used, which allow intermediate values between 0 and 1 to be stored in the tensor. This approach indicates:
+    \begin{itemize}
+        \item $0$: No boundary in this pixel.
+        \item $1$: The boundary passes through this pixel.
+        \item Values between $0$ and $1$: Probability of a boundary passing through.
+    \end{itemize}
+
+    This method ensures smooth and precise boundary representation, as shown in the figure below:
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.5\linewidth]{LateX//figs/polyline.png}
-        \caption{IMMAGINE DA SISTEMARE}
-        \label{fig:enter-label}
+        \caption{Example of Boundaries Rendered with Polylines}
+        \label{fig:boundary-rendering}
     \end{figure}
-
+    
+    Using a thickness of 3 pixels, the anti-aliased polylines provide a visually smooth and accurate depiction of boundaries in the tensor.
+    
     \item \textit{Texture Loader}: this loader is responsible for loading all images from the various cameras included in the sensor suite (as discussed in the relevant section). Each camera provides a unique view of the environment, capturing distinct visual information that the network can utilize for perception tasks.
     Historically, the term \textit{texture} was used in computer graphics to refer to images applied to 3D models or surfaces, giving them realistic visual details, such as color, pattern, and surface irregularities. 
     \begin{figure}[H]
@@ -414,7 +455,43 @@ The primary input loaders are:
         \label{fig:texture-loader}
     \end{figure}
 
-    \item CamPosLoader
+    \item \textit{CamPosLoader}: this is responsible for loading all camera calibration data, including both intrinsic and extrinsic parameters. These parameters are fundamental for accurately projecting the 3D environment onto a 2D image plane and aligning the images in BEV (Bird's-Eye View) reconstruction.
+    The intrinsic parameters define the camera’s internal properties, which govern how it captures and transforms 3D points into 2D pixel coordinates. These parameters are represented by the intrinsic matrix \( A \), defined as:
+    \begin{equation}
+        A = \begin{bmatrix}
+        f_x & 0 & c_x \\ 
+        0 & f_y & c_y \\ 
+        0 & 0 & 1 
+        \end{bmatrix}
+    \end{equation}
+    where:
+    \begin{itemize}
+        \item \( f_x \) and \( f_y \) are the focal lengths in the \( x \) and \( y \) directions, typically measured in pixels.
+        \item \( c_x \) and \( c_y \) are the coordinates of the principal point (optical center) on the image plane.
+    \end{itemize}
+    This matrix \( A \) transforms 3D points in the camera’s local coordinate system into 2D pixel coordinates. Intrinsic parameters also include distortion coefficients that correct lens distortions, which are essential for ensuring that the BEV projection remains undistorted.
+    The extrinsic parameters, instead, describe the camera's position and orientation relative to a fixed reference frame (often the vehicle's coordinate system). These are represented by the rotation matrix \( R \) and the translation vector \( T \), which together form the extrinsic matrix \( [R \,|\, T] \):
+    \begin{equation}
+        [R \,|\, T] = \begin{bmatrix}
+        r_{11} & r_{12} & r_{13} & t_x \\ 
+        r_{21} & r_{22} & r_{23} & t_y \\ 
+        r_{31} & r_{32} & r_{33} & t_z 
+        \end{bmatrix}
+    \end{equation}
+    where:
+    \begin{itemize}
+        \item \( R \) is a \( 3 \times 3 \) rotation matrix that orients the camera relative to the reference frame.
+        \item \( T = \begin{bmatrix} t_x & t_y & t_z \end{bmatrix}^T \) is the translation vector, which provides the camera’s position within the reference frame.
+    \end{itemize}
+    
+    To project a 3D point from the world coordinate system onto the 2D image plane, the transformation follows:
+    \begin{equation}
+        \text{Pixel Coordinates} = A \cdot [R \,|\, T] \cdot \text{World Coordinates}
+    \end{equation}
+    
+    \item \textit{DirVector Loader}: This loader calculates and provides the unprojected image coordinates, specifically the direction vectors from the camera origin to the image plane at a normalized depth of 1. These direction vectors represent the world coordinates of each pixel as if they were projected onto the image plane with a depth of 1, creating a unit depth field.
+    
+    In computer vision, a direction vector describes the line of sight from the camera’s focal point (origin) to each pixel on the image plane. These vectors are normalized to a unit depth of 1, meaning they extend to a hypothetical plane one unit away from the camera. By storing these direction vectors, the \textit{DirVector Loader} allows the network to back-project or unproject image coordinates into the 3D world, facilitating depth-based calculations.
 
 \end{itemize}
 
