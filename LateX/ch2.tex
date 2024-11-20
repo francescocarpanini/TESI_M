@@ -355,8 +355,6 @@ Attention mechanisms can be categorized by their data domains:
 
 Self-attention, the core of transformers, operates by transforming the input sequence into three vectors: queries, keys, and values. These are computed through linear transformations. The attention mechanism then calculates a weighted sum of the values based on the similarity between queries and keys. The weighted sum, combined with the original input, is processed through a feed-forward network to produce the output, enabling the model to capture long-range dependencies effectively \cite{ramachandran2019standalone}.
 
-
-
 \section{MapAlign: Architecture description}
 This section introduces MapAlign, the neural network developed in this thesis, following an initial overview of neural networks. The purpose of MapAlign is to integrate seamlessly into the pipeline of RTMG, a neural network introduced in (INSERIRE CAPITOLO) that is able to generate HD maps in real time. 
 MapAlign would be positioned in the pipeline specifically at the dataset creation stage, where it addresses a crucial requirement for RTMG: achieving perfect alignment between data from the vehicle's sensor suite and the HD map, which serves as the RTMG network’s target.
