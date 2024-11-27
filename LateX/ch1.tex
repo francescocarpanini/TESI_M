@@ -17,7 +17,7 @@ The SAE International established a six-tier classification system in 2014, whic
 \end{figure}
 
 \begin{itemize}
-    \item Level 0: No Automation – At this level, the human driver is fully responsible for all tasks, though the vehicle may provide warnings or momentary assistance, such as automatic emergency braking (SAE J3016).
+    \item Level 0: No Automation – At this level, the human driver is fully responsible for all tasks, though the vehicle may provide warnings or momentary assistance, such as automatic emergency braking.
     \item Level 1: Driver Assistance – Vehicles at this level are equipped with systems like adaptive cruise control, where the driver remains in control but can benefit from limited automated assistance in specific scenarios.
     \item Level 2: Partial Automation – Level 2 vehicles can control both steering and acceleration/deceleration under certain conditions, but the human driver must remain attentive and ready to take over at any time.
     \item Level 3: Conditional Automation – At this level, the vehicle can manage most driving tasks, but the driver must be available to overtake when requested by the system. This level marks a significant milestone as the vehicle can make decisions autonomously under specific circumstances.
@@ -27,7 +27,7 @@ The SAE International established a six-tier classification system in 2014, whic
 
 The progression through these levels is not just a technical challenge but also involves addressing ethical, regulatory, and safety concerns. Autonomous driving technology is a complex field that incorporates artificial intelligence, sensor fusion, human-machine interaction, and cybersecurity. 
 
-Currently, the industry has achieved partial automation (level 3) in some commercial vehicles, allowing the vehicle to handle certain driving tasks with human oversight. The system is designed to activate only on pre-approved roads, meaning it won’t work just anywhere. For example, this functionality is currently available on certain highways across key regions and major city areas within approved states, linking certain metropolitan zones with limited-access highways \cite{bmw2024}.
+Currently, the industry has achieved partial automation (Level 3) in some commercial vehicles, allowing the vehicle to handle certain driving tasks with human oversight. The system is designed to activate only on pre-approved roads, meaning it won’t work just anywhere. For example, this functionality is currently available on certain highways across key regions and major city areas within approved states, linking certain metropolitan zones with limited-access highways \cite{bmw2024}.
 
 Looking ahead, certain companies have announced plans to reach level 4 automation in the near future, aiming for vehicles that can perform all driving tasks under specific conditions without human intervention. This progression is closely tied to the rise of the robo-taxi\footnote{A robo-taxi is an autonomous vehicle designed to operate as a taxi service without a human driver. Equipped with high levels of automation (at least level 4), these vehicles can navigate, pick up, and drop off passengers independently within specific operational areas or conditions} phenomenon, where fully autonomous vehicles could provide ride-hailing services without a driver. Achieving these higher levels of automation will demand sophisticated mapping and a precise, real-time reconstruction of the environment around the vehicle.
 
@@ -36,20 +36,24 @@ Looking ahead, certain companies have announced plans to reach level 4 automatio
 Maps are essentials to the development and implementation of autonomous driving systems, that help with navigation and understanding the surroundings. Self-driving cars use many types of maps that enable precise navigation and an accurate environmental perception. 
 
 \subsection{SD Maps}
-The simplest of these are Standard-Definition (SD) maps, which are typically used in conventional GPS-based navigation systems. SD maps show a complete map of the roads, points of interest (POIs) like landmarks and businesses, basic journey information, and sometimes also traffic data. They are the digital equivalent to traditional paper maps, containing essential details needed to navigate from point A to point B, such as road networks with basic shapes and directions, addresses, and notable locations \cite{Mudduluru_SD_vs_HD_Maps, Chiang2021}.
-However SD maps alone are not enough for autonomous driving, where a vehicle must take decisions independently and requires a clear sense of its environment, they lack the fine-grained detail and real-time data necessary for the complex decision-making involved in this field.
+The simplest of these are Standard-Definition (SD) maps, which are typically used in conventional GPS-based navigation systems. SD maps show a complete map of the roads, points of interest (POIs) like landmarks and businesses, basic journey information, and sometimes also traffic data. They are the digital equivalent of traditional paper maps, containing essential details needed to navigate from \textit{point A} to \textit{point B} \cite{Mudduluru_SD_vs_HD_Maps, Chiang2021}.
+However, SD maps alone are not enough for autonomous driving, where a vehicle must take decisions independently and requires a clear sense of its environment, they lack the fine-grained detail and real-time data necessary for the complex decision-making required in this field.
 
 ***
 
 \subsection{Topological Maps}
-Topological maps, which are representations of the environment focusing on the connectivity of locations rather than geometric details, began to be explored in autonomous driving (AD) around the 2000s. They introduce a layer of connectivity that can be helpful in robot navigation. These maps represent environments through a graph structure, where intersections, pathways, and connections between road segments are shown without needing precise geometric data \cite{li2020survey}. For example, a topological map of a subway system uses nodes to represent stations, with edges representing navigable paths between them. \cite{8105770}
+Topological maps, which are representations of a space that emphasizes the connectivity and relationships between different locations rather than their exact distances or physical layout, began to be explored around the 2000s. They introduce a layer of connectivity that can be helpful in robot navigation. These maps represent environments through a graph structure, where intersections, pathways, and connections between road segments are shown without needing precise geometric data \cite{li2020survey}. For example, a topological map of a subway system uses nodes to represent stations, with edges representing navigable paths between them. \cite{8105770}
 Topological maps provide advantages by saving only relevant information at points called nodes, which represent specific situations, places, or landmarks. They require less memory than metric maps, which memorizes every pixel in the environment. These nodes are connected by edges, defining navigable paths between locations, and can store useful data, such as poses and scans, to aid in localization \cite{murciego2021topological}.
 
 ***
 
+
+
 \subsection{HD Maps}
-Semantic maps advance navigation by including labeled features like lanes, traffic signals, and pedestrian zones. This adds functional context to help autonomous vehicles understand road rules and identify specific areas on the road. Maps designed for this purpose are often called High-Definition (HD) Maps. These maps provide extremely high precision, down to the centimeter level \cite{geospatialworld_hd_maps}.
-HD Maps are the most advanced mapping technology for autonomous driving. They offer highly accurate lane boundaries, detailed road layouts, and real-time traffic data, making precise localization and path planning possible. HD Maps combine data from both topological and semantic maps, delivering the high-resolution details needed to navigate complex environments safely.
+High-Definition (HD) Maps play a crucial role in autonomous driving by providing highly accurate and detailed information about the road and its surroundings. These maps are specifically designed to support navigation and decision-making for self-driving vehicles.
+
+Unlike traditional maps, HD Maps include semantic information, such as labeled features for lanes, traffic signals, pedestrian zones, and other road elements. This functional context can help understand road rules and identify specific areas with precision. With centimeter-level accuracy \cite{geospatialworld_hd_maps}, combining data from both topological and semantic maps, HD Maps can guarantee precise localization and path planning.
+
 The idea of HD Maps began with Mercedes-Benz in 2010 and gained attention in 2013 with the Bertha Drive Project. In this project, a fully autonomous Mercedes-Benz S500 successfully traveled the historic Bertha Benz Memorial Route using a highly accurate 3D map. This project, in partnership with the mapping company HERE, led to the development of the HD Live Map \cite{8105770}.
 HD Maps are crucial for autonomous driving because they allow vehicles to pinpoint their position on the road, even in busy urban areas where satellite signals might be weak, due to multi-path fading issues, or inaccurate.
 \begin{figure}[H]
@@ -71,8 +75,11 @@ For HD maps to be effective in autonomous driving, they must meet certain standa
     \item Dynamic data: HD maps should include dynamic information to support the vehicle’s decisions during driving.
 \end{enumerate}
 
-Today, several companies provide HD mapping services for autonomous driving systems. For instance, the TomTom HD Map allows vehicles to pinpoint their position on the road with centimeter-level accuracy. TomTom’s RoadDNA improves this accuracy further by offering localization layers that work well with various sensor setups, giving data in formats that boost a vehicle’s understanding of its environment. Similarly, HERE offers an HD Live Map service, which includes detailed, real-time data layers, allowing autonomous vehicles to safely navigate complex routes.
-In simple terms, HD maps are a 3D reconstruction of the road environment, helping to manage an autonomous vehicle’s behavior on the road. HD maps should include:
+Today, several companies provide HD mapping services for autonomous driving systems. For instance, the TomTom HD Map allows vehicles to locate their position on the road with centimeter-level accuracy. TomTom’s RoadDNA improves this accuracy further by offering localization layers that work well with various sensor setups, giving data in formats that boost a vehicle’s understanding of its environment. AGGIUNGERE CITAZIONE AL SERVIZIO
+
+Similarly, HERE and others maps companies, offers an HD Live Map service, which includes detailed, real-time data layers, allowing autonomous vehicles to safely navigate complex routes.
+
+In simple terms, HD maps are a 3D reconstruction of the road environment, that has to include:
 \begin{itemize}
     \item connections between lanes (including implied ones),
     \item lane markings, curbs, traffic signs, and pedestrian crossings,
@@ -86,10 +93,290 @@ The main advantages of HD maps are:
     \item They contain all the semantic information needed by an autonomous vehicle.
 \end{enumerate}
 
-However, the main drawback is that HD maps are hard to maintain and expensive to update. Mapping an entire continent, especially the extensive highway networks needed for mainstream vehicles, is costly, requiring millions of dollars. For automakers, the per-vehicle cost can be significant, impacting profit margins, as large fleets need up-to-date maps to function effectively \cite{gitlin2017detailedmaps}.
-The highway networks in places like Central and Western Europe add up to hundreds of thousands of kilometers, and even after completing the initial maps, parts of them quickly become outdated due to road changes and construction. Autonomous systems that rely on these maps need frequent updates—ideally within weeks, a much faster turnaround than the months typically required for standard-definition maps used by humans.
-So, HD map providers need solutions that can not only map large road networks but also update them frequently without sacrificing quality or driving up costs. Most HD mapping companies currently use specialized survey vehicles equipped with expensive, high-end sensor hardware, often costing between $200000\$$ and $300000\$$ each. To justify these high costs, these vehicles need to be in constant use. However, deploying enough of them to re-map small road sections across large regions, like the U.S. or Europe, isn’t economically feasible \cite{dahlstrom2021hdmaps}.
 
-\section{Localization on HD Maps}
 
-\section{State of the Art}
+
+
+The main challenge of high-definition (HD) maps is their complexity and the high cost of maintenance and updates. Mapping large areas, such as entire highway networks needed for widespread vehicle deployment, requires significant resources. For auto-makers, keeping maps up-to-date can become a major expense, as accurate maps are essential for effective operation \cite{gitlin2017detailedmaps}.
+
+Highway networks in regions like Central and Western Europe cover hundreds of thousands of kilometers. Even after the initial mapping is complete, these maps quickly become outdated due to road changes and construction. Autonomous systems depending on HD maps need frequent updates, ideally every few weeks, compared to standard maps for human drivers, which may take months to refresh. This creates a significant challenge for HD map providers to maintain quality while ensuring frequent updates.
+
+Currently, most HD mapping companies use specialized survey vehicles equipped with advanced sensors to collect data. However, deploying enough vehicles to keep maps current over large regions, such as the U.S. or Europe, remains a logistical and financial challenge \cite{dahlstrom2021hdmaps}.
+
+Combining real-time data from vehicle sensors with cloud-based HD map data creates a virtual representation of the environment, including landmarks. However, this process faces several technical bottlenecks:
+\begin{itemize}
+    \item \textbf{Data collection:} Driving for just one hour generates massive amounts of data, requiring significant storage and processing capacity.
+    \item \textbf{Data processing:} Turning raw data into usable navigation information is computationally intensive and can take days.
+    \item \textbf{Data transmission:} Current network speeds are insufficient to handle the large data volumes efficiently, even with emerging technologies like 5G.
+    \item \textbf{Latency:} Real-time operation demands extremely low latency, requiring high-performance onboard computing.
+\end{itemize}
+
+These challenges emphasize the need for a balanced approach, integrating external HD map data with the autonomous vehicle's onboard capabilities \cite{SEIF2016159, bao2022highdefinitionmapgenerationtechnologies}.
+
+Autonomous vehicles are equipped with advanced sensors that can reconstruct their surroundings in real time. This capability introduces a promising idea: creating HD maps directly onboard the vehicle without depending on external map providers.
+
+This approach offers several benefits:
+\begin{itemize}
+    \item Removes the cost of purchasing and maintaining external HD maps.
+    \item Avoids reliance on frequent external updates.
+    \item Reduces dependency on third-party providers, lowering risks of data corruption or security issues.
+\end{itemize}
+
+A neural network architecture can be developed to enable real-time HD map reconstruction. Recent approaches, such as HDMapNet \cite{li2022hdmapnetonlinehdmap}, use neural networks to reconstruct HD maps from sensor data captured by the vehicle. These systems focus on dynamically building semantic maps based on observations from onboard sensors. HDMapNet, for instance, combines image features from vehicle cameras and point clouds from LiDAR to predict map elements in bird's-eye view.
+
+To train such neural networks, precise ground truth data is essential. This thesis contributes to this process by automating the creation of training datasets. The proposed method selects ground truth data for the network's target predictions using an offline localization method with high accuracy. By automating this step, the dataset creation pipeline becomes more efficient, enabling faster data processing and analysis. This, in turn, allows the model to train with larger datasets, improving its robustness and scalability over time.
+
+\section{Localization on HD Maps - State of the Art}
+
+Localization is a fundamental subsystem in autonomous vehicles, directly impacting the accuracy and reliability of high-definition (HD) maps. The most common techniques for localization integrate data from multiple sensors, including GNSS, IMU, cameras, LiDAR, and radar, in conjunction with HD maps. These techniques can broadly be classified into odometry-based methods, map matching algorithms, and fusion-based approaches.
+
+Odometry-based methods, such as visual odometry and LiDAR odometry, estimate a vehicle's motion by comparing consecutive sensor readings. Techniques like Visual SLAM and LiDAR SLAM build on these methods by adding features like loop closure and optimization, which help improve accuracy over time. However, these methods often require significant computational power, especially in environments with many features or dense structures. CITARE PAPER
+One limitation of these methods is that they do not use a pre-existing map. This means the vehicle cannot anticipate road details, which can be a problem in challenging conditions such as bad weather or when parts of the road are blocked or obscured.
+
+Map matching algorithms align a vehicle's estimated path with features in an HD map. These algorithms can work in two modes: online, for real-time localization, and offline, for high-accuracy tasks such as creating or updating HD maps. 
+Geometric techniques, such as point-to-curve and curve-to-curve matching, are the basic methods used in map matching. Modern approaches improve these techniques by using \textit{Lanelet maps} \cite{6856487}, which represent the drivable environment with both geometric and topological details. Lanelets are small, connected road segments that can include additional information about the static environment. Vectorized HD maps are also used to improve accuracy in map matching.
+
+Fusion-based approaches combine data from multiple sensors, such as GNSS, IMU, LiDAR, and cameras, with HD map features. These methods use filtering techniques (e.g., Kalman Filters) and optimization frameworks to improve localization robustness and accuracy, even in challenging environments with occlusions or poor GNSS signals. 
+
+This section explores the state of the art in localization methods, with a focus on offline approaches that are crucial in this thesis. Localization in autonomous driving often involves recording data from the ego vehicle's sensors and compare them to ones from an HD map in order to estimate its pose. One common data format used in such tasks is the point cloud\footnote{A point cloud is a collection of 3D data points obtained from sensors like LiDAR or stereo cameras, representing locations in space and possibly additional attributes such as intensity or color.}. 
+
+Point cloud registration is the process of aligning an input scan \( S \) (source) with a map \( M \) (target). Common algorithms for this task include the Iterative Closest Point (ICP) and Normal Distributions Transform (NDT). 
+
+Although this work focuses on offline methods, other types of data and techniques will be discussed in the following sections.
+
+\subsection*{Iterative Closest Point (ICP)}
+ICP treats the registration problem as an iterative optimization process. It establishes correspondences between the nearest points in \( S \) and \( M \) and minimizes the sum of squared distances between these correspondences. The optimization problem can be expressed as:
+\begin{equation}
+    \min_{\mathbf{T}} \sum_{i=1}^{N_s} \| \mathbf{T} \mathbf{x}_i - \mathbf{y}_{\text{nearest}}(\mathbf{x}_i) \|^2,
+\end{equation}
+
+where \( \mathbf{T} \in SE(3) \) is the rigid-body transformation matrix, \( \mathbf{x}_i \) are the points in the source scan \( S \), and \( \mathbf{y}_{\text{nearest}}(\mathbf{x}_i) \) represents the nearest point in \( M \) corresponding to \( \mathbf{x}_i \). 
+The ICP algorithm alternates between two steps:
+\begin{enumerate}
+    \item \textbf{Correspondence assignment:} Find the nearest neighbors between \( S \) and \( M \).
+    \item \textbf{Pose update:} Solve for the transformation \( \mathbf{T} \) that minimizes the alignment error.
+\end{enumerate}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{LateX//figs/ICP.png}
+    \caption{Enter Caption DA SOSTITUIRE}
+    \label{fig:enter-label}
+\end{figure}
+The main drawbacks of this approach are:
+\begin{itemize}
+    \item \textbf{Sensitive to Initial Guess}: ICP needs a good starting alignment of the two shapes. If the initial positions are far apart, the algorithm might not work well and could get stuck in a wrong solution.
+    \item \textbf{Slow for Large Data}: When dealing with very large point clouds, ICP can take a lot of time because it has to match every point in one set to the closest point in the other set repetitively.
+    \item \textbf{Prone to Local Minima}: ICP might not find the best alignment if there are multiple possible alignments. Instead, it may stop at a sub-optimal solution (a \textit{local minimum}).
+    \item \textbf{Assumes Similarity}: ICP works best when the two shapes being aligned are already similar. If there are large differences (like missing parts due to obstruction or noise), the algorithm might fail.
+    \item \textbf{Sensitive to Noise and Outliers}: Points that don’t belong to the object (outliers) or errors in the data (noise) can cause the alignment to be inaccurate.
+\end{itemize}
+
+\subsection*{Normal Distributions Transform (NDT)}
+NDT takes a probabilistic approach by discretizing the map \( M \) into a grid of cells \( \ \beta_i \ \) and modeling the points within each cell as a Gaussian distribution. For each cell \( \beta_i \), the mean vector \( \boldsymbol{\mu}_i \) and covariance matrix \( \Sigma_i \) are computed as:
+\begin{equation}
+    \boldsymbol{\mu}_i = \frac{1}{n_i} \sum_{k=1}^{n_i} \mathbf{z}_k, \quad
+    \Sigma_i = \frac{1}{n_i - 1} \sum_{k=1}^{n_i} (\mathbf{z}_k - \boldsymbol{\mu}_i)(\mathbf{z}_k - \boldsymbol{\mu}_i)^\top,
+\end{equation}
+where \( \mathbf{z}_k \) are the points in cell \( \beta_i \), and \( n_i \) is the number of points in the cell.
+The likelihood of a point \( \mathbf{x}_i \) from \( S \) belonging to a cell \( \beta_i \) in \( M \) is evaluated using the multivariate Gaussian probability density function:
+\begin{equation}
+    p(\mathbf{x}_i | \beta_i) = \frac{1}{(2\pi)^{d/2} |\Sigma_i|^{1/2}} \exp\left(-\frac{1}{2} (\mathbf{x}_i - \boldsymbol{\mu}_i)^\top \Sigma_i^{-1} (\mathbf{x}_i - \boldsymbol{\mu}_i)\right)
+\end{equation}
+The transformation \( \mathbf{T} \) is then optimized to maximize the overall likelihood:
+\begin{equation}
+    \max_{\mathbf{T}} \sum_{i=1}^{N_s} p(\mathbf{T} \mathbf{x}_i | \beta_{\text{nearest}}(\mathbf{T} \mathbf{x}_i))
+\end{equation} 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{LateX//figs/NDT.png}
+    \caption{Enter Caption DA CAMBIARE}
+    \label{fig:enter-label}
+\end{figure}
+The whole process can be summarized as:
+\begin{algorithm}[H]
+\caption{Normal Distributions Transform (NDT)}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Source scan \( S \), map \( M \), initial pose \( \mathbf{T}_0 \), cell size \( c \)
+\State \textbf{Output:} Optimal transformation \( \mathbf{T} \)
+\State Discretize \( M \) into grid cells of size \( c \)
+\For{each cell \( \beta_i \) containing points}
+    \State Compute \( \boldsymbol{\mu}_i \) and \( \Sigma_i \)
+\EndFor
+\State Initialize \( \mathbf{T} = \mathbf{T}_0 \)
+\Repeat
+    \State Transform \( S \) using \( \mathbf{T} \)
+    \State Compute likelihood of each point in \( S \) given nearest cell in \( M \)
+    \State Update \( \mathbf{T} \) using a gradient-based optimizer
+\Until{Convergence criteria are met}
+\State \textbf{Return} \( \mathbf{T} \)
+\end{algorithmic}
+\end{algorithm}
+
+The main drawbacks of this approach are:
+\begin{itemize}
+    \item \textbf{Sensitive to Initial Alignment}: Like ICP, NDT also depends on a good initial alignment. Poor initial guesses can lead to misalignment or failure to converge.
+    \item \textbf{Computational Cost}: The algorithm can be computationally expensive, especially for large datasets, as it involves dividing space into grids and performing complex calculations.
+    \item \textbf{Parameter Tuning}: NDT requires careful tuning of parameters, such as grid size. Improper settings can lead to inaccurate results or slow performance.
+    \item \textbf{Assumes Gaussian Distribution}: NDT assumes that points within each grid cell follow a Gaussian distribution. This assumption may not hold true in some real-world scenarios, leading to errors.
+    \item \textbf{Not Robust to Noise}: NDT can struggle with noisy or incomplete data, which can disrupt the formation of accurate Gaussian models.
+\end{itemize}
+
+Both ICP and NDT are essential tools for scan matching, with ICP being suitable for fine alignment and NDT offering robustness in environments with noise and sparse data.
+
+\subsection*{Path Optimization Without Point Clouds}
+
+While methods like Iterative Closest Point (ICP) and Normal Distributions Transform (NDT) are effective for point cloud-based alignment, there are alternative approaches that do not rely on point clouds. One such technique involves leveraging data from other sources, such as GNSS and visual odometry, to reconstruct and optimize the vehicle's path on an HD map. This approach is particularly useful when point cloud data is unavailable or when computational efficiency is a priority.
+
+To achieve this, several steps are undertaken:
+\begin{enumerate}
+    \item \textbf{Data Acquisition}: Data is collected from the Global Navigation Satellite System (GNSS) or through a combination of GNSS and visual odometry. These data sources provide an initial estimate of the vehicle's path.
+    \item \textbf{Path Reconstruction}: By analyzing the GNSS or odometry data, a preliminary path of the vehicle is reconstructed on the map. However, this path often contains inaccuracies, such as the vehicle being mapped through parking spots or over curbs—areas that were not actually covered. 
+    \item \textbf{Manual Correction}: To refine the reconstructed path, an operator provides key points through which the vehicle certainly passed. These points are typically centered within the permissible lane boundaries, guiding the optimizer toward a more accurate solution.
+    \item \textbf{Optimization Process}: A robust optimization algorithm is applied to align the reconstructed path with the HD map. This involves:
+    \begin{itemize}
+        \item Minimizing the distance between observed map boundaries (e.g., lanes, curbs) and their counterparts on the HD map.
+        \item Enforcing constraints that ensure the vehicle passes close to the manually specified points.
+        \item Maintaining relative positional consistency between successive frames, ensuring smoothness in the optimized path.
+    \end{itemize}
+\end{enumerate}
+
+The result is an optimized path that closely matches the true trajectory of the vehicle. This process ensures that the vehicle’s estimated position aligns with the HD map's features, as illustrated in Figure~\ref{fig:optimizer}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{LateX//figs/opt_pose.png}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{drhxfc.pdf}
+    \caption{Illustration of the path optimization process. The figure shows the initial path (orange), manually specified points (green), and the final optimized path (red) overlaid on the HD map.}
+    \label{fig:optimizer}
+\end{figure}
+
+
+The operations described can be summarized in the following pseudo-code:
+\begin{algorithm}[H]
+\caption{Vehicle Path Optimization on HD Maps}
+\begin{algorithmic}[1]
+\State \textbf{Input:} GNSS/visual odometry data $\mathcal{D}$, HD map $\mathcal{M}$, manual waypoints $\mathcal{W}$
+\State \textbf{Output:} Optimized path $\mathcal{P}_{\text{opt}}$
+\State \textbf{Initialize:} Ceres problem $\mathcal{C}$, weights $\lambda$, max iterations $T_{\text{max}}$
+
+\State \textbf{Step 1:} Reconstruct preliminary path $\mathcal{P}_{\text{init}}$ using $\mathcal{D}$.
+\State \textbf{Step 2:} Identify keyframes $\mathcal{F}$:
+\For {each frame $f_i \in \mathcal{D}$}
+    \If {frame is a manual waypoint $w_i \in \mathcal{W}$}
+        \State Add $f_i$ to $\mathcal{F}$
+    \EndIf
+\EndFor
+
+\State \textbf{Step 3:} Add constraints to $\mathcal{C}$:
+\For {each frame $f_i \in \mathcal{F}$}
+    \If {$f_i$ has manual waypoint $w_i$}
+        \State Add manual pose constraint to $\mathcal{C}$
+    \EndIf
+    \State Add relative pose constraints to $\mathcal{C}$ between $f_i$ and neighbors
+    \State Add perception constraints (e.g., lanes, curbs) to $\mathcal{C}$
+\EndFor
+
+\State \textbf{Step 4:} Solve optimization problem:
+\State Configure Ceres options with $T_{\text{max}}$, threads, and convergence criteria
+\State Solve $\mathcal{C}$ using Ceres solver
+
+\State \textbf{Step 5:} Interpolate poses between keyframes:
+\For {each consecutive frame pair $(f_i, f_j) \in \mathcal{F}$}
+    \For {each intermediate frame $f_k$ between $f_i$ and $f_j$}
+        \State Interpolate pose of $f_k$ using weighted average of $f_i$ and $f_j$
+    \EndFor
+\EndFor
+
+\State \textbf{Return:} $\mathcal{P}_{\text{opt}}$, the optimized path
+\end{algorithmic}
+\end{algorithm}
+
+To address the challenge of aligning the vehicle's estimated trajectory with the HD map and correcting inaccuracies in the reconstructed path, the Ceres Solver \cite{Agarwal_Ceres_Solver_2022} can work properly. Ceres is a robust, open-source non-linear least-squares optimizer widely used in robotics and computer vision. It operates by minimizing the sum of squared residuals between the observed and expected values. In this context, the residuals represent discrepancies such as the distance between the vehicle's estimated path and the HD map features (e.g., lanes, curbs), as well as the differences in relative poses between successive frames. By incorporating constraints like manual waypoints and map observations, Ceres ensures that the optimized trajectory is both accurate and smooth, closely matching the vehicle's true path. 
+
+The same pipeline can be used with other optimizers that could solve this problem include \textit{g2o} \cite{Kummerle_g2o_2011}, a graph-based optimization framework widely used in simultaneous localization and mapping (SLAM), and the \textit{Levenberg-Marquardt} algorithm \cite{Levenberg_LMA_1944, Marquardt_LMA_1963}, a hybrid optimization method combining gradient descent and Gauss-Newton techniques for non-linear least squares. 
+
+Bundle adjustment frameworks \cite{Triggs_BA_1999}, which refine poses and 3D points in structure-from-motion, can also be adapted for trajectory alignment. Additionally, \textit{GTSAM} (Georgia Tech Smoothing and Mapping) \cite{Dellaert_GTSAM_2012}, a library for factor graph-based optimization, is well-suited for problems requiring trajectory smoothing and constraint handling. Non-linear programming solvers such as \textit{IPOPT} \cite{Wachter_IPOPT_2006} are another option, providing robust constraint management for trajectory refinement. 
+
+In addition to traditional optimization methods, recent advancements in neural network-based algorithms offer a promising alternative for solving trajectory alignment and localization problems. For example, \textit{OrienterNet} \cite{sarlin2023orienternetvisuallocalization2d} shows how neural networks can predict precise orientations and locations directly from visual data.
+
+Unlike many visual localization algorithms that depend on complex 3D point clouds, which are expensive to create, store, and maintain, OrienterNet uses simpler 2D semantic maps. It estimates the location and orientation of an image by matching a neural Bird’s-Eye View with globally available maps like OpenStreetMap. This allows localization anywhere such maps are accessible. OrienterNet is trained using only camera poses and learns to match semantic map elements in an end-to-end manner. This approach automates the alignment process by learning directly from large-scale data.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\linewidth]{LateX//figs/2304.02009v1.pdf}
+    \caption{Enter Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+Their implementation consists of an image network (\( \Phi_{\text{image}} \)) and map network (\( \Phi_{\text{map}} \)) that are U-Nets with ResNet101 and VGG-16 as backbones. The Bird’s-Eye View (BEV) network (\( \Phi_{\text{BEV}} \)) consists of 4 residual blocks. The BEV grid covers an area of \( 32 \times 32 \, \text{m} \) with a pixel-resolution of \( \Delta = 50 \, \text{cm} \).
+
+
+Another approach is presented in Visual Cross-View Metric Localization with Dense Uncertainty Estimates \cite{xia2022visualcrossviewmetriclocalization}, which addresses visual cross-view metric localization for outdoor robotics. The goal is to determine the location of a ground-level camera within a satellite image patch that shows the surrounding area. Unlike previous work that focused on range sensors (e.g., LiDAR, Radar) or used vision as a secondary regression step after cross-view image retrieval, this method focuses directly on metric localization. 
+
+The implementation assumes the availability of a rough localization prior, such as GPS/GNSS, odometry, or other robot localization methods. The architecture takes a ground-level image \( G \) and a top-down satellite image \( S \) of size \( L \times L \), representing the local area where \( G \) was captured. The goal is to estimate the 2D image coordinates \( X \in [0, 1]^2 \) within \( S \) corresponding to the ground camera's location.
+
+The network uses a Siamese-like architecture without weight sharing. Each input (ground or satellite) is processed through a VGG feature extractor. For the satellite branch, features are transformed into a \( L' \times L' \times 512 \) volume. Spatial-Aware Feature Aggregation (SAFA) modules are then applied, generating 512-dimensional vectors that are concatenated to form a single global descriptor of size \( 1 \times 1 \times 4096 \). The matching is performed using cosine similarity. This architecture provides dense probabilistic outputs, which are particularly useful for downstream tasks like sensor fusion.
+
+The final related work discussed is BEV-Locator: An End-to-End Visual Semantic Localization Network Using Multi-View Images \cite{zhang2022bevlocatorendtoendvisualsemantic}. Traditional visual localization methods solve the semantic map-matching problem using geometric models. These models often require complex parameter tuning, which limits their scalability for large-scale applications. 
+
+BEV-Locator introduces a different approach by using a neural network for end-to-end visual semantic localization with multi-view camera images. The system works as follows: A visual Bird’s-Eye-View (BEV) encoder processes and transforms multi-view images into the BEV space. Semantic map features are encoded into structured vectors called map queries. A cross-modal transformer then associates BEV features with these map queries using cross-attention. Finally, the ego vehicle's pose is inferred by decoding the transformer's output. 
+
+The implementation includes:
+\begin{itemize}
+    \item \textbf{BEV Encoder:} Extracts features from surrounding images and projects them into BEV space.
+    \item \textbf{Semantic Map Encoder:} Encodes semantic map information into structural vectors, used as map queries for the transformer module.
+    \item \textbf{Cross-Modal Transformer:} Computes attention and queries the ego vehicle's pose using map queries and BEV features.
+    \item \textbf{Pose Decoder:} Converts the query vectors into the vehicle's pose.
+\end{itemize}
+
+To summarize the current state of the art that inspired MapAlign, a set of offline methods for localization on HD maps using deep learning-based neural networks for automatic ground truth generation, is presented a Table that shows the results of these methods, which will be used for comparison in later sections.
+
+\begin{table}[H]
+\renewcommand{\arraystretch}{1.15}
+\centering
+\scriptsize
+\caption{List of Map Matching Localization Methods AGGIUSTARE} 
+\label{table:map_matching_methods}
+\begin{tabular}{@{}
+    >{\centering\arraybackslash}p{2.25cm}
+    >{\centering\arraybackslash}p{0.75cm}
+    >{\centering\arraybackslash}p{1.25cm}
+    >{\centering\arraybackslash}p{2.0cm}
+    >{\centering\arraybackslash}p{1.25cm}
+    >{\centering\arraybackslash}p{1.25cm}
+    >{\centering\arraybackslash}p{2.0cm}
+    >{\centering\arraybackslash}p{1.25cm}
+@{}}
+\toprule
+\textbf{Method} & \textbf{Year} & \textbf{Type} & \textbf{Map Types} & \textbf{Online} & \textbf{Offline} & \textbf{Sensors} & \textbf{Accuracy (m)} \\ \midrule
+Point to Point matching \cite{bernstein1996mapmatching} & 1996 & Geometric & Navigation map & \checkmark & \checkmark & GNSS, IMU & n/a \\
+Arcs matching \cite{WHITE200091} & 2000 & Geometric & Navigation map & \checkmark & \checkmark & GNSS, IMU & n/a \\
+Frèchet Distance \cite{chen2011frechet} & 2011 & Geometric & Navigation map & \checkmark & \checkmark & GNSS, IMU & n/a \\
+Lane marking matching \cite{6629509} & 2013 & Feature matching & Vector map & \checkmark & \checkmark & GNSS, IMU, Monocular, Stereo & n/a \\
+High Precision Digital Maps \cite{6615239} & 2013 & Feature matching & Vector map & \checkmark & \checkmark & GNSS, IMU, Stereo & 1.00 \\
+Point Cloud matching \cite{6942558} & 2014 & Feature matching & Dense point cloud map & \checkmark & \checkmark & GNSS, IMU, LIDAR & 0.25 \\
+Road segment connectivity \cite{QUDDUS2015328} & 2015 & Geometric & Navigation map & \checkmark & \checkmark & GNSS, IMU & n/a \\
+Camera matching \cite{7759304} & 2016 & Feature matching & Dense point cloud map & \checkmark & \checkmark & GNSS, IMU, LIDAR & 0.30 \\
+Point Group Association \cite{7528079} & 2016 & Landmark matching & Navigation map & \checkmark & \checkmark & GNSS, IMU, MMW radar & n/a \\
+Sensors Fusion \cite{7547970} & 2017 & Feature matching & Vector map & \checkmark & \checkmark & GNSS, IMU, Stereo, Wheel encoder & 0.73 \\
+HD Maps and GNSS \cite{li2017hdmaps} & 2017 & Particle filter & Navigation map & \checkmark & \checkmark & GNSS, IMU & 4.70 \\
+Fusion Map \cite{8317804} & 2018 & Multi hypotheses & Navigation map & \checkmark & \checkmark & GNSS, IMU & 1.75 \\
+Lane Marking matching \cite{8569951} & 2018 & Feature matching & Vector map & \checkmark & \checkmark & GNSS, IMU & 0.04 \\
+Visual Localization \cite{DBLP:journals/corr/abs-1801-05269} & 2018 & Feature matching & Dense point cloud map & \checkmark & \checkmark & GNSS, IMU, LIDAR & 0.60 \\
+Compact Semantic Map \cite{DBLP:journals/corr/abs-1805-06155} & 2018 & Feature matching & Vector map & \checkmark & \checkmark & GNSS, IMU & 0.35 \\
+Sparse Semantic Map \cite{DBLP:journals/corr/abs-1908-03274} & 2019 & Feature matching & Lightweight vector map & \checkmark & \checkmark & GNSS, IMU, Stereo & 0.51 \\
+Closest Point (ICP) \cite{s20082166} & 2020 & Feature matching & Vector map & \checkmark & \checkmark & GNSS, IMU, Stereo & 0.48 \\
+Monocular Localization \cite{s20071870} & 2020 & Feature matching & Lightweight vector map & \checkmark & \checkmark & GNSS, IMU, Stereo & 0.24 \\
+Visual Odometry and HD Maps \cite{9304659} & 2020 & Feature matching & Lightweight vector map & \checkmark & \checkmark & GNSS, IMU, Stereo & 0.15 \\
+Visual Semantic Localization \cite{wang2021visual} & 2021 & Feature matching & Lightweight vector map & \checkmark & \checkmark & GNSS, IMU, Stereo, Wheel encoder & 0.13 \\
+Microphones and Sparse Map \cite{article11} & 2021 & Probabilistic model & Lightweight vector map & \checkmark & \checkmark & GNSS, IMU, Microphone & 0.30 \\
+Multi-sensors localization \cite{9772400} & 2022 & Neural network & Lightweight vector map & \checkmark & \checkmark & GNSS, IMU, Wheel encoder & 0.13 \\
+Multi-view images \cite{zhang2022bevlocatorendtoendvisualsemantic} & 2022 & End-to-end learning & Lightweight vector map & \checkmark & \checkmark & GNSS, IMU, Multi-view camera & 0.09 \\
+Road shape matching \cite{article122} & 2023 & Geometric & Lightweight vector map & \checkmark & \checkmark & GNSS, IMU & 3.69 \\ \bottomrule
+\end{tabular}
+\end{table}
