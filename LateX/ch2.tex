@@ -661,8 +661,8 @@ During the project's development, two different dataset splits were utilized. In
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/vie_citta.png}
-    \caption{CAMBIARE IMMAGINE, METTERE EVIDEZIAZIONE DELLE VIE}
+    \includegraphics[width=1\linewidth]{LateX//figs/sequence_map.pdf}
+    \caption{Enter Caption}
     \label{fig:enter-label}
 \end{figure}
 The sequences are varied, captured under diverse weather conditions and traffic scenarios, including both well-illuminated days and nighttime recordings with varying illumination levels. Some sequences were recorded in adverse weather conditions, contributing to the dataset's robustness. Additionally, certain sequences lack data from some cameras (referred to as \textit{missing modalities}). This variation is advantageous, as it trains the model to be robust against different sensor suite configurations and to handle scenarios where some sensor data may be unavailable.
@@ -680,4 +680,4 @@ The entire code-base was developed in Python, chosen for its compatibility with 
 
 For training the neural network, \textit{CUDA} (Compute Unified Device Architecture) was employed to leverage GPU acceleration \cite{cuda}. CUDA is a parallel computing platform and programming model developed by NVIDIA, enabling dramatic increases in computing performance by harnessing the power of graphics processing units (GPUs). By utilizing CUDA, the code can perform parallel computations efficiently, significantly reducing training time and improving performance.
 
-The training phase was conducted on a dedicated server equipped with three NVIDIA Tesla V100 GPUs, each with 32 GB of memory, 256 GB of RAM, and a 64-core processor. Despite the availability of multiple GPUs, most of the training utilized a single GPU due to concurrent tasks that needed to be managed simultaneously. This setup provided the necessary computational resources to handle the intensive processing requirements of training deep neural networks.
+The training phase was conducted on a dedicated server equipped with three NVIDIA Tesla V100 GPUs, each with $32$ GB of memory, $256$ GB of RAM, and a 64-core processor. Despite the availability of multiple GPUs, most of the training utilized a single GPU due to concurrent tasks that needed to be managed simultaneously. This setup provided the necessary computational resources to handle the intensive processing requirements of training deep neural networks.
