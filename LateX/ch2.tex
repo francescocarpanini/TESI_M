@@ -1,18 +1,19 @@
 \NoBgThispage
 \chapter{MapAlign: Deep-Learning based approach}
 
+This chapter introduces neural networks, providing the foundational concepts needed to understand the architecture developed for MapAlign. It emphasizes the critical role of data in this process, followed by an explanation of the dataset and the methods used to manage data in MapAlign and its architecture. 
+
 \section{Neural Networks}
 Neural Networks (NNs) are computational models inspired by the structure and functionality of the human brain, consisting of interconnected layers of neurons. Just as biological neurons process signals transmitted across synapses, artificial neurons in a neural network receive inputs, process them, and generate outputs \cite{Grosan2011}. These networks are primarily used in a wide range of machine learning tasks such as image recognition, natural language processing, and predictive analytics.
 In this chapter the building blocks, main principles, and training methodologies of neural networks will be explored, starting with an in-depth discussion of the neuron as the basic unit.
 
 \subsection{Neuron and its Function}
 At the core of every neural network lies the artificial neuron, modeled after its biological counterpart. Each neuron receives input signals, which are processed and combined to produce an output. Mathematically, this process is represented as follows \cite{10.11648/j.ajnna.20190501.12}:
-% Neuron Input
 \begin{equation}
     \textit{net}_i = \sum_{j=1}^{d} w_{ji} \cdot \textit{in}_j + b_{0i}
 \end{equation}
 
-Here, $(\text{in}_1, \text{in}_2, \ldots, \text{in}_d)$ are the $d$ inputs the neuron receives, analogous to signals received by biological neurons through synapses. These inputs are weighted by $w_{ji}$, which are the synaptic weights, representing the strength of the connection between neurons, which can be either positive (if one unit excites another) or negative (if one unit suppresses or inhibits another). The higher the weight, the more influence one unit has on another (This corresponds to the way actual brain cells trigger one another across synapses) \cite{10.11648/j.ajnna.20190501.12}.
+Where, $(\text{in}_1, \text{in}_2, \ldots, \text{in}_d)$ are the $d$ inputs the neuron receives, analogous to signals received by biological neurons through synapses. These inputs are weighted by $w_{ji}$, which are the synaptic weights, representing the strength of the connection between neurons, which can be either positive (if one unit excites another) or negative (if one unit suppresses or inhibits another). The higher the weight, the more influence one unit has on another (This corresponds to the way actual brain cells trigger one another across synapses) \cite{10.11648/j.ajnna.20190501.12}.
 
 Learning in a neural network is essentially an adjustment of these weights. The term $b_{0i}$ is a bias that helps adjust the output and enhances the model's flexibility. The sum of these weighted inputs results in the neuron’s excitation level, denoted as $\textit{net}_i$.
 Once the net input ${net}_i$ is computed, the neuron applies an activation function $f(\cdot)$ to determine the output:
@@ -21,26 +22,25 @@ Once the net input ${net}_i$ is computed, the neuron applies an activation funct
     \textit{out}_i = f(\textit{net}_i)
 \end{equation}
 
-The activation function introduces non-linearity to the model, enabling neural networks to learn complex, non-linear mappings between inputs and outputs. Common activation functions include:
+The activation function makes the model non-linear, helping neural networks learn complex relationships between inputs and outputs. Without it, the network would only apply simple linear transformations, with the consequence that it could only learn basic patterns. By adding non-linearity, the network can understand and learn more complicated connections through the data.
+
+The most commonly used activation functions are summarized below and their behavior is illustrated in Figure~\ref{fig:activation-functions}:
 \begin{itemize}
-    \item Sigmoid: Outputs values between $0$ and $1$.
-    \item Tanh: Outputs values between $-1$ and $1$.
-    \item ReLU: Outputs values following: $f(\textit{net}_i) = \max(0, \textit{net}_i)$.
+    \item Sigmoid: Outputs values between $0$ and $1$;
+    \item Tanh: Outputs values between $-1$ and $1$;
+    \item ReLU: Outputs values following: $f(\textit{net}_i) = \max(0, \textit{net}_i)$;
     \item Softmax: Outputs a probability distribution, defined as: $f(\textit{net}_i) = \frac{\exp(\textit{net}_i)}{\sum_{j} \exp(\textit{net}_j)}$
 \end{itemize}
-
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/activation_functions_xkcd.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \caption{Behavior of four common activation functions: Sigmoid, Tanh, ReLU, and Softmax.}
+    \label{fig:activation-functions}
 \end{figure}
 
-In a neural network, the activation function is very important because it decides how data moves through the layers. One of the most popular activation functions is the Rectified Linear Unit (ReLU). It became widely used after showing great results in the AlexNet model \cite{NIPS2012_c399862d}.
+In a neural network, the activation function is very important, because it decides how data moves through the layers. One of the most popular activation functions is the Rectified Linear Unit (ReLU). It became widely used after showing great results in the AlexNet model \cite{NIPS2012_c399862d}.
 
 ReLU is particularly popular because it introduces non-linearity without saturating for positive values, an issue that affects functions like Sigmoid and Tanh, which tend to have very small gradients at extreme values, leading to the vanishing gradient problem. Additionally, the simplicity of ReLU’s derivative allows for efficient back-propagation, enhancing computational speed during training and supporting convergence in deep networks.
-% ReLU Derivative
 \begin{equation}
     f'(\textit{net}_i) =
     \begin{cases}
@@ -48,22 +48,20 @@ ReLU is particularly popular because it introduces non-linearity without saturat
     0, & \textit{net}_i \leq 0
     \end{cases}
 \end{equation}
-
 Given the importance of ReLU and its advantageous properties, this function will be the focus in subsequent sections, as it will serve as the primary activation function in the architectures discussed.
 
 \subsection{Neural Network Architecture}
-Neural networks are generally organized in layers:
+Neural networks are structured in layers, as shown in Figure~\ref{fig:nn-architecture}, which are described as follows::
 \begin{itemize}
-    \item Input Layer: Takes in the raw data features.
-    \item Output Layer: Outputs the final predictions.
-    \item Hidden Layers: Contain intermediate neurons that extract hierarchical features. The presence of multiple hidden layers makes the network \textit{deep}, giving rise to deep neural networks (DNNs).
+    \item \textit{Input Layer}: Takes in the raw data features;
+    \item \textit{Output Layer}: Outputs the final predictions;
+    \item \textit{Hidden Layers}: Contain intermediate neurons that extract hierarchical features. The presence of multiple hidden layers makes the network \textit{deep}, giving rise to deep neural networks (DNNs).
 \end{itemize}
-
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{LateX//figs/nn_intro_def.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \caption{An illustration of a neural network architecture showing the input layer, hidden layers, and output layer.}
+    \label{fig:nn-architecture}
 \end{figure}
 
 \subsubsection*{Forward Propagation}
@@ -76,35 +74,35 @@ Loss functions are a fundamental component of neural network training. They quan
 Depending on the task the neural network (NN) needs to learn, various loss functions can be used. Below are some widely used loss functions \cite{LF_review}:
 
 \begin{itemize}
-    \item \textbf{L1 Loss}:  
-    The L1 loss calculates the absolute difference between the predicted and true values:
+    \item \textit{L1 Loss}:  
+    The L1 Loss calculates the absolute difference between the predicted and true values:
     \begin{equation}
         E(\mathbf{w}, \mathbf{x}) = \sum_{i=1}^{N} |y_i - \hat{y}_i|
     \end{equation}
-    Here, \(y_i\) represents the true label, \(\hat{y}_i\) the predicted output, and \(N\) the number of samples. L1 loss is robust to outliers because it does not square the error, reducing sensitivity to large differences.
+    Here, \(y_i\) represents the true label, \(\hat{y}_i\) the predicted output, and \(N\) the number of samples. L1 Loss is robust to outliers because it does not square the error, reducing sensitivity to large differences.
 
-    \item \textbf{Mean Absolute Error (MAE)}:  
+    \item \textit{Mean Absolute Error (MAE)}:  
     MAE is derived from the L1 loss by calculating the mean of the absolute differences:
     \begin{equation}
         E(\mathbf{w}, \mathbf{x}) = \frac{1}{N} \sum_{i=1}^{N} |y_i - \hat{y}_i|
     \end{equation}
     Like L1 loss, it is robust to outliers and is widely used in regression tasks.
 
-    \item \textbf{L2 Loss}:  
+    \item \textit{L2 Loss}:  
     L2 loss computes the sum of squared differences between predicted and true values:
     \begin{equation}
         E(\mathbf{w}, \mathbf{x}) = \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
     \end{equation}
     By squaring the errors, L2 loss is more sensitive to larger errors, which can be useful in tasks that require penalizing significant deviations but can be affected by outliers.
 
-    \item \textbf{Mean Squared Error (MSE)}:  
+    \item \textit{Mean Squared Error (MSE)}:  
     MSE extends L2 loss by calculating the average of squared differences:
     \begin{equation}
         E(\mathbf{w}, \mathbf{x}) = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
     \end{equation}
     It is commonly used in regression tasks but shares the sensitivity of L2 loss to outliers.
 
-    \item \textbf{Smooth L1 Loss}:  
+    \item \textit{Smooth L1 Loss}:  
     Smooth L1 loss blends L1 and L2 losses, making it less sensitive to outliers while retaining sensitivity to small errors:
     \begin{equation}
         E(\mathbf{w}, \mathbf{x}) = 
@@ -115,21 +113,21 @@ Depending on the task the neural network (NN) needs to learn, various loss funct
     \end{equation}
     This loss is widely used in tasks like object detection, where robustness to outliers is important.
 
-    \item \textbf{Cross-Entropy Loss}:  
+    \item \textit{Cross-Entropy Loss}:  
     Cross-entropy loss is commonly used in classification tasks. It measures the difference between the predicted probability distribution and the true distribution:
     \begin{equation}
         E(\mathbf{w}, \mathbf{x}) = -\frac{1}{N} \sum_{i=1}^{N} \sum_{c=1}^{C} y_{i,c} \log(\hat{y}_{i,c})
     \end{equation}
     Here, \(C\) is the number of classes, \(y_{i,c}\) is 1 if sample \(i\) belongs to class \(c\), and \(\hat{y}_{i,c}\) is the predicted probability for that class \cite{mao2023crossentropylossfunctionstheoretical}.
 
-    \item \textbf{Focal Loss}:  
+    \item \textit{Focal Loss}:  
     Focal loss extends cross-entropy loss with a modulating factor to focus more on hard-to-classify examples and address class imbalance:
     \begin{equation}
         E(\mathbf{w}, \mathbf{x}) = -\frac{1}{N} \sum_{i=1}^{N} \sum_{c=1}^{C} \alpha_c (1 - \hat{y}_{i,c})^\gamma y_{i,c} \log(\hat{y}_{i,c})
     \end{equation}
     Here, \(\alpha_c\) is a weighting factor for class \(c\), and \(\gamma\) controls the focus on difficult examples \cite{DBLP:journals/corr/abs-1708-02002}.
 
-    \item \textbf{IoU Loss}:  
+    \item \textit{IoU Loss}:  
     Intersection over Union (IoU) loss is used in object detection tasks to directly optimize the overlap between predicted and ground-truth bounding boxes. It is defined as:
     \begin{equation}
         E(\mathbf{w}, \mathbf{x}) = 1 - \frac{\text{Intersection}}{\text{Union}}
@@ -138,22 +136,22 @@ Depending on the task the neural network (NN) needs to learn, various loss funct
 
 \end{itemize}
 
-From now on, only the L1, L2, MSE, and MAE loss functions will be considered, as the task involved with this project is not focused on classification. Each of these loss functions offers unique advantages: L1 and smooth L1 are more robust to outliers, while MSE and L2 give greater penalty to larger errors. Choosing the right loss function is essential and should be based on the specific requirements of the task and the nature of the data.
+From now on, only the L1, L2, MSE, and MAE loss functions will be considered, as the task involved with this project is not focused on classification. Each of these loss functions offers unique advantages: L1 and smooth L1 are more robust to outliers, while MSE and L2 give greater penalty to larger errors. Choosing the right loss function is essential and should be based on the specific requirements of the task and the nature of the data. The behavior and comparison of these loss functions are illustrated in Figure~\ref{fig:loss-functions}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX/figs/loss_functions_xkcd.pdf}
-    \caption{CAMBIARE IMMAGINE}
-    \label{fig:enter-label}
+    \caption{Visualization of L1, Smooth L1, MSE, and a comparison of their behavior, highlighting their distinct characteristics.}
+    \label{fig:loss-functions}
 \end{figure}
 
 \subsubsection*{Gradient Descent and Back-propagation}
 In neural networks, after computing the gradients via \textit{back-propagation}, the following step is to update the weights to minimize the loss function. This is done using an optimizer, which controls how the weights are adjusted based on the gradients. The learning rate $\eta$ is a key hyper-parameter in this update process, determining the step size in the direction of the gradient. 
-A proper learning rate is crucial: if it's too large, the network may overshoot the optimal solution; if it's too small, convergence becomes slow and inefficient.
+A proper learning rate is crucial: if it's too large, the network may overshoot the optimal solution; if it's too small, convergence becomes slow and inefficient, as shown in Figure ~\ref{fig:lr-behaviours}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/learning_rate.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \caption{Illustration of the impact of different learning rates on the convergence behavior of gradient descent. A high learning rate can lead to overshooting the optimal solution, while a low learning rate results in slow convergence.}
+    \label{fig:lr-behaviours}
 \end{figure}
 
 The optimizer updates the weights accordingly the following general rule:
@@ -165,7 +163,7 @@ where where: $\theta$ represents the weights, $\eta$ depicts the learning rate a
     \nabla_\theta L = \frac{\partial L}{\partial \theta}
 \end{equation}
 
-Gradient Descent is an optimization algorithm that updates the model's parameters after analyzing the entire training dataset in each iteration. While this method ensures a comprehensive update, it is time-consuming, especially because the learning rate—a small value by design—results in only tiny adjustments to the parameters during each step. This makes training a neural network slow and inefficient. To address this issue, more efficient approaches have been developed. Two of the most widely used optimizers are Stochastic Gradient Descent (SGD), which updates parameters using small, randomly selected subsets of data (batches), and Adam, which combines adaptive learning rates with momentum to speed up convergence. These methods significantly improve training efficiency and are commonly used in modern deep learning.
+Gradient Descent is an optimization algorithm that updates the model's parameters after analyzing the entire training dataset in each iteration. While this method ensures a comprehensive update, it is time-consuming, especially because the learning rate, a small value by design, results in only tiny adjustments to the parameters during each step. This makes training a neural network slow and inefficient. To address this issue, more efficient approaches have been developed. Two of the most widely used optimizers are Stochastic Gradient Descent (SGD), which updates parameters using small, randomly selected subsets of data (batches), and Adam, which combines adaptive learning rates with momentum to speed up convergence. These methods significantly improve training efficiency and are commonly used in modern deep learning.
 
 \subsubsection*{Stochastic Gradient Descent}
 A practical variant of gradient descent, particularly suited for large datasets, is Stochastic Gradient Descent (SGD). Unlike traditional gradient descent, which computes the gradient over the entire dataset, SGD calculates the gradient for each individual data point.
@@ -269,13 +267,13 @@ In this section, the fundamental structure of neural networks has been introduce
 The typical workflow for training a neural network using backpropagation \cite{10.11648/j.ajnna.20190501.12} involves the following steps:
 
 \begin{enumerate} 
-    \item Initialize the network by assigning random weights to all connections. 
-    \item Compute the activation of the hidden nodes using the input data and the weights of the connections between the input layer and the hidden layer.
-    \item Compute the activation of the output nodes using the activations of the hidden nodes and the weights of the connections between the hidden layer and the output layer.
-    \item Calculate the error at the output nodes by comparing the predicted outputs to the actual target values.
-    \item Adjust the weights between the output layer and the hidden layer by propagating the error backward through the network.
-    \item Propagate the error further back to the hidden layer and adjust the weights between the hidden layer and the input layer accordingly.
-    \item Repeat this process iteratively, updating the weights until a convergence criterion is met, such as reaching a minimal error or completing a predefined number of epochs.
+    \item Initialize the network by assigning random weights to all connections;
+    \item Compute the activation of the hidden nodes using the input data and the weights of the connections between the input layer and the hidden layer;
+    \item Compute the activation of the output nodes using the activations of the hidden nodes and the weights of the connections between the hidden layer and the output layer;
+    \item Calculate the error at the output nodes by comparing the predicted outputs to the actual target values;
+    \item Adjust the weights between the output layer and the hidden layer by propagating the error backward through the network;
+    \item Propagate the error further back to the hidden layer and adjust the weights between the hidden layer and the input layer accordingly;
+    \item Repeat this process iteratively, updating the weights until a convergence criterion is met, such as reaching a minimal error or completing a predefined number of epochs;
     \item Once the training is complete, use the final optimized weights to make predictions by computing the activations of the output nodes.
 \end{enumerate}
 
@@ -288,51 +286,55 @@ A Convolutional Neural Network (CNN), or \textit{ConvNet}, is a specialized type
 What sets CNNs apart from traditional neural networks is their ability to exploit the spatial structure of data—typically images—by arranging neurons in a manner inspired by the human visual cortex. The architecture is organized into layers, each contributing to feature extraction and decision-making. These include:
 
 \begin{itemize}
-    \item \textbf{Convolutional layers:} Apply filters (kernels) to the input image, generating feature maps that highlight patterns such as edges, textures, or shapes.
-    \item \textbf{Pooling layers:} Reduce the spatial dimensions of feature maps through operations like max pooling or average pooling, thereby lowering computational requirements and mitigating overfitting.
+    \item \textit{Convolutional layers:} Apply filters (kernels) to the input image, generating feature maps that highlight patterns such as edges, textures, or shapes;
+    \item \textit{Pooling layers:} Reduce the spatial dimensions of feature maps through operations like max pooling or average pooling, thereby lowering computational requirements and mitigating over-fitting;
     \item \textbf{Fully connected layers:} Occurring near the network's end, these layers connect every neuron to the previous layer's neurons and play a key role in decision-making, such as classifying an image into categories.
 \end{itemize}
 
 CNNs are particularly efficient at processing 2D data by replacing traditional matrix multiplications with convolutional operations. This design enables them to capture spatial hierarchies in image data, from low-level features like edges to high-level features such as objects and faces.
 
 To investigate deeper and provide a more detailed understanding, the building blocks of a CNN are:
-
 \begin{enumerate}
-    \item \textbf{Convolutional Layers:} These layers perform operations that are mathematically similar to convolutions, but in practice, the operation computed is a \textit{correlation}, defined as:
+    \item \textit{Convolutional Layers:} These layers perform operations that are mathematically similar to convolutions, but in practice, the operation computed is a \textit{correlation}, defined as:
     \begin{equation}
         (f \star g)(x, y) = \sum_{m}\sum_{n}f(x + m, y + n) \cdot g(m, n)
     \end{equation}
-    where \( f \) represents the input and \( g \) denotes the kernel (or filter). For a 2D image, this operation involves sliding a filter over the input image and computing the dot product between the filter and segments of the image, resulting in an \textit{activation map}. The kernels are learnable parameters, enabling the CNN to automatically learn feature detectors for edges, textures, and more complex patterns. Each filter responds to a particular feature within the input, such as vertical edges or textures.
-
+    where \( f \) represents the input and \( g \) denotes the kernel (or filter). For a 2D image, this operation involves sliding a filter over the input image and computing the dot product between the filter and segments of the image, resulting in an \textit{activation map}, as shown in Figure~\ref{fig:cnn-layer}. The kernels are learnable parameters, enabling the CNN to automatically learn feature detectors for edges, textures, and more complex patterns. Each filter responds to a particular feature within the input, such as vertical edges or textures.
+    
+    \begin{minipage}{\linewidth}
     \begin{figure}[H]
-        \centering
         \includegraphics[width=1\linewidth]{LateX//figs/CCN_layer.pdf}
-        \caption{Illustration of a Convolutional Layer.}
+        \caption{Visualization of the operation of a Convolutional Layer. The diagram illustrates the input tensor, the selected patch, the learnable kernel, and the resulting output tensor.}
         \label{fig:cnn-layer}
     \end{figure}
-
+    \end{minipage}
+    \vspace{0.25 cm}
+    
     Unlike fully connected (FC) layers, convolutional layers preserve the spatial (2D) structure of images, meaning the input and output are not flattened. Each output unit is connected only to a small, localized set of neighboring input units, known as the \textit{local receptive field}. Additionally, convolutional layers implement weight sharing, where the same weights are used across all positions of the input, ensuring that the same filter is applied throughout the image. This structure leverages the inherent properties of image data, where local patterns (e.g., edges or textures) often repeat in different locations across the image.
 
-    \item \textbf{Non-Linear Activation Function:} After the convolution operation, the next step is to apply a non-linear activation function to the resulting feature maps. This non-linearity enables the network to learn complex patterns and represent intricate relationships within the data. 
+    \item \textit{Non-Linear Activation Function:} After the convolution operation, the next step is to apply a non-linear activation function to the resulting feature maps. This non-linearity enables the network to learn complex patterns and represent intricate relationships within the data. 
 
-    \item \textbf{Pooling Layers:} After the activation function, pooling layers are used to reduce the spatial dimensions of the activation maps while retaining the most important information. They aggregate neighboring values into a single output using a predefined function, applied channel-wise with a specific \textit{stride}. The \textit{stride} refers to the step size by which the pooling kernel moves across the input. A stride greater than 1 (\( s > 1 \)) results in down-sampling the activation map by skipping positions.
+    \item \textit{Pooling Layers:} After the activation function, pooling layers are used to reduce the spatial dimensions of the activation maps while retaining the most important information. They aggregate neighboring values into a single output using a predefined function, applied channel-wise with a specific \textit{stride}. The \textit{stride} refers to the step size by which the pooling kernel moves across the input. A stride greater than 1 (\( s > 1 \)) results in down-sampling the activation map by skipping positions.
     
-    The most commonly used pooling operation is \textit{max pooling}, which selects the maximum value from each patch of the feature map. The mathematical formulation for max pooling is:
+    The most commonly used pooling operation is \textit{max pooling}, which selects the maximum value from each patch of the feature map, as depicted in Figure~\ref{fig:cnn-pooling}. The mathematical formulation for max pooling is:
     \begin{equation}
         P = \max_{(i,j) \in \text{patch}} x(i,j)
     \end{equation}
     where \( P \) is the pooled value, and \( x(i,j) \) represents the values within the pooling window.
     
+    \begin{minipage}{\linewidth}
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.85\linewidth]{LateX//figs/CNN_poolinh.pdf}
-        \caption{Illustration of a Max-pooling Layer.}
+        \caption{Visualization of a Max-pooling Layer. The figure depicts the input tensor, the pooling window, and the resulting output tensor after applying the max-pooling operation.}
         \label{fig:cnn-pooling}
     \end{figure}
+    \end{minipage}
+    \vspace{0.25 cm}
     
     Pooling layers offer several benefits. They contribute to \textit{translation invariance}, making the network more robust to variations in the position or scale of features within the input. Notably, pooling layers do not have learnable parameters, which simplifies the network and reduces over-fitting. However, this lack of learnable parameters can also limit the network's ability to adapt pooling to specific tasks. 
 
-    \item \textbf{Fully Connected Layers:} In the final stage of a CNN, fully connected layers generate the network's output. These layers take the high-level features extracted by the previous layers and map them to the desired output format. Every neuron in a fully connected layer is connected to all neurons in the preceding layer, allowing the network to combine and interpret the features learned throughout the architecture. This step creates the final output, which could represent values such as predictions, scores, or any other required output specific to the task.
+    \item \textit{Fully Connected Layers:} In the final stage of a CNN, fully connected layers generate the network's output. These layers take the high-level features extracted by the previous layers and map them to the desired output format. Every neuron in a fully connected layer is connected to all neurons in the preceding layer, allowing the network to combine and interpret the features learned throughout the architecture. This step creates the final output, which could represent values such as predictions, scores, or any other required output specific to the task. A representation of a fully connected layer can be seen in Figure~\ref{fig:nn-architecture}.
     
 \end{enumerate}
 
@@ -342,31 +344,31 @@ CNNs are also commonly used as \textit{feature extractors} or \textit{backbones}
 
 The main advantages of CNNs include:
 \begin{itemize}
-    \item \textbf{Translation Invariance}: CNNs achieve translation invariance by applying the same convolutional filters across different parts of the image. This enables the network to recognize objects even when they appear in different locations within the image, which is a substantial advantage over traditional methods that often require manually engineered features.
+    \item \textit{Translation Invariance}: CNNs achieve translation invariance by applying the same convolutional filters across different parts of the image. This enables the network to recognize objects even when they appear in different locations within the image, which is a substantial advantage over traditional methods that often require manually engineered features.
 
-    \item \textbf{Hierarchical Feature Learning}: CNNs detect features in a hierarchical manner. In the initial layers, they capture low-level features such as edges, corners, or textures. In deeper layers, they detect higher-level, abstract features like shapes or object parts. This hierarchical learning process is akin to how the human visual cortex processes visual stimuli, progressing from simple to complex patterns.
+    \item \textit{Hierarchical Feature Learning}: CNNs detect features in a hierarchical manner. In the initial layers, they capture low-level features such as edges, corners, or textures. In deeper layers, they detect higher-level, abstract features like shapes or object parts. This hierarchical learning process is akin to how the human visual cortex processes visual stimuli, progressing from simple to complex patterns.
 
-    \item \textbf{Efficiency}: By using local connectivity, each neuron in convolutional layers is connected only to a small region of the input, known as the \textit{receptive field}, rather than the entire input. This significantly reduces computational requirements. Additionally, weight sharing in convolution layers, where the same filter is applied across different regions, reduces the number of parameters compared to fully connected networks, making CNNs computationally efficient.
+    \item \textit{Efficiency}: By using local connectivity, each neuron in convolutional layers is connected only to a small region of the input, known as the \textit{receptive field}, rather than the entire input. This significantly reduces computational requirements. Additionally, weight sharing in convolution layers, where the same filter is applied across different regions, reduces the number of parameters compared to fully connected networks, making CNNs computationally efficient.
 \end{itemize}
 
 Over time, various CNN architectures have been developed to optimize performance for specific tasks. Notable architectures include:
 \begin{enumerate}
-    \item \textbf{VGG-16}: Known for its simplicity, VGG-16 uses small \(3 \times 3\) convolutional filters but stacks a large number of convolutional layers followed by fully connected layers, creating a deep architecture with strong feature extraction capabilities \cite{7486599}.
+    \item \textit{VGG-16}: Known for its simplicity, VGG-16 uses small \(3 \times 3\) convolutional filters but stacks a large number of convolutional layers followed by fully connected layers, creating a deep architecture with strong feature extraction capabilities \cite{7486599};
 
-    \item \textbf{ResNet}: ResNet introduced the concept of residual learning, which enables the training of very deep architectures. By incorporating skip connections, ResNet addresses the vanishing gradient problem, allowing for efficient training of deep networks. Various versions of ResNet exist, distinguished by the number of layers they contain, such as ResNet-18, ResNet-34, ResNet-50, ResNet-101, and ResNet-152. The number indicates the total layers, with deeper variants like ResNet-101 and ResNet-152 providing increasingly refined feature representations while maintaining efficient training \cite{DBLP:journals/corr/HeZRS15, 10197463}.
+    \item \textit{ResNet}: ResNet introduced the concept of residual learning, which enables the training of very deep architectures. By incorporating skip connections, ResNet addresses the vanishing gradient problem, allowing for efficient training of deep networks. Various versions of ResNet exist, distinguished by the number of layers they contain, such as ResNet-18, ResNet-34, ResNet-50, ResNet-101, and ResNet-152. The number indicates the total layers, with deeper variants like ResNet-101 and ResNet-152 providing increasingly refined feature representations while maintaining efficient training \cite{DBLP:journals/corr/HeZRS15, 10197463};
 
-    \item \textbf{Inception (GoogLeNet)}: The Inception network incorporates convolutional layers of varying sizes applied in parallel. This multi-scale approach allows the network to capture features at different levels of granularity, enhancing its ability to recognize complex patterns \cite{DBLP:journals/corr/SzegedyLJSRAEVR14}.
+    \item \textit{Inception (GoogLeNet)}: The Inception network incorporates convolutional layers of varying sizes applied in parallel. This multi-scale approach allows the network to capture features at different levels of granularity, enhancing its ability to recognize complex patterns \cite{DBLP:journals/corr/SzegedyLJSRAEVR14};
 
-    \item \textbf{EfficientNet}: This model family scales network width, depth, and resolution to achieve higher accuracy with fewer parameters. EfficientNet strikes a balance between accuracy and efficiency, making it a popular choice for many practical applications \cite{DBLP:journals/corr/abs-1905-11946}.
+    \item \textit{EfficientNet}: This model family scales network width, depth, and resolution to achieve higher accuracy with fewer parameters. EfficientNet strikes a balance between accuracy and efficiency, making it a popular choice for many practical applications \cite{DBLP:journals/corr/abs-1905-11946}.
 \end{enumerate}
 
 While CNNs were originally designed for image-related tasks, their versatility has led to adaptations in various other domains, including:
 \begin{itemize}
-    \item \textbf{Natural Language Processing (NLP)}: CNNs are used for tasks such as text classification by applying convolutional filters over word embeddings, allowing the network to capture local dependencies in textual data.
+    \item \textit{Natural Language Processing (NLP)}: CNNs are used for tasks such as text classification by applying convolutional filters over word embeddings, allowing the network to capture local dependencies in textual data;
 
-    \item \textbf{Time Series Analysis}: CNNs can be applied to temporal data, effectively capturing local dependencies between data points over time, making them suitable for analyzing patterns in time series data.
+    \item \textit{Time Series Analysis}: CNNs can be applied to temporal data, effectively capturing local dependencies between data points over time, making them suitable for analyzing patterns in time series data;
 
-    \item \textbf{Speech Recognition}: In combination with Recurrent Neural Networks (RNNs) or Transformers, CNNs can be utilized in speech recognition tasks, such as voice recognition or speech-to-text conversion, where they contribute to feature extraction and processing.
+    \item \textit{Speech Recognition}: In combination with Recurrent Neural Networks (RNNs) or Transformers, CNNs can be utilized in speech recognition tasks, such as voice recognition or speech-to-text conversion, where they contribute to feature extraction and processing.
 \end{itemize}
 
 Through these applications, CNNs have proven to be a flexible and powerful tool in both traditional and emerging fields, providing a foundation for extracting robust features that can enhance the performance of complex neural networks.
@@ -383,103 +385,118 @@ Transformers were initially developed to solve sequence transduction tasks, such
 
 The attention mechanism, introduced to overcome the bottleneck of fixed-length encoding vectors, enhances model capacity for handling long or complex sequences \cite{DBLP:journals/corr/VaswaniSPUJGKP17}. Attention can be formulated as:
 \begin{equation}
-\text{Attention} = f(g(x), x)
+    \text{Attention} = f(g(x), x)
 \end{equation}
 where \( g(x) \) generates attention, corresponding to identifying discriminative regions, and \( f(g(x), x) \) processes input \( x \) based on attention \( g(x) \).
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\linewidth]{LateX/figs/attention_transformer_architecture.pdf}
-    \caption{Caption}
-    \label{fig:enter-label}
-\end{figure}
 
 Attention mechanisms can be categorized by their data domains:
 \begin{itemize}
-    \item \textit{What to attend to (channel):} Highlights specific features.
-    \item \textit{Where to attend to (spatial):} Focuses on spatial regions.
+    \item \textit{What to attend to (channel):} Highlights specific features;
+    \item \textit{Where to attend to (spatial):} Focuses on spatial regions;
     \item \textit{When to attend to (temporal):} Captures temporal dynamics.
 \end{itemize}
+
+As shown in Figure~\ref{fig:attention}, the architecture of the attention mechanism highlights the interaction between the input and the attention weights.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{LateX/figs/attention_transformer_architecture.pdf}
+    \caption{Architecture of the attention mechanism \cite{DBLP:journals/corr/VaswaniSPUJGKP17}.}
+    \label{fig:attention}
+\end{figure}
 
 Self-attention, the core of transformers, operates by transforming the input sequence into three vectors: queries, keys, and values. These are computed through linear transformations. The attention mechanism then calculates a weighted sum of the values based on the similarity between queries and keys. The weighted sum, combined with the original input, is processed through a feed-forward network to produce the output, enabling the model to capture long-range dependencies effectively \cite{ramachandran2019standalone}.
 
 \section{MapAlign: Architecture description}
-This section introduces MapAlign, the neural network developed in this thesis, following an initial overview of neural networks. MapAlign is designed to integrate seamlessly into the pipeline of a deeper neural network capable of reconstructing HD maps, starting from data gathered by the vehicle's onboard sensors.
+This section introduces MapAlign, the neural network developed in this thesis, following an initial overview of neural networks. MapAlign is designed to integrate smoothly into the pipeline of a deeper neural network, mentioned in Chapter 1, capable of reconstructing HD maps, starting from data gathered by the vehicle's onboard sensors, in Real Time.
 
-MapAlign is positioned specifically at the dataset creation stage, addressing a critical challenge in the pipeline: achieving precise alignment between the vehicle's sensor data and the HD map, which serves as the target for the deeper network \cite{Li_HDMapNet_2022}. Traditional pipelines for HD map creation rely heavily on manual annotation and extensive resources to maintain map semantics, significantly limiting their scalability. In contrast, MapAlign automates the ground-truth generation process, minimizing reliance on optimization techniques and eliminating the need for manual alignment steps, which were previously necessary to ensure data precision.
+MapAlign is positioned specifically at the dataset creation stage, addressing a critical challenge in the pipeline: achieving precise alignment between the vehicle's sensor data and the HD map, which serves as the target for the deeper network \cite{Li_HDMapNet_2022}. Traditional pipelines for HD map creation rely heavily on manual annotation and extensive resources to maintain map semantics, significantly limiting their scalability. In contrast, MapAlign automates the ground-truth generation process, minimizing reliance on optimization techniques and eliminating the need for manual alignment steps.
 
-The deeper neural network in the pipeline benefits from this automation by encoding image features from surrounding cameras or point clouds from radar to predict vectorized map elements in the bird’s-eye view. This process dynamically constructs local semantics based on onboard sensor observations, overcoming the inefficiencies of traditional methods.
+Creating a network that can reconstruct an HD map in real time by using image features from surrounding cameras or point clouds from radar, or other sensors, to predict vectorized map elements in a bird’s-eye view has many advantages. MapAlign helps this architecture, by eliminating the need for manual adjustments during ground truth generation. Additionally, better localization improves the accuracy and reliability of the generated HD map. This precise alignment not only accelerates the dataset creation process but also enhances the overall system’s performance, as improved alignment contributes to better accuracy in the deeper network's learning and predictions.
 
-MapAlign’s primary objective is to output values that populate a rotation-translation matrix, aligning the HD map with the vehicle’s perception, by predicting the values of the three coordinates \( (x, y, z) \) and the heading angle \( \theta \), while contributions from pitch and roll are disregarded, as they are unnecessary for this alignment task. These values define how to rotate and translate the map to match the vehicle's spatial understanding accurately. This precise alignment not only accelerates the dataset creation process but also enhances the overall system’s performance, as improved alignment contributes to better accuracy in the deeper network's learning and predictions.
 
+MapAlign’s primary objective is to output values that populate a rotation-translation matrix, aligning the HD map with the vehicle’s perception, by predicting the values of the three coordinates \( (x, y, z) \) and the heading angle \( \theta \), while contributions from pitch and roll are ignored, as they are unnecessary for this alignment task. These values define how to rotate and translate the map to match the vehicle's spatial understanding accurately. 
 
 \subsection{Input Loaders}
+Given the purpose of MapAlign, it is clear that this neural network requires input about the car's surroundings and the portion of the HD map corresponding to the vehicle's current position. These data can be either generated or, in this specific case, collected by autonomous vehicles equipped with extensive sensor suites that will be explained in more detail in the following sections.
 
-The developed neural network processes data that is primarily stored in Python dictionaries, derived from the de-serialization of binary files generated during sequence capture by the autonomous vehicle. Before this data can be used by the network, it must undergo pre-processing to ensure compatibility and proper formatting.
+The neural network processes data mainly stored in Python dictionaries, which are created by de-serializing binary files generated during the runs of the autonomous vehicle. These runs include both human-driven mode and autonomous driving mode when engaged. Before the network can use the data, it must undergo pre-processing to ensure proper formatting and compatibility with the network's requirements.
 
 This subsection details the input loaders used in the system, focusing on how the network takes and prepares data for processing. The network operates with sensor data formatted as tensors, which are structured to resemble multi-channel images. In this representation, each point (analogous to a pixel in an image) contains specific information, while each channel corresponds to data from a particular sensor. 
 The primary input loaders are:
 \begin{itemize}
     \item \textit{BevObservation Loader:} This loader generates a tensor that encapsulates all Bird's-Eye View (BEV) measurements extracted from the data produced by detector neural networks installed on the vehicle. It processes data from the binary serialization file, organizing it into distinct channels, each corresponding to a specific data type, such as lane markings, road boundaries, free spaces, traffic signs, obstacles, stixels\footnote{A stixel is a compact representation of vertical structures in an environment, such as poles, pedestrians, or vehicles. It divides the scene into small vertical columns, summarizing 3D information into a simplified format for efficient processing.}, parking areas, and individual instances. The specific elements included in the tensor can be configured through a dedicated configuration file, allowing flexibility.
     In this architecture, the focus is primarily on \textit{road boundaries}. These are critical as they align closely with features present in high-definition (HD) maps, which are crucial for accurate map-to-sensor alignment.
-    To construct the multi-channel tensor, data from various sensors must be converted to a unified image coordinate system, ensuring seamless integration across channels. Specific transformations and pre-processing steps are required for each type of sensor data:
-    \begin{itemize}
-        \item \textit{Camera Data:} Image data undergoes calibration and warping to align with the BEV perspective.
-        \item \textit{Radar Data:} Radar points are filtered and projected onto the BEV tensor, considering the sensor's position and orientation.
-    \end{itemize}
-    A visual representation of the multi-channel tensor is presented in Figure \ref{fig:bev-loader}, where each layer is represented with a distinct color, illustrating the layered structure of the tensor.
+    
+    To create the multi-channel tensor, data from different sensors must be transformed into the same image coordinate system. This ensures that all channels can integrate smoothly. Each type of sensor data requires specific transformations and pre-processing. For camera data, because images are calibrated, through perspective projection images can be warped to match the BEV perspective. For radar data, the point cloud is filtered and projected onto the BEV tensor, taking into account the sensor's position and orientation.
+
+    A visual representation of the multi-channel tensor is presented in Figure~\ref{fig:bev-loader}, where each layer is represented with a different color, illustrating the layered structure of the tensor.
+
+    \begin{minipage}{\linewidth}
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.85\linewidth]{LateX//figs/bevLoader.pdf}
-        \caption{Layered Tensor Representation of Sensor Inputs}
-        \label{fig:bev-loader}
+        \includegraphics[width=0.85\linewidth]{LateX//figs/observations.pdf}
+        \caption{Layered Tensor Representation of Sensor Inputs: Blue indicates curbs and lane markings, yellow represents the radar point cloud, red corresponds to stixels projections, and gray denotes free space.}
+         \label{fig:bev-loader}
     \end{figure}
-
-    \item \textit{Ego Loader:} This component represents the ego vehicle within the same tensor used for other sensor data. A dedicated function generates a rectangular outline corresponding to the vehicle's physical dimensions. These dimensions are derived from the actual vehicle used to record the dataset sequences, ensuring accurate representation and alignment within the scene.
+    \end{minipage}
+    \vspace{0.25 cm}
+    
+    \item \textit{Ego Loader:} This component represents the ego vehicle within the same tensor used for other sensor data. A dedicated function generates a rectangular outline corresponding to the vehicle's physical dimensions. These dimensions are derived from the vehicle used to record the dataset sequences, ensuring accurate representation and alignment within the scene.
     The function takes as input the vehicle's specific spatial coordinates, including key points and orientations, with particular emphasis on the \textit{heading angle}, which defines the vehicle's direction relative to the map or environment frame. This precise representation is especially valuable for visualizations, enabling the ego vehicle's position and orientation to be clearly understood in relation to the surrounding environment.
-    A visual representation of the ego vehicle's tensor overlay is shown in Figure \ref{fig:ego-loader}, where the vehicle's rectangular outline is depicted within the BEV tensor.
+    A visual representation of the ego vehicle's tensor overlay is shown in Figure~\ref{fig:ego-loader}, where the vehicle's rectangular outline is depicted within the BEV tensor.
+
+    \begin{minipage}{\linewidth}
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.75\linewidth]{LateX//figs/egoLoader.pdf}
-        \caption{Tensor Representation of Ego Vehicle}
+        \caption{Tensor Representation of the Ego Vehicle: The dimensions of the car are represented as a rectangle mapped in tensor coordinates.}
         \label{fig:ego-loader}
     \end{figure}
-
+    \end{minipage}
+    \vspace{0.25 cm}
+    
     \item \textit{Boundaries Loader:} This data loader generates a semantic representation of the operational environment's boundaries by creating a tensor that encodes this information. It takes as input a dictionary containing HD map data for the relevant area. The dimensions of the reference area are specified in a configuration file, defining the rectangular region around the vehicle's position used for boundary extraction.
-    The map data uses a fixed spatial resolution to ensure precise alignment with the vehicle’s position, where each pixel corresponds to $25$ centimeters in the real world. To focus on the relevant area, the loader queries the map within a predefined region extending from $-32$ meters to $96$ meters along the x-axis and from $-32$ meters to $32$ meters along the y-axis, covering the vehicle’s operational zone. A visual depiction of these boundaries is provided in Figure \ref{fig:hd-map-boundaries}.
+    The map data uses a fixed spatial resolution to ensure precise alignment with the vehicle’s position, where each pixel corresponds to $25$ centimeters in the real world. To focus on the relevant area, the loader queries the map within a predefined region extending from $-32$ meters to $96$ meters along the $x$-axis and from $-32$ meters to $32$ meters along the $y$-axis, covering the vehicle’s operational zone. 
+    To optimize computational efficiency, map compression reduces data density beyond a specific threshold. Within close proximity, the map’s resolution is preserved, while beyond $50$ meters along the x-axis and $20$ meters along the y-axis, data density is reduced. This ensures high-quality spatial data near the vehicle while maintaining computational efficiency.
+
+    The tensor is initialized with zeros, indicating the absence of boundaries. Boundary points from the HD map are then drawn onto the tensor using OpenCV's \texttt{polyline} function \cite{itseez2015opencv}. The use of anti-aliased polylines (\texttt{LINE\_AA}) allows pixel values to range between $0$ and $1$, representing the probability of a boundary passing through a pixel, as illustrated in Figure~\ref{fig:polylines}. In this representation, a value of $0$ means no boundary is present in the pixel, a value of $1$ indicates that the boundary directly passes through the pixel, and intermediate values between $0$ and $1$ signify the probability of a boundary passing through the pixel.
+    
+    \begin{minipage}{\linewidth}
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.75\linewidth]{LateX//figs/mappaHD.pdf}
-        \caption{Boundaries on HD Map}
+        \includegraphics[width=0.4\linewidth]{LateX//figs/polyline.pdf}
+        \caption{Example of line representation using anti-aliasing. The red line demonstrates how this approach encodes both the exact location of the boundary and regions with probabilities greater than zero, according to grid's resolution.}
+        \label{fig:polylines}
+    \end{figure}
+    \end{minipage}
+    \vspace{0.25 cm}
+
+    This method ensures smooth and precise boundary representation, as illustrated in Figure~\ref{fig:hd-map-boundaries}.
+    
+    \begin{minipage}{\linewidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\linewidth]{LateX//figs/boundaries-mappahd.pdf}
+        \caption{Tensor representation of all boundaries in the queried zone: different colors are used to distinguish between segments.}
         \label{fig:hd-map-boundaries}
     \end{figure}
-    To optimize computational efficiency, map compression reduces data density beyond a specific threshold. Within close proximity, the map’s resolution is preserved, while beyond $50$ meters along the x-axis and $20$ meters along the y-axis, data density is reduced. This ensures high-quality spatial data near the vehicle while maintaining computational efficiency.
-    The tensor is initially filled with zeros, representing the absence of boundaries.
-    HD map data provides boundary points, which are rendered onto the tensor using OpenCV’s \texttt{polylines} function \cite{itseez2015opencv}. Specifically, anti-aliasing polylines (\texttt{LINE\_AA}) are used, allowing intermediate values between $0$ and $1$ to represent the likelihood of a boundary passing through a pixel. This approach encodes:
-    \begin{itemize}
-        \item $0$: No boundary in this pixel.
-        \item $1$: The boundary passes through this pixel.
-        \item Values between $0$ and $1$: Probability of a boundary passing through this pixel.
-    \end{itemize}
-    
-    This method ensures smooth and precise boundary representation, as illustrated in Figure \ref{fig:boundary-rendering}.
-
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.5\linewidth]{LateX//figs/polyline.png}
-        \caption{Example of Boundaries Rendered with Polylines}
-        \label{fig:boundary-rendering}
-    \end{figure}
+    \end{minipage}
+    \vspace{0.25 cm}
     
     \item \textit{Texture Loader}: This loader is responsible for loading all images from the various cameras included in the sensor suite (which will be discussed in the following section). Each camera provides a unique view of the environment, capturing distinct visual information that the network can utilize for perception tasks.
     Historically, the term \textit{texture} was used in computer graphics to refer to images applied to 3D models or surfaces, giving them realistic visual details, such as color, pattern, and surface irregularities. 
+    
+    \begin{minipage}{\linewidth}
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.95\linewidth]{LateX//figs/Screenshot 2024-09-27 at 12.00.55.png}
-        \caption{Camera Textures: Images from Multiple Views}
+        \caption{Camera Textures: Images from Multiple Views. The first six images represent long-range cameras, while the last four correspond to short-range cameras.}
         \label{fig:texture-loader}
     \end{figure}
-
-\item \textit{CamPosLoader:} This loader is responsible for loading all camera calibration data, including both intrinsic and extrinsic parameters, which are essential for accurately projecting the 3D environment onto a 2D image plane and aligning images for BEV (Bird's-Eye View) reconstruction.
+    \end{minipage}
+    \vspace{0.25 cm}
+    
+    \item \textit{CamPosLoader:} This loader is responsible for loading all camera calibration data, including both intrinsic and extrinsic parameters, which are essential for accurately projecting the 3D environment onto a 2D image plane and aligning images for BEV (Bird's-Eye View) reconstruction.
 
     The \textit{intrinsic parameters} define the camera’s internal properties, which determine how 3D points are captured and transformed into 2D pixel coordinates. These parameters are represented by the intrinsic matrix \( A \), defined as:
     \begin{equation}
@@ -531,7 +548,7 @@ Data augmentation is a technique used to artificially increase the diversity of 
 
 In this project, data augmentation is applied to simulate variations in the vehicle's position and orientation relative to the map. Using the optimized ground-truth position, known as \texttt{opt\_pose}, as the reference, augmentation introduces random rotations and shifts to mimic changes in the vehicle’s pose. This method accounts for slight discrepancies between the map alignment and the vehicle’s sensor data, preparing the model to handle similar disarrange during real-world application.
 
-Specifically, the data augmentation involves:
+Specifically, the data augmentation, depicted in Figure~\ref{fig:data_augmentation_maps} involves:
 \begin{itemize}
     \item Rotation: The map is randomly rotated within a range of -30 to 30 degrees to simulate orientation variations between the map and the vehicle.
     \item The map is shifted horizontally and vertically by up to 10\% of the image’s width and height, respectively, to account for minor lateral and vertical misalignments.
@@ -541,8 +558,8 @@ Directly using GNSS (Global Navigation Satellite System) data to align the map a
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/data_augmentation_zoom.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \caption{Visual representation of various data augmentations applied to the same frame: different rotations and translations are demonstrated.}
+    \label{fig:data_augmentation_maps}
 \end{figure}
 Using optimized positioning data that has been corrected through standard methods, a consistent and reliable ground-truth alignment is achieved, after which the previously described augmentation is applied, in order to get the most effective and well-balanced dataset possible.
 
@@ -551,9 +568,9 @@ In conclusion, all input loaders and data augmentation techniques have been desc
 \subsection{Target Loader}
 The target loader is responsible for providing the target values that the network aims to predict. This loader prepares the ground-truth values for these transformations, giving the network a reference for learning to estimate spatial adjustments. In this context, the four values the network must predict include:
 \begin{enumerate}
-    \item Translation along the x-axis,
-    \item Translation along the y-axis,
-    \item Translation along the z-axis, 
+    \item Translation along the x-axis;
+    \item Translation along the y-axis;
+    \item Translation along the z-axis;
     \item Rotation around the heading (yaw) axis.
 \end{enumerate}
 By learning these values, the network can effectively align the augmented data back to its original position, enhancing its robustness and accuracy in spatial localization.
@@ -562,7 +579,7 @@ By learning these values, the network can effectively align the augmented data b
 
 As outlined in the previous subsection, the target is a set of four parameters: \( x \), \( y \), \( z \), and \( \theta \). These parameters define transformations between two primary reference frames: the world frame and the body-car frame. The transformation data can be computed either from the map to the car or vice-versa and are visualized accordingly.
 
-Specifically, we focus on transformations between these two frames:
+Specifically, we focus on transformations between these two frames, as depicted in Figure~\ref{fig:post_processing}:
 \begin{enumerate}
     \item \textbf{From World to Body Frame}: This transformation matrix, denoted as \( T_{W \to B} \), converts coordinates from the world frame (\( W \)) to the body (car) frame (\( B \)). It is defined as:
     \begin{equation}
@@ -597,18 +614,18 @@ Specifically, we focus on transformations between these two frames:
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{LateX//figs/post_proc.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \caption{The two images represent two different ways to process the output data: the roto-translation can be applied to the vehicle (right image) or to the map (left image).}
+    \label{fig:post_processing}
 \end{figure}
 
 \section{Dataset}
 
 The dataset comprises multiple sequences recorded in diverse urban environments, capturing a variety of driving conditions. Each frame in these sequences includes not only visual data but also synchronized information from all sensors mounted on the vehicle. The data is stored in an efficient \texttt{.bin} file format, optimizing storage and facilitating streamlined data handling. The dataset is collected from autonomous test vehicles equipped with a range of sensors, typically including:
 \begin{itemize}
-    \item Long-range cameras
-    \item Short-range cameras
-    \item Radars
-    \item GPS/GNSS
+    \item Long-range cameras;
+    \item Short-range cameras;
+    \item Radars;
+    \item GPS/GNSS.
 \end{itemize}
 
 \subsection{Sensor Suite}
@@ -616,12 +633,12 @@ The dataset comprises multiple sequences recorded in diverse urban environments,
 The sensor suite configuration of the test vehicles integrates various sensors to provide a comprehensive perception of the environment. An illustration of the sensor suite configuration is shown in Figure \ref{fig:sensor-suite}. 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX/figs/sensor_suite2.pdf}
-    \caption{Illustration of the Sensor Suite Configuration. ATTENZIONE IMMAGINE DA CORREGGERE}
+    \includegraphics[width=1\linewidth]{LateX//figs/carallview.pdf}
+    \caption{Sensor suite representation: the front view and back view of the equipment, along with a BEV representation of the sensor mounting positions. Orange indicates the long-range stereo camera, green represents radar (mid-range or long-range), yellow appoints short-range stereo camera, and blue denotes the GNSS-IMU sensor.}
     \label{fig:sensor-suite}
 \end{figure}
 
-The long-range cameras can be utilized either as stereo cameras or mono cameras, depending on the type of test being conducted. In the specific sequences used for this project, data is sourced from six stereo cameras with a $120$-degree field of view. These cameras capture images at a resolution of $3840 \times 2160$ pixels and are used at a scale of $2$ (i.e., their dimensions are halved through pyramid scaling). This down-scaling facilitates faster inference operations by reducing computational load while retaining essential visual information.
+The long-range cameras can be used either as stereo cameras or mono cameras, depending on the type of test being conducted. In the specific sequences used for this project, data is sourced from six stereo cameras with a $120$-degree field of view. These cameras capture images at a resolution of $3840 \times 2160$ pixels and are used at a scale of $2$ (i.e., their dimensions are halved through pyramid scaling). This down-scaling facilitates faster inference operations by reducing computational load while retaining essential visual information.
 
 Short-range cameras are positioned lower on the vehicle to enable a $360$-degree reconstruction of the environment around the car. These cameras capture images at a resolution of $1920 \times 1080$ pixels and are used at full scale. Like the long-range cameras, they are stereo cameras but with a smaller baseline. This configuration allows for deterministic and traditional depth measurements of objects, making it easier to accurately position them within the world coordinates.
 
@@ -650,27 +667,27 @@ Types of Automotive Radars:
 \begin{itemize}
     \item Long-Range Radars: Capable of detecting objects up to 300 meters away, suitable for Adaptive Cruise Control (ACC) and highway driving scenarios.
     \item Medium-Range Radars: With a range of about $100$ meters, these are effective for detecting cross traffic, aiding in lane changes, and merging maneuvers.
-    \item Short-Range Radars: Effective up to 30 meters, ideal for low-speed maneuvers such as parking and navigating in tight spaces.
+    \item Short-Range Radars: Effective up to $30$ meters, ideal for low-speed maneuvers such as parking and navigating in tight spaces.
 \end{itemize}
 
 On the test vehicle, multiple radars are installed, including one long-range radar positioned at the front of the vehicle and several medium-range radars strategically placed to cover the surrounding environment.
 
-At the conclusion of the dataset description, it is pertinent to highlight the specific areas of the city where the recorded sequences were collected. The data was gathered in various locations around Parma, including Via Langhirano, the train station area, and the Parma Fiere. These sequences comprise a total of [insert total frame count] frames, which were divided into training and validation sets to facilitate the model's development and evaluation.
-
-During the project's development, two different dataset splits were utilized. Initially, only sequences from a specific area were used to reduce data volume and focus on refining the model's structure and functionality. This approach allowed for rapid iteration and debugging without the complexity of a large, diverse dataset. Once the foundational methodology was established and the optimal workflow was determined, the dataset was expanded to include all available recorded sequences. This expansion introduced greater diversity and complexity, enhancing the model's ability to generalize across different environments.
-
+At the conclusion of the dataset description, it is pertinent to highlight the specific areas of the city where the recorded sequences were collected. The data was gathered in various locations around Parma, including Via Langhirano, the train station area, and the Parma Fiere, as represented in Figure~\ref{fig:dataset_map}. These sequences comprise a total of [insert total frame count] frames, which were divided into training and validation sets to facilitate the model's development and evaluation.
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/sequence_map.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \caption{City representation with highlighted zones where the sequences were recorded.}
+    \label{fig:dataset_map}
 \end{figure}
-The sequences are varied, captured under diverse weather conditions and traffic scenarios, including both well-illuminated days and nighttime recordings with varying illumination levels. Some sequences were recorded in adverse weather conditions, contributing to the dataset's robustness. Additionally, certain sequences lack data from some cameras (referred to as \textit{missing modalities}). This variation is advantageous, as it trains the model to be robust against different sensor suite configurations and to handle scenarios where some sensor data may be unavailable.
+
+During the project's development, two different dataset splits were utilized. Initially, only sequences from a specific area were used to reduce data volume and focus on refining the model's structure and functionality. This approach allowed for rapid iteration and debugging without the complexity of a large, diverse dataset. Once the foundational methodology was established and the optimal workflow was determined, the dataset was expanded to include all available recorded sequences. This expansion introduced greater diversity and complexity, enhancing the model's ability to generalize across different environments.
+
+The sequences are varied, captured under different weather conditions and traffic scenarios, including both well-illuminated days and nighttime recordings with varying illumination levels. Some sequences were recorded in adverse weather conditions, contributing to the dataset's robustness. Additionally, certain sequences lack data from some cameras (referred to as \textit{missing modalities}) as shown in Figure~\ref{fig:missing_modalities}. This variation is advantageous, as it trains the model to be robust against different sensor suite configurations and to handle scenarios where some sensor data may be unavailable.
 \begin{figure}
     \centering
     \includegraphics[width=0.9\linewidth]{LateX//figs/missing_modalities.pdf}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \caption{Representation of missing modalities: in the left image, the short-range cameras were disconnected; in the right image, one of the long-range cameras was out of use.}
+    \label{fig:missing_modalities}
 \end{figure}
 \section{Methodology}
 
@@ -680,4 +697,4 @@ The entire code-base was developed in Python, chosen for its compatibility with 
 
 For training the neural network, \textit{CUDA} (Compute Unified Device Architecture) was employed to leverage GPU acceleration \cite{cuda}. CUDA is a parallel computing platform and programming model developed by NVIDIA, enabling dramatic increases in computing performance by harnessing the power of graphics processing units (GPUs). By utilizing CUDA, the code can perform parallel computations efficiently, significantly reducing training time and improving performance.
 
-The training phase was conducted on a dedicated server equipped with three NVIDIA Tesla V100 GPUs, each with $32$ GB of memory, $256$ GB of RAM, and a 64-core processor. Despite the availability of multiple GPUs, most of the training utilized a single GPU due to concurrent tasks that needed to be managed simultaneously. This setup provided the necessary computational resources to handle the intensive processing requirements of training deep neural networks.
+The training phase was conducted on a dedicated server equipped with three NVIDIA Tesla V100 GPUs, each with $32$ GB of memory, $256$ GB of RAM, and a $64$-core processor. Despite the availability of multiple GPUs, most of the training utilized a single GPU due to concurrent tasks that needed to be managed simultaneously. This setup provided the necessary computational resources to handle the intensive processing requirements of training deep neural networks.

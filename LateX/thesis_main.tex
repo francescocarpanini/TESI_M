@@ -3,16 +3,20 @@
 % INITIALIZATION 
 \linespread{1.5}
 \setlength{\headheight}{14.5pt}
-\setlength{\skip\footins}{3.5pc plus 5pt minus 2pt}
+\setlength{\skip\footins}{2.5pc plus 5pt minus 2pt}
 
 % IMPORT ALL THE USEFUL PACKAGES
 \usepackage{layout}
+\usepackage{changepage}
+\usepackage{adjustbox}
 \RequirePackage{watermark}
 \usepackage{background}
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc} 
 \usepackage{fancyhdr}
 \usepackage{amsmath}
+\usepackage{makecell} 
+\usepackage{longtable} 
 %\usepackage[nosort]{cite}
 \usepackage{graphicx}
 \usepackage{epstopdf}
@@ -26,6 +30,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{amsfonts}
+\usepackage{caption}
 
 \usepackage{tikz}
 \usetikzlibrary{positioning}
@@ -85,8 +90,9 @@
 
 \begin{document}
 \frenchspacing 
-\linespread{1.2}
+\linespread{1.3}
 \graphicspath{{figs/}}
+\captionsetup[table]{skip=12pt}
 
 \newgeometry{top=3cm, bottom=3cm, left=3cm, right=3cm}
 \begin{frontmatter}
@@ -133,23 +139,23 @@
 
 
 \cleardoublepage
-\renewcommand\contentsname{Tabella dei Contenuti} % translate name in italian if necessary
+%\renewcommand\contentsname{Tabella dei Contenuti} % translate name in italian if necessary
 \tableofcontents
-\markboth{Tabella dei Contenuti}{Tabella dei Contenuti} % translate name in italian if necessary
+%\markboth{Tabella dei Contenuti}{Tabella dei Contenuti} % translate name in italian if necessary
 \cleardoublepage
 \phantomsection
 
 \cleardoublepage
-\renewcommand\contentsname{Elenco delle Figure} % translate name in italian if necessary
+%\renewcommand\contentsname{Elenco delle Figure} % translate name in italian if necessary
 \listoffigures
-\markboth{Elenco delle Figure}{Elenco delle Figure} % translate name in italian if necessary
+%\markboth{Elenco delle Figure}{Elenco delle Figure} % translate name in italian if necessary
 \cleardoublepage
 \phantomsection
 
 \cleardoublepage
-\renewcommand\contentsname{Elenco delle Tabelle} % translate name in italian if necessary
+%\renewcommand\contentsname{Elenco delle Tabelle} % translate name in italian if necessary
 \listoftables
-\markboth{Elenco delle Tabelle}{Elenco delle Tabelle} % translate name in italian if necessary
+%\markboth{Elenco delle Tabelle}{Elenco delle Tabelle} % translate name in italian if necessary
 \cleardoublepage
 \phantomsection
 
@@ -160,7 +166,7 @@
 \mainmatter
 
 %Margini provvisori solo per visualizzazione, andare a modificare per stampa finale
-\newgeometry{top=3cm, bottom=2.5cm, left=3cm, right=3cm}
+\newgeometry{top=3.5cm, bottom=2.5cm, left=3cm, right=3cm}
 %\newgeometry{top=2cm, bottom=1cm, left=1cm, right=1cm} %per stampare bozza
 
 \input{intro.tex}
