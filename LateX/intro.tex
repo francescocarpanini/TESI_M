@@ -3,16 +3,21 @@
 \addcontentsline{toc}{chapter}{\numberline{}Introduction}
 \markboth{Introduction}{Introduction}
 
-This thesis presents MapAlign, a neural network specifically designed to automatically generate ground truth data. This ground truth is used to create a dataset for training a deeper neural network capable of generating HD maps in real time. As expected, such a network requires a robust and comprehensive dataset to ensure effective training and reliable performance.
+This thesis is the outcome of an internship at VisLab (an Ambarella Inc. company) during the spring and summer of 2024. VisLab, originally established as a spin-off of the University of Parma, operates in the autonomous driving sector. The project focuses on developing offline methods for localization on HD maps using deep learning-based neural networks for automatic ground truth generation.
+
+HD maps are crucial for autonomous driving tasks but are expensive to maintain and keep updated. To address this, alternative approaches are being explored, such as neural networks capable of generating HD maps in real time. A critical component of this process is the development of an offline localization method that ensures the accuracy and quality of the dataset used during the training phase that comprehends both output of sensors and a query of the HD map.
+
+Currently, state-of-the-art methods achieve the required precision in localization tasks only through significant human effort to manually align the map with the vehicle’s perception, and then traditional algorithms to refine the process by minimizing some cost functions. This thesis aims to eliminate the need for such manual intervention.
+
+The proposed solution is MapAlign, a neural network designed to automatically generate ground truth data. This ground truth is then used to create datasets for training deeper neural networks. The strength of such networks depends on the availability of robust training data.
 
 The thesis is structured as follows:
+\begin{itemize}
+    \item Chapter 1 presents the concepts of autonomous driving, the importance of HD maps, and the role of localization in this context. It also reviews the state-of-the-art localization techniques currently in use;
+    \item Chapter 2 provides an overview of neural networks and describes the dataset preparation process required to train MapAlign;
+    \item Chapter 3 examines the development of different neural network architectures. It compares two approaches: a network that operates without images with one that incorporates such data, presenting the results of different configurations;
+    \item Chapter 4 concludes with an analysis of the results to determine the best trade-off between performance and efficiency. Future directions and potential improvements are discussed, with a focus on real-world applications.
 
-Chapter 1 introduces the concepts of autonomous driving, the role of maps, and the importance of HD maps. Additionally, it provides an overview of the state-of-the-art localization techniques for HD maps.
+\end{itemize}
 
-Chapter 2 offers an introduction to neural networks and describes the dataset necessary to train MapAlign. It highlights the types of data required and the preparation steps involved.
-
-Chapter 3 explores the various neural network architectures, presenting the results obtained from different attempts and configurations.
-
-Chapter 4 concludes with a comparison of the results to identify the best trade-off between performance and efficiency. Future developments and potential improvements are also discussed, focusing on enabling real-world applications of the proposed model.
-
-This work aims to contribute to the field of autonomous driving by simplifying the generation of HD map datasets, ultimately facilitating the development of more advanced and reliable mapping systems.
+This thesis aims to advance autonomous driving by rearranging the generation of HD map datasets, by supporting the development of more reliable and efficient mapping systems.
