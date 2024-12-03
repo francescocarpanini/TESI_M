@@ -36,7 +36,7 @@ Figure~\ref{fig:model1} illustrates the complete structure of the proposed model
 \end{figure}
 
 The primary goal of this model was to accurately predict the four values that allow the alignment between the car pose and the HD map: translations along the \( x, y, z \) axes and the heading angle. Alongside model design, appropriate loss functions were also defined. As described in Chapter 1, the three loss functions used were L1, L1-smooth, and MSE.
-It is advantageous to employ a single loss function that accounts for all parameters collectively, as this ensures the network learns to optimize the relationships and trade-offs between them in a comprehensive manner. However, incorporating individual loss components for each parameter can further enhance the model's performance by encouraging it to focus on specific prediction tasks. This approach enhances interpretability by enabling the network to recognize parameter-specific shades and promotes generalization by preventing any single parameter from dominating the optimization process. For this reason two additional specialized losses for the translationvalues and heading angle were added. 
+It is advantageous to employ a single loss function that accounts for all parameters collectively, as this ensures the network learns to optimize the relationships and trade-offs between them in a comprehensive manner. However, incorporating individual loss components for each parameter can further enhance the model's performance by encouraging it to focus on specific prediction tasks. This approach enhances interpretability by enabling the network to recognize parameter-specific shades and promotes generalization by preventing any single parameter from dominating the optimization process. For this reason two additional specialized losses for the translation values and heading angle were added. 
 The heading angle was especially critical and challenging to learn accurately, so this structure was consistent across different model versions.
 
 The initial iterations used the following high-level parameters:
@@ -92,7 +92,7 @@ The model's performances during evaluation aligned with expectations, and the tr
     \setlength{\tabcolsep}{10pt}
     \begin{tabular}{c c c c c}
         \toprule
-        \textbf{Iteration} & \textbf{$\Delta$ Pose [m]} & \textbf{$\Delta \theta$ [rad] $\rightarrow$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta h$ [m]} \\
+        \textbf{Iteration} & \textbf{$\Delta$Pose [m]} & \textbf{$\Delta \theta$ [rad] $\rightarrow$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta z$ [m]} \\
         \midrule
         \num{20000}  & 2.02 & $0.05 \rightarrow 2.86$  & 1.94 & 0.08 \\
         \num{40000}  & 1.43 & $0.22 \rightarrow 12.6$  & 1.37 & 0.06 \\
@@ -127,7 +127,7 @@ Since the specific loss graphs didn’t show any significant difference, only th
     \setlength{\tabcolsep}{10pt} 
     \begin{tabular}{c c c c c}
         \toprule
-        \textbf{Iteration} & \textbf{$\Delta$ Pose [m]} & \textbf{$\Delta \theta$ [rad] $\rightarrow$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta h$ [m]} \\
+        \textbf{Iteration} & \textbf{$\Delta$Pose [m]} & \textbf{$\Delta \theta$ [rad] $\rightarrow$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta z$ [m]} \\
         \midrule
         \num{20000}  & 2.00 & $0.11 \rightarrow 6.31$  & 1.98 & 0.02 \\
         \num{40000}  & 1.89 & $0.13 \rightarrow 7.45$  & 1.84 & 0.05 \\
@@ -168,7 +168,7 @@ Below is reported a summary of the evaluation results observed during the traini
     \setlength{\tabcolsep}{10pt} 
     \begin{tabular}{c c c c c}
         \toprule
-        \textbf{Iteration} & \textbf{$\Delta$ Pose [m]} & \textbf{$\Delta \theta$ [rad] $\rightarrow$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta h$ [m]} \\
+        \textbf{Iteration} & \textbf{$\Delta$Pose [m]} & \textbf{$\Delta \theta$ [rad] $\rightarrow$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta z$ [m]} \\
         \midrule
         \num{20000}  & 1.75 & $0.14 \rightarrow 8.02$  & 1.73 & 0.02 \\
         \num{40000}  & 1.81 & $0.14 \rightarrow 8.02$  & 1.73 & 0.02 \\
@@ -201,7 +201,7 @@ The results obtained with the Mean Squared Error (MSE) loss function (Table~\ref
     \setlength{\tabcolsep}{10pt} 
     \begin{tabular}{c c c c c}
         \toprule
-        \textbf{Iteration} & \textbf{$\Delta$ Pose [m]} & \textbf{$\Delta \theta$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta h$ [m]} \\
+        \textbf{Iteration} & \textbf{$\Delta$Pose [m]} & \textbf{$\Delta \theta$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta z$ [m]} \\
         \midrule
         \num{20000}  & 4.69 & 2.74  & 4.68 & 0.01 \\
         \num{40000}  & 4.31 & 2.02  & 4.30 & 0.01 \\
@@ -223,7 +223,7 @@ Similarly, Table~\ref{tab:pose_variations_deg_l1} shows the results obtained usi
     \setlength{\tabcolsep}{10pt}
     \begin{tabular}{c c c c c}
         \toprule
-        \textbf{Iteration} & \textbf{$\Delta$ Pose [m]} & \textbf{$\Delta \theta$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta h$ [m]} \\
+        \textbf{Iteration} & \textbf{$\Delta$Pose [m]} & \textbf{$\Delta \theta$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta z$ [m]} \\
         \midrule
         \num{20000}  & 3.88 & 2.16  & 3.64 & 0.24 \\
         \num{40000}  & 3.68 & 1.77  & 3.45 & 0.24 \\
@@ -245,7 +245,7 @@ Finally, the Smooth L1 loss function yielded the best results, as shown in Table
     \setlength{\tabcolsep}{10pt} 
     \begin{tabular}{c c c c c}
         \toprule
-        \textbf{Iteration} & \textbf{$\Delta$ Pose [m]} & \textbf{$\Delta \theta$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta h$ [m]} \\
+        \textbf{Iteration} & \textbf{$\Delta$Pose [m]} & \textbf{$\Delta \theta$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta z$ [m]} \\
         \midrule
         \num{20000}  & 3.08 & 1.59  & 2.61 & 0.47 \\
         \num{40000}  & 3.05 & 1.51  & 2.61 & 0.47 \\
@@ -296,7 +296,7 @@ A summary of the results obtained during different evaluation stages, as iterati
     \setlength{\tabcolsep}{10pt} 
     \begin{tabular}{c c c c c}
         \toprule
-        \textbf{Iteration} & \textbf{$\Delta$ Pose [m]} & \textbf{$\Delta \theta$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta h$ [m]} \\
+        \textbf{Iteration} & \textbf{$\Delta$Pose [m]} & \textbf{$\Delta \theta$ [deg]} & \textbf{$\Delta x + \Delta y$ [m]} & \textbf{$\Delta z$ [m]} \\
         \midrule
         \num{10000}   & 2.35 & 1.70  & 2.21 & 0.14 \\
         \num{20000}   & 2.16 & 1.04  & 1.88 & 0.28 \\
@@ -416,7 +416,7 @@ The results of the evaluation, as presented in Table~\ref{tab:pose_variations}, 
     \scriptsize
     \begin{tabular}{>{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{3.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm}}
         \toprule
-        \textbf{Iteration} & \textbf{$\Delta$ Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta h$} \\
+        \textbf{Iteration} & \textbf{$\Delta$Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta z$} \\
         & \text{[m]} & \text{[deg]} & \text{[m]} & \text{[m]} \\
         \midrule
         \num{20000} & 0.52 & 1.4  & 0.50 & 0.01 \\
@@ -481,7 +481,7 @@ The choice of optimizer is a recurring topic in machine learning research. It is
     \scriptsize
     \begin{tabular}{>{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{3.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm}}
         \toprule
-        \textbf{Iteration} & \textbf{$\Delta$ Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta h$} \\
+        \textbf{Iteration} & \textbf{$\Delta$Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta z$} \\
         & \text{[m]} & \text{[deg]} & \text{[m]} & \text{[m]} \\
         \midrule
         \num{20000}  & 0.58 & 1.50   & 0.57 & 0.01 \\
@@ -501,7 +501,7 @@ Adam appears to be an excellent choice when the goal is to accelerate training, 
 
 As in the initial approach, the model was tested by performing inference on sequences that were not included during the training phase. Figure~\ref{fig:bev_inference_2} highlights three particularly interesting scenarios, demonstrating the model's robustness in diverse and challenging conditions.
 
-In the first case, the model performs well even on a straight road with minimal texture, a condition that previously posed difficulties for alignment. This result underscores the improved capability of the model to handle scenarios with limited visual cues.
+In the first case, the model demonstrates strong performance even on straight roads with minimal texture, a condition that previously challenged alignment. These results highlight the enhanced ability of the model to manage scenarios with limited visual keys. Notably, the inference was performed on the same sequence where the previous architecture struggled, showcasing improvements not only in quantitative metrics but also in practical real-world scenarios.
 
 The second example involves a complex situation: an intersection with multiple lanes that gradually disappear shortly after the crossing. Despite the intricate nature of this environment, the model successfully maintains alignment, demonstrating its abilities.
 

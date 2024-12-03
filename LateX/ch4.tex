@@ -21,26 +21,28 @@ Table~\ref{tab:evaluation_results_2} summarizes all the attempts made, highlight
 
 \begin{table}[H]
 \centering
-\caption{Comparison of evaluation results across different architectures, with the best performing results, for each, highlighted in bold.}
+\caption{Comparison of evaluation results across different architectures, with the best performing results highlighted in bold.}
 \label{tab:evaluation_results_2}
-\scriptsize 
-\renewcommand{\arraystretch}{1} 
-\begin{tabular}{llcllccr}
+\scriptsize
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lcccccccc}
 \toprule
-\textbf{Method} & \makecell{\textbf{Dataset}\\\textbf{Split}} & \makecell{\textbf{Heading}\\\textbf{Measurement}\\\textbf{Unit}} & \textbf{Batch Size} & \makecell{\textbf{Loss}\\\textbf{Function}} & \textbf{Iterations} & \makecell{\textbf{Eval}\\$\Delta$\textbf{Pose}} & \makecell{\textbf{Eval}\\$\Delta \theta$} \\
+\textbf{Method} & \makecell{\textbf{Dataset}\\\textbf{Split}} & \makecell{\textbf{Heading}\\\textbf{Measurement}\\\textbf{Unit}} & \textbf{Optimizer} & \makecell{\textbf{Batch}\\\textbf{Size}} & \makecell{\textbf{Loss}\\\textbf{Function}} & \textbf{Iterations} & \makecell{\textbf{Eval}\\$\Delta$\textbf{Pose}\\(m)} & \makecell{\textbf{Eval}\\$\Delta \theta$\\(deg)} \\
 \midrule
-Just detector & Via Lang & RAD & 64 & MSE        & 100,000 & 1.54 & 1.15 \\
-Just detector & Via Lang & RAD & 64 & L1         & 100,000 & 1.40 & 1.72 \\
-Just detector & Via Lang & RAD & 64 & L1 Smooth  & 100,000 & 1.38 & 1.15 \\
-Just detector & Via Lang & DEG & 64 & MSE        & 100,000 & 2.51 & 1.81 \\
-Just detector & Via Lang & DEG & 64 & L1         & 100,000 & 2.05 & 1.45 \\
-Just detector & Via Lang & DEG & 64 & L1 Smooth  & 100,000 & 1.65 & 1.10 \\
-Just detector & All      & DEG & 64 & L1 Smooth  & 100,000 & \textbf{1.61} & \textbf{0.74} \\
-BEV           & All      & DEG & 32 & L1 Smooth  & 100,000 & \textbf{0.01} & \textbf{0.004} \\
-BEV           & All      & DEG & 32 & L1 Smooth  & 100,000 & 0.03 & 0.004 \\
+Detectors & Via Lang & RAD & SGD  & 64 & MSE         & 100,000 & 1.54        & 1.15        \\
+Detectors & Via Lang & RAD & SGD  & 64 & L1          & 100,000 & 1.40        & 1.72        \\
+Detectors & Via Lang & RAD & SGD  & 64 & L1 Smooth   & 100,000 & 1.38        & 1.15        \\
+Detectors & Via Lang & DEG & SGD  & 64 & MSE         & 100,000 & 2.51        & 1.81        \\
+Detectors & Via Lang & DEG & SGD  & 64 & L1          & 100,000 & 2.05        & 1.45        \\
+Detectors & Via Lang & DEG & SGD  & 64 & L1 Smooth   & 100,000 & 1.65        & 1.10        \\
+Detectors & All      & DEG & SGD  & 64 & L1 Smooth   & 100,000 & \textbf{1.61} & \textbf{0.74} \\
+BEV       & All      & DEG & Adam & 32 & L1 Smooth   & 100,000 & 0.03        & 0.004       \\
+BEV       & All      & DEG & SGD  & 32 & L1 Smooth   & 100,000 & \textbf{0.01} & \textbf{0.004} \\
 \bottomrule
 \end{tabular}
 \end{table}
+
 
 The potential real-world applications of these methods are promising. The second approach, in particular, could be employed for ground truth generation during dataset creation, as described in Chapter 1. This application focuses on generating high-definition (HD) maps in real time using the car’s sensor suite and a basic standard-definition (SD) map. As mentioned earlier, perfect alignment is critical for defining the input and target data of the network.
 

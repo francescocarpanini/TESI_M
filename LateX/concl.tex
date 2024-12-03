@@ -2,9 +2,22 @@
 \addcontentsline{toc}{chapter}{\numberline{}Conclusion}
 \markboth{Conclusion}{Conclusion}
 
-In conclusion, the results achieved met the initial expectations, successfully delivering the performance required to accomplish the primary objective: enabling the offline localization on HD maps without the need of any manual adjustments.
+RILEGGERE E AMPLIAREEEEEEEE
+This thesis provided a comprehensive review of the state of the art in HD map-based localization, a critical topic in autonomous driving. After introducing neural networks, their structure, and key components, the thesis focused on two different neural network-based approaches for offline localization aimed at generating ground truth for networks capable of reconstructing the details of an HD map in real time.
 
-As outlined in dedicated sections, there are numerous potential opportunities for further development. These include maintaining the current architecture while incorporating more generalized data during the training phase by increasing dimension of the dataset by integrating different scenarios or exploring alternative architectures to improve precision. 
+The two approaches involved in this research were distinct yet complementary. The first approach utilized features extracted from detectors as inputs along with relevant sections of the HD map. The second approach involved using captured images to reconstruct a bird's-eye view (BEV) that was then integrated with the network inputs. Particularly with the second approach, the results met the initial expectations, successfully achieving the goal of enabling offline localization on HD maps without requiring manual adjustments.
 
-However, following the latter approach would likely increase the computational resources required, making it usable just in offline pipelines, where inference times are not that important.
-This work demonstrates a step toward automating localization processes and provides a basis for future improvements aimed at refining performance and expanding applicability.
+As highlighted in the thesis, there are several opportunities for future development. These include enhancing the current architecture by incorporating more generalized data during training, potentially expanding the dataset to cover a wider range of scenarios, or exploring alternative architectures to improve precision. 
+
+However, pursuing the latter option may increase the computational resources required, limiting its use to offline pipelines where inference time is not as critical. This work marks an important step toward automating the localization process and provides a foundation for future advancements aimed at refining performance and broadening its applicability.
+
+By examining the inner workings of neural networks and making adjustments to custom architectures, this research moves beyond traditional fine-tuning and offers valuable insights into the development of more robust and adaptable models.
+
+
+
+
+This thesis presented an in-depth exploration of HD map-based localization, a fundamental aspect of autonomous driving systems. In the context of this research, two novel neural network architectures were developed to address the challenge of offline localization, with the goal of generating ground truth data for HD map reconstruction in real-time. These approaches were designed to handle different aspects of the localization process, leveraging neural networks to enhance the accuracy and efficiency of aligning vehicle sensor data with detailed HD maps.
+
+The first architecture focused on utilizing features extracted from environmental detectors as inputs, along with relevant sections of the HD map. This approach was chosen to efficiently integrate available sensor data with the static map information, aiming to improve the alignment precision. The second architecture took a different route by reconstructing a bird's-eye view (BEV) from captured images, which was then combined with the network's inputs. This architecture was designed to enhance the network’s ability to interpret spatial relationships from the sensor data, enabling more robust localization in dynamic environments.
+
+These two approaches were developed to meet different operational needs. The first approach offers a straightforward method that prioritizes the direct integration of sensor data with HD map sections, while the second approach leverages a more complex, image-based transformation that enhances the spatial understanding of the environment. Both architectures were evaluated with the aim of achieving high-performance offline localization with minimal manual intervention, contributing to the overall goal of automating the localization process for autonomous driving systems.

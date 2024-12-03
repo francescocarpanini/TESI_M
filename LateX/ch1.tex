@@ -41,7 +41,7 @@ Maps are essential to the development and implementation of autonomous driving s
 The simplest of these are Standard-Definition (SD) maps, which are typically used in conventional GPS-based navigation systems. SD maps show a complete map of the roads, points of interest (POIs) like landmarks and businesses, basic journey information, and sometimes also traffic data. They are the digital equivalent of traditional paper maps as can be seen in Figure~\ref{fig:sd_map}, containing essential details needed to navigate from \textit{point A} to \textit{point B} \cite{Mudduluru_SD_vs_HD_Maps, Chiang2021}.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\linewidth]{LateX//figs/SD_MAP.pdf}
+    \includegraphics[width=0.65\linewidth]{LateX//figs/SD_MAP_compressed.pdf}
     \caption{Illustration of an SD map showcasing its limitations in providing the fine-grained details.}
     \label{fig:sd_map}
 \end{figure}
@@ -57,7 +57,7 @@ High-Definition (HD) Maps play a crucial role in autonomous driving by providing
 Unlike traditional maps, HD Maps include semantic information, such as labeled features for lanes, traffic signals, pedestrian zones, and other road elements. This functional context can help understand road rules and identify specific areas with precision. With centimeter-level accuracy \cite{geospatialworld_hd_maps}, combining data from both topological and semantic maps, HD Maps can guarantee precise localization and path planning, as illustrated in Figure~\ref{fig:hd_map}.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/CAP1_MERGE_HD_MAP.pdf}
+    \includegraphics[width=1\linewidth]{LateX//figs/CAP1_MERGE_HD_MAP_compressed.pdf}
     \caption{An example of an HD Map that combines topological and semantic information.}
     \label{fig:hd_map}
 \end{figure}
@@ -73,8 +73,7 @@ For HD maps, to be effective in autonomous driving, they must meet certain stand
     \item High accuracy: HD maps need sub-meter precision to ensure exact positioning.
     \item 3D representation: All map features should be accurately mapped in all three dimensions;
     \item Detailed attributes: Road elements such as lanes, boundaries, and signs must be clearly defined with attribute data;
-    \item Real-world scale consistency: HD maps must precisely match real-world measurements, with no tolerance for scale errors;
-    \item Dynamic data: HD maps should include dynamic information to support the vehicle’s decisions during driving.
+    \item Real-world scale consistency: HD maps must precisely match real-world measurements, with no tolerance for scale errors.
 \end{enumerate}
 
 Today, several companies provide HD mapping services for autonomous driving systems. For instance, the TomTom HD Map \cite{TomTomHDMaps} allows vehicles to locate their position on the road with centimeter-level accuracy. TomTom’s RoadDNA, as shown in Figure~\ref{fig:road_dna}, improves this accuracy further by offering localization layers that work well with various sensor setups, providing data in formats that enhance a vehicle’s understanding of its environment.
@@ -115,12 +114,12 @@ Autonomous vehicles are equipped with advanced sensors that can reconstruct thei
 A neural network architecture can be developed to enable real-time HD map reconstruction. Recent approaches, such as \textit{HDMapNet} \cite{li2022hdmapnetonlinehdmap}, use neural networks to reconstruct HD maps from sensor data captured by the vehicle. These systems focus on dynamically building semantic maps based on observations from onboard sensors. HDMapNet, for instance, combines image features from vehicle cameras and point clouds from LiDAR to predict map elements in bird's-eye view, like it can be seen in Figure ~\ref{fig:hd_map_net}.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/HDmapNET.pdf}
+    \includegraphics[width=1\linewidth]{LateX//figs/HDmapNET_compressed.pdf}
     \caption{In contrast to pre-annotating global semantic maps, a local map learning framework is presented that makes use of on-board sensors to estimate local semantic maps \cite{li2022hdmapnetonlinehdmap}.}
     \label{fig:hd_map_net}
 \end{figure}
 
-To train such neural networks effectively, accurate ground truth data is indispensable. In this context, ground truth refers to the precise segment of the HD map that must be reconstructed from the raw data collected by the vehicle's sensors. Achieving this requires exact localization to align the sensor data with the corresponding HD map. This thesis contributes to this process by automating the creation of training datasets. The proposed method selects ground truth data for the network's target predictions using an offline localization method with high accuracy. By automating this step, the dataset creation pipeline becomes more efficient, enabling faster data processing and analysis. This, in turn, allows the model to train with larger datasets, improving its robustness and scalability over time.
+To train such neural networks effectively, accurate ground truth data is essential. In this context, ground truth refers to the precise segment of the HD map that must be reconstructed from the raw data collected by the vehicle's sensors. Achieving this requires exact localization to align the sensor data with the corresponding HD map. This thesis contributes to this process by automating the creation of training datasets. The proposed method selects ground truth data for the network's target predictions using an offline localization method with high accuracy. By automating this step, the dataset creation pipeline becomes more efficient, enabling faster data processing and analysis. This, in turn, allows the model to train with larger datasets, improving its robustness and scalability over time.
 
 \section{Localization on HD Maps: A State-of-the-Art Review}
 
@@ -296,8 +295,8 @@ The operations described can be summarized in the following pseudo-code, and the
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{drhxfc.pdf}
-    \caption{Illustration of the path optimization process. The figure shows the initial path (orange), manually specified points (green), and the final optimized path (red) overlaid on the HD map.}
+    \includegraphics[width=0.9\linewidth]{LateX/figs/drhxfc_compressed.pdf}
+    \caption{Illustration of the path optimization process. The Figures show the initial path (orange), manually specified points (green), and the final optimized path (red) overlaid on the HD map.}
     \label{fig:optimizer}
 \end{figure}
 

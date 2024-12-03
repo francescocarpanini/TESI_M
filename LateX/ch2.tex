@@ -1,6 +1,6 @@
 \chapter{MapAlign: Deep-Learning based approach}
 
-This chapter introduces neural networks, providing the foundational concepts needed to understand the architecture developed for MapAlign. It emphasizes the critical role of data in this process, followed by an explanation of the dataset and the methods used to manage data in MapAlign and its architecture. 
+This chapter introduces neural networks, providing the foundational concepts needed to understand the architecture developed for MapAlign, it emphasizes the critical role of data in this process, followed by an explanation of the dataset and the methods used to manage data in MapAlign and its architecture. 
 
 \section{Neural Networks}
 Neural Networks (NNs) are computational models inspired by the structure and functionality of the human brain, consisting of interconnected layers of neurons. Just as biological neurons process signals transmitted across synapses, artificial neurons in a neural network receive inputs, process them, and generate outputs \cite{Grosan2011}. These networks are primarily used in a wide range of machine learning tasks such as image recognition, natural language processing, and predictive analytics.
@@ -418,7 +418,7 @@ MapAlign’s primary objective is to output values that populate a rotation-tran
 \subsection{Input Loaders}
 Given the purpose of MapAlign, it is clear that this neural network requires input about the car's surroundings and the portion of the HD map corresponding to the vehicle's current position. These data can be either generated or, in this specific case, collected by autonomous vehicles equipped with extensive sensor suites that will be explained in more detail in the following sections.
 
-The neural network processes data mainly stored in Python dictionaries, which are created by de-serializing binary files generated during the runs of the autonomous vehicle. These runs include both human-driven mode and autonomous driving mode when engaged. Before the network can use the data, it must undergo pre-processing to ensure proper formatting and compatibility with the network's requirements.
+The neural network processes data mainly stored in Python dictionaries, which are created by de-serializing binary files generated during the runs of the autonomous vehicle. These runs include both human-driven mode and autonomous driving mode when engaged. Before the network can use the data, it must be pre-processed to ensure proper formatting and compatibility with the network's requirements.
 
 This subsection details the input loaders used in the system, focusing on how the network takes and prepares data for processing. The network operates with sensor data formatted as tensors, which are structured to resemble multi-channel images. In this representation, each point (analogous to a pixel in an image) contains specific information, while each channel corresponds to data from a particular sensor. 
 The primary input loaders are:
@@ -634,14 +634,14 @@ The dataset comprises multiple sequences recorded in diverse urban environments,
 The sensor suite configuration of the test vehicles integrates various sensors to provide a comprehensive perception of the environment. An illustration of the sensor suite configuration is shown in Figure \ref{fig:sensor-suite}. 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/carallview.pdf}
+    \includegraphics[width=1\linewidth]{LateX//figs/carallview_compressed.pdf}
     \caption{Sensor suite representation: the front view and back view of the equipment, along with a BEV representation of the sensor mounting positions. Orange indicates the long-range stereo camera, green represents radar (mid-range or long-range), yellow appoints short-range stereo camera, and blue denotes the GNSS-IMU sensor.}
     \label{fig:sensor-suite}
 \end{figure}
 
-The long-range cameras can be used either as stereo cameras or mono cameras, depending on the type of test being conducted. In the specific sequences used for this project, data is sourced from six stereo cameras with a $120$-degree field of view. These cameras capture images at a resolution of $3840 \times 2160$ pixels and are used at a scale of $2$ (i.e., their dimensions are halved through pyramid scaling). This down-scaling facilitates faster inference operations by reducing computational load while retaining essential visual information.
+The long-range cameras can be used either as stereo cameras or mono cameras, depending on the type of test being conducted. In the specific sequences used for this project, data is sourced from six stereo cameras with a $70$-degree field of view. These cameras capture images at a resolution of $3840 \times 1920$ pixels and are used at a scale of $2$ (i.e., their dimensions are halved through pyramid scaling). This down-scaling facilitates faster inference operations by reducing computational load while retaining essential visual information.
 
-Short-range cameras are positioned lower on the vehicle to enable a $360$-degree reconstruction of the environment around the car. These cameras capture images at a resolution of $1920 \times 1080$ pixels and are used at full scale. Like the long-range cameras, they are stereo cameras but with a smaller baseline. This configuration allows for deterministic and traditional depth measurements of objects, making it easier to accurately position them within the world coordinates.
+Short-range cameras are positioned lower on the vehicle to enable a $360$-degree reconstruction of the environment around the car. After a de-warping process, these cameras capture images at a resolution of $992 \times 1024$ pixels, which are used at their full scale. Like the long-range cameras, they are stereo cameras but with a smaller baseline. This configuration allows for deterministic and traditional depth measurements of objects, making it easier to accurately position them within the world coordinates.
 
 Pros of Using Stereo Cameras:
 \begin{itemize}
@@ -676,20 +676,31 @@ On the test vehicle, multiple radars are installed, including one long-range rad
 At the conclusion of the dataset description, it is pertinent to highlight the specific areas of the city where the recorded sequences were collected. The data was gathered in various locations around Parma, including Via Langhirano, the train station area, and the Parma Fiere, as represented in Figure~\ref{fig:dataset_map}. These sequences comprise a total of [insert total frame count] frames, which were divided into training and validation sets to facilitate the model's development and evaluation.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/sequence_map.pdf}
+    \includegraphics[width=0.9\linewidth]{LateX//figs/sequence_map.pdf}
     \caption{City representation with highlighted zones where the sequences were recorded.}
     \label{fig:dataset_map}
 \end{figure}
 
 During the project's development, two different dataset splits were utilized. Initially, only sequences from a specific area were used to reduce data volume and focus on refining the model's structure and functionality. This approach allowed for rapid iteration and debugging without the complexity of a large, diverse dataset. Once the foundational methodology was established and the optimal workflow was determined, the dataset was expanded to include all available recorded sequences. This expansion introduced greater diversity and complexity, enhancing the model's ability to generalize across different environments.
 
-The sequences are varied, captured under different weather conditions and traffic scenarios, including both well-illuminated days and nighttime recordings with varying illumination levels. Some sequences were recorded in adverse weather conditions, contributing to the dataset's robustness. Additionally, certain sequences lack data from some cameras (referred to as \textit{missing modalities}) as shown in Figure~\ref{fig:missing_modalities}. This variation is advantageous, as it trains the model to be robust against different sensor suite configurations and to handle scenarios where some sensor data may be unavailable.
-\begin{figure}
+The dataset sequences incorporates a variety of scenarios captured under different weather and traffic conditions. Some sequences are captured without occlusions from other cars, while others are limited by a reduced horizon due to vehicles in front. There are sequences from both well-illuminated days and nighttime recordings, with varying illumination levels. This variation is critical because direct sunlight can cause reflections on camera lenses, rendering them ineffective. Similarly, at night, limited visibility can further restrict the field of view. Additionally, some sequences were recorded under adverse weather conditions, which contribute to the dataset’s robustness. In these cases, water droplets on the lenses can affect sensor performance. For instance, short-range cameras, positioned in the lower part of the vehicle, are particularly susceptible to being obstructed by water droplets.
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{LateX//figs/missing_modalities.pdf}
-    \caption{Representation of missing modalities: in the left image, the short-range cameras were disconnected; in the right image, one of the long-range cameras was out of use.}
+    \includegraphics[width=1\linewidth]{LateX//figs/scenarios.pdf}
+    \caption{Representation of different driving scenarios: obstructions, flare caused by direct sunlight, and nighttime sequences.}
+    \label{fig:scenarios}
+\end{figure}
+
+Certain sequences also lack data from some cameras, a situation referred to as missing modalities. As shown in Figure~\ref{fig:missing_modalities}, this could occur if one of the long-range cameras was turned off or if a sequence was captured without the entire sensor suite dedicated to short-range cameras.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{LateX//figs/missing_modalities.pdf}
+    \caption{Representation of missing modalities: in the left image, the short-range cameras were disconnected, while in the right image, one of the long-range cameras was out of use.}
     \label{fig:missing_modalities}
 \end{figure}
+
+All of these factors impact the detectors' ability to extract relevant environmental information, which in turn complicates the alignment process. 
+
 \section{Methodology}
 
 This section outlines the methodology employed to solve the task. After defining all the inputs and targets for the network and deserializing the required data, it is essential to describe the tools and frameworks utilized in the project. The model's detailed description and the various attempts made will be presented in the subsequent section.
