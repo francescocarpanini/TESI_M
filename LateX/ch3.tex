@@ -1,27 +1,27 @@
-\NoBgThispage
 \chapter{MapAlign: Training and Model Approaches}
 
 This chapter provides a detailed and comprehensive analysis of the developed architecture throughout its various phases, focusing particularly on the two approaches that reached the most promising results.
 
-\section{First Approach}
+\section{Feature-Based Localization}
 
-The first approach aimed to create a model to perform the task explained earlier without using raw images. Instead, it used features extracted by neural network detectors running directly on the car. These detectors captured information like curbs, markings, and boundaries from image sequences and stored it in the packed data described before. This made the input much smaller since the raw image data was not included.
+The first approach developed relied on features already extracted by neural networks running on the car during its operations. These networks captured details like curbs, road markings, and boundaries from image sequences, and the extracted features were saved in a compact data format. By using this pre-processed information instead of raw images, the model significantly reduced the size of the input data.
 
-The \textit{BEVPreprocessor} prepares the input data with a simple structure consisting of a single convolutional layer with just $0.0013$ million parameters, keeping it efficient. 
-The \textit{Backbone}, based on the BiSeNetV1 architecture \cite{DBLP:journals/corr/abs-1808-00897}, is the most complex component, with $12.63$ million parameters. The backbone uses two paths, as shown in Figure~\ref{fig:bisenetv1}: 
+The developed architecture consists of four main components: the preprocessor, backbone, decoder, and network head. Each of these components is analyzed in detail.
+
+The \textit{BEVPreprocessor} prepares the input data with a simple structure consisting of a single convolutional layer with just $0.0013$ million parameters, keeping it efficient. This ensures that all input data is resized to the same dimensions, allowing it to be combined into a single tensor for improved representation.
+
+The \textit{Backbone}, built on the BiSeNetV1 architecture \cite{DBLP:journals/corr/abs-1808-00897}, is the most complex component, containing $12.63$ million parameters. Its main role is to extract relevant features while discarding unnecessary data. As illustrated in Figure~\ref{fig:bisenetv1}, the backbone operates using two distinct paths:
 \begin{enumerate}
     \item Spatial Path: Designed with a small stride to preserve spatial details, this path captures high-resolution features through several convolutional layers, emphasizing fine-grained spatial information.
     \item Context Path: This path quickly down-samples the input to expand the receptive field, helping the model capture broader context. It utilizes Attention Refinement Modules (ARMs) and additional convolutional layers. ARMs allow the model to focus on important regions within the input tensor, significantly contributing to the model's parameter count.
-    
+\end{enumerate}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{LateX//figs/bisenetv1.pdf}
     \caption{Architecture of BiSeNetV1 Backbone. The backbone comprises two parallel paths: the Spatial Path and the Context Path. The dual-path structure enables efficient and accurate segmentation by combining spatial information with global context.}
     \label{fig:bisenetv1}
 \end{figure}
-
-\end{enumerate}
-A Feature Fusion Module is used to efficiently combine the features from the Spatial and Context Paths.
+A Feature Fusion Module is then used to efficiently combine the features from the Spatial and Context Paths.
 
 The \textit{Decoder} then up-samples these features to restore them to the original input resolution, with a parameter count of $0.0924$ million. The role of the decoder is to convert high-level, low-resolution features back into the detailed, high-resolution format needed for accurate output. This component ensures that the model’s outputs match the input tensor's scale, making the model suitable for precise localization tasks.
 
@@ -35,8 +35,8 @@ Figure~\ref{fig:model1} illustrates the complete structure of the proposed model
     \label{fig:model1}
 \end{figure}
 
-The primary goal was to accurately predict the four values that allow the alignment between the car pose and the HD map: translations along the \( x, y, z \) axes and the heading angle. Alongside model design, appropriate loss functions were also defined. As described in Chapter 1, the three loss functions used were L1, L1-smooth, and MSE.
-It is advantageous to employ a single loss function that accounts for all parameters collectively, as this ensures the network learns to optimize the relationships and trade-offs between them in a comprehensive manner. However, incorporating individual loss components for each parameter can further enhance the model's performance by encouraging it to focus on specific prediction tasks. This approach enhances interpretability by enabling the network to recognize parameter-specific shades and promotes generalization by preventing any single parameter from dominating the optimization process. For this reason two additional specialized losses for the translation and heading angle were added. 
+The primary goal of this model was to accurately predict the four values that allow the alignment between the car pose and the HD map: translations along the \( x, y, z \) axes and the heading angle. Alongside model design, appropriate loss functions were also defined. As described in Chapter 1, the three loss functions used were L1, L1-smooth, and MSE.
+It is advantageous to employ a single loss function that accounts for all parameters collectively, as this ensures the network learns to optimize the relationships and trade-offs between them in a comprehensive manner. However, incorporating individual loss components for each parameter can further enhance the model's performance by encouraging it to focus on specific prediction tasks. This approach enhances interpretability by enabling the network to recognize parameter-specific shades and promotes generalization by preventing any single parameter from dominating the optimization process. For this reason two additional specialized losses for the translationvalues and heading angle were added. 
 The heading angle was especially critical and challenging to learn accurately, so this structure was consistent across different model versions.
 
 The initial iterations used the following high-level parameters:
@@ -47,7 +47,7 @@ The initial iterations used the following high-level parameters:
     \item Automatic Mixed Precision (AMP) was enabled to improve training speed and resource use.
 \end{itemize}
 
-The learning rate demonstrated the following behavior during training:
+The learning rate was selected to achieve the following behavior during training:
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{LateX//figs/learning_rate_progression.png}
@@ -62,12 +62,13 @@ Checkpoints were saved every $100$ iterations, and evaluations were performed ev
     \text{eval}_z &= |z_{\text{gt}} - z_{\text{pred}}|, \\
     \text{eval}_{\theta} &= |\theta_{\text{gt}} - \theta_{\text{pred}}|.
 \end{align}
+Since the z-axis is not augmented, the ground truth for translation along this axis must always be zero. Consequently, the network is required to consistently output always the same value.
 
 Training was accelerated with CUDA, using CuDNN benchmarking for improved speed. Initial training sessions utilized only a portion of the dataset to refine the model’s structure and functionality before scaling to the full dataset. The used dataset focused on sequences captured in the southern part of the city. 
 
-\subsection*{Minor SPlit Heading in radiants:}
+\subsection*{Minor Dataset Split with Heading Angle in Radians}
 \subsubsection*{MSE}
-The first training session of the architecture described used MSE as loss function, along with the parameters described above. This approach resulted in a steadily decreasing loss, as shown in Figure~\ref{fig:mse-loss-progression}:
+The first training session of the architecture described used MSE as Loss function, along with the parameters described above. This approach resulted in a regular decreasing loss, as shown in Figure~\ref{fig:mse-loss-progression}:
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/loss_total_mse_progression_comparison.png}
@@ -75,7 +76,7 @@ The first training session of the architecture described used MSE as loss functi
     \label{fig:mse-loss-progression}
 \end{figure}
 
-Focusing on specific losses for the pose and heading angle, the following behavior was observed:
+Focusing on specific losses for pose and heading angle, the following pattern was observed:
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/mse_pose_heading_loss_comparison.png}
@@ -83,9 +84,10 @@ Focusing on specific losses for the pose and heading angle, the following behavi
     \label{fig:pose-heading-loss}
 \end{figure}
 
-The model's behavior during evaluation aligned with expectations, and the training evaluations yielded the following results:
+The model's performances during evaluation aligned with expectations, and the training evaluations yielded the results that are reported in Table~\ref{tab:pose_variations_mse}:
 \begin{table}[H]
     \centering
+    \scriptsize
     \renewcommand{\arraystretch}{1.2} 
     \setlength{\tabcolsep}{10pt}
     \begin{tabular}{c c c c c}
@@ -103,13 +105,13 @@ The model's behavior during evaluation aligned with expectations, and the traini
     \label{tab:pose_variations_mse}
 \end{table}
 
-Despite the loss functions decreasing and reaching very low values, indicating potential generalization and effective learning, the evaluation process reveals that the results are still not optimal or acceptable. The positional error exceeds one meter, which is insufficient for HD map alignment applications, as discussed in Chapter 1. This could be acceptable if iterative optimization is still included in the desired pipeline of the dataset generator. This approach could simply eliminate the part where the sequences had to be manually aligned. However, it was not sufficient, so other attempts were made and will be further demonstrated. 
+Despite the loss functions decreasing and reaching very low values, indicating potential generalization and effective learning, the evaluation process reveals that the results are still not optimal or acceptable. The positional error exceeds one meter, which is insufficient for HD map alignment applications, as discussed in Chapter 1. This could be acceptable if iterative optimization was still included in the desired pipeline of the dataset generator. This approach could simply eliminate the part where the sequences had to be manually aligned. However, it was not sufficient, so other attempts were made and will be further demonstrated. 
 
 \subsubsection*{L1 Loss}
 The results with the L1 loss are consistent with previous observations. 
-The figure below illustrates the behavior of the neural network. Vertically, the first three images represent the inputs: obstacles extracted directly on the car, associated HD maps, and the fusion of the two. The fourth image represents the target, which is the perfect alignment that the network aims to achieve. The last image represents the prediction by the network. As can be seen, this time, the prediction is post-processed to perform a roto-translation of the car and its world reconstruction.
+Figure ~\ref{fig:network-training-results1} illustrates the behavior of the neural network. Vertically, the first three images represent the inputs: features extracted directly by the car, associated HD maps, and the fusion of the two. The fourth image represents the target, which is the perfect alignment that the network aims to achieve. The final image shows the network's prediction. This time, the prediction has been post-processed to apply a roto-translation of the car and its reconstructed environment.
 
-The results, as shown in Figure~\ref{fig:network-training-results1}, present measurements taken at two different points during training: one at the start and one close to the end. At the beginning, the network does not provide accurate values as it has not yet learned to generalize well. By the end of training, the second image on the right demonstrates that the network's performance improves significantly, reducing the misalignments, although they do not reach zero.
+The results, illustrated in Figure~\ref{fig:network-training-results1}, show measurements taken at two stages of training: one at the start and one near the end. Initially, the network produces inaccurate values, as it has not yet learned to generalize effectively. This is evident from the misalignment between the map and the car's reconstructed environment. By the end of training, as shown in the image on the right, the network's performance improves significantly, reducing the misalignments, though they are not completely overcame.
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/IMMAGINI_L1_rete.pdf}
@@ -117,9 +119,10 @@ The results, as shown in Figure~\ref{fig:network-training-results1}, present mea
     \label{fig:network-training-results1}
 \end{figure}
 
-Since the specific loss graphs didn’t show any significant differences, only the evaluation Table is presented for this experiment.
+Since the specific loss graphs didn’t show any significant difference, only the evaluation Table is presented for this experiment.
 \begin{table}[H]
     \centering
+    \scriptsize
     \renewcommand{\arraystretch}{1.2} 
     \setlength{\tabcolsep}{10pt} 
     \begin{tabular}{c c c c c}
@@ -136,23 +139,23 @@ Since the specific loss graphs didn’t show any significant differences, only t
     \caption{Evaluation (L1) values in pose, angle, combined displacement ($\Delta x + \Delta y$), and height across iterations using L1 Loss Function.}
     \label{tab:pose_variations_l1}
 \end{table}
-On the small test set, it’s evident that simply changing the loss function to L1 is insufficient to achieve the required precision to eliminate the iterative optimizer. 
+On the small test set, it is clear that simply switching the loss function to L1 is not enough to achieve the desired precision which is required to eliminate the iterative optimizer.
 
 \subsubsection*{Smooth L1 Loss}
-In this experiment, the Smooth L1 loss, which is similar to L1 but less sensitive to outliers, was employed. The training results, as expected, remained consistent. However, this time, some interesting differences emerged. The results demonstrated slight improvements compared to previous attempts. Both loss graphs and the evaluation table are provided below to illustrate this behavior.
+In this other experiment, the Smooth L1 loss, which is similar to L1 but less sensitive to outliers, was employed. The training results, as expected, remained consistent. However, this time, some interesting differences emerged. The results demonstrated slight improvements compared to previous attempts. Both loss graphs and the evaluation Table are provided below to illustrate the pattern.
 
-The total Loss graph exhibits the anticipated behavior, as depicted in Figure ~\ref{fig:smooth-l1-total-loss} gradually decreasing as the number of iterations increases. 
+The total loss graph shows the expected trend, as illustrated in Figure ~\ref{fig:smooth-l1-total-loss}, with a gradual decrease as the number of iterations increases.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/loss_total_l1s_progression_comparison.png}
-    \caption{Total loss progression using Smooth L1 as the loss function. The plot includes a standard scale on the left and a logarithmic scale on the right for an improved visualization.}
+    \includegraphics[width=0.95\linewidth]{LateX//figs/loss_total_l1s_progression_comparison.png}
+    \caption{Total loss progression using Smooth L1 as Loss function. The plot includes a standard scale on the left and a logarithmic scale on the right.}
     \label{fig:smooth-l1-total-loss}
 \end{figure}
 
-As shown in Figure~\ref{fig:smooth-l1-pose-heading-loss}, the total loss contributions reveal that the translation component constitutes the majority, while the heading loss contributes only a minor portion to the overall result. This observation prompted further investigation into this behavior in following experiments.
+As shown in Figure~\ref{fig:smooth-l1-pose-heading-loss}, the total Loss contributions reveal that the translation component constitutes the majority, while the heading loss contributes only a minor portion to the overall result. This observation prompted further investigation into this behavior in following experiments.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/l1s_pose_heading_loss_comparison.png}
+    \includegraphics[width=0.95\linewidth]{LateX//figs/l1s_pose_heading_loss_comparison.png}
     \caption{Pose (orange) and Heading (yellow) Loss comparison during training. The plot includes a standard scale on the left and a logarithmic scale on the right.}
     \label{fig:smooth-l1-pose-heading-loss}
 \end{figure}
@@ -160,6 +163,7 @@ As shown in Figure~\ref{fig:smooth-l1-pose-heading-loss}, the total loss contrib
 Below is reported a summary of the evaluation results observed during the training session:
 \begin{table}[H]
     \centering
+    \scriptsize
     \renewcommand{\arraystretch}{1.2} 
     \setlength{\tabcolsep}{10pt} 
     \begin{tabular}{c c c c c}
@@ -170,16 +174,16 @@ Below is reported a summary of the evaluation results observed during the traini
         \num{40000}  & 1.81 & $0.14 \rightarrow 8.02$  & 1.73 & 0.02 \\
         \num{60000}  & 1.35 & $0.02 \rightarrow 1.15$  & 1.35 & 0.01 \\
         \num{80000}  & 1.46 & $0.02 \rightarrow 1.15$  & 1.46 & 0.00 \\
-        \num{100000} & 1.38 & $0.02 \rightarrow 1.15$  & 1.38 & 0.00 \\
+        \num{100000} & \textbf{1.38} & $0.02 \rightarrow \textbf{1.15}$  & \textbf{1.38} & \textbf{0.00} \\
         \bottomrule
     \end{tabular}
     \caption{Evaluation (L1) values in pose, angle, combined displacement ($\Delta x + \Delta y$), and height across iterations using Smooth L1 Loss Function.}
     \label{tab:pose_variations_l1s}
 \end{table}
 
-Tables~\ref{tab:pose_variations_mse},~\ref{tab:pose_variations_l1}, and~\ref{tab:pose_variations_l1s} show that the Smooth L1 Loss gave the best results. This makes sense because Smooth L1 combines the strengths of L1 and L2 losses. It handles outliers better than MSE loss while keeping a good balance between speed and stability during training. This makes it a good choice for regression tasks involving spatial transformations. However, the improvements from switching to Smooth L1 loss were not enough to achieve the level of precision needed for this specific task.
+Tables~\ref{tab:pose_variations_mse},~\ref{tab:pose_variations_l1}, and~\ref{tab:pose_variations_l1s} show that the Smooth L1 Loss gave the best results. This makes sense because Smooth L1 combines the strengths of L1 and L2 losses. It handles outliers better than MSE loss while keeping a good balance between speed and stability during training. This proves that it is a good choice for regression tasks involving spatial transformations. However, the improvements from switching to Smooth L1 loss were not enough to achieve the level of precision needed for this specific task.
 
-\subsection*{Minor SPlit Heading in degrees}
+\subsection*{Minor Dataset Split with Heading Angle in Degrees}
 As highlighted by various empirical studies, including \cite{yu2022normalizationeffectsdeepneural}, ensuring that the outputs are normalized or of similar magnitudes can assist in improving network training.
 
 To make predicted values comparable, it is crucial to maintain them on the same scale. This prevents scenarios where variables with larger values disproportionately influence the loss function, overshadowing those with smaller scales. Furthermore, normalized or standardized variables enhance the efficiency of optimization algorithms, such as Adam or SGD, as these algorithms perform better with inputs on a similar scale.
@@ -192,6 +196,7 @@ The results obtained with the Mean Squared Error (MSE) loss function (Table~\ref
 
 \begin{table}[H]
     \centering
+    \scriptsize
     \renewcommand{\arraystretch}{1.2} 
     \setlength{\tabcolsep}{10pt} 
     \begin{tabular}{c c c c c}
@@ -213,6 +218,7 @@ Similarly, Table~\ref{tab:pose_variations_deg_l1} shows the results obtained usi
 
 \begin{table}[H]
     \centering
+    \scriptsize
     \renewcommand{\arraystretch}{1.2} 
     \setlength{\tabcolsep}{10pt}
     \begin{tabular}{c c c c c}
@@ -234,6 +240,7 @@ Finally, the Smooth L1 loss function yielded the best results, as shown in Table
 
 \begin{table}[H]
     \centering
+    \scriptsize
     \renewcommand{\arraystretch}{1.2} 
     \setlength{\tabcolsep}{10pt} 
     \begin{tabular}{c c c c c}
@@ -244,35 +251,31 @@ Finally, the Smooth L1 loss function yielded the best results, as shown in Table
         \num{40000}  & 3.05 & 1.51  & 2.61 & 0.47 \\
         \num{60000}  & 2.55 & 1.67  & 2.54 & 0.00 \\
         \num{80000}  & 2.40 & 1.60  & 2.40 & 0.00 \\
-        \num{100000} & 1.60 & 1.10  & 1.60 & 0.00 \\
+        \num{100000} & \textbf{1.60} & \textbf{1.10}  & \textbf{1.60} & \textbf{0.00} \\
         \bottomrule
     \end{tabular}
     \caption{Evaluation (L1) values in pose, angle (in degrees), combined displacement ($\Delta x + \Delta y$), and height across iterations using Smooth L1 loss.}
     \label{tab:pose_variations_deg_l1s}
 \end{table}
 
-
 These results underscore the critical role of maintaining consistent value scales across predicted parameters and reaffirm the effectiveness of Smooth L1 loss in training this kind of models.
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/l1s_111_DEG_pose_heading_loss_comparison.png}
-    \caption{Enter Caption}
-    \label{fig:enter-label}
+    \caption{Comparison of Pose (orange) and Heading (yellow) losses during training. The plot features a standard scale on the left and a logarithmic scale on the right, highlighting a greater contribution of the heading loss.}
+    \label{fig:deg-l1s-loss-comparison}
 \end{figure}
 
 Converting the heading angle to degrees, as expected, led to improved results by reducing errors and aligning predicted values more closely with the desired targets. Once again, the Smooth L1 loss demonstrated superior generalization performance.
 
-\subsection*{Full dataset split}
+\subsection*{Full Dataset Split with Heading Angle in Degrees}
 As mentioned at the beginning of this section, the previous attempts were conducted without utilizing the entire available dataset. Based on the results from the preliminary experiments, the full dataset was later employed by merging all sequences from the three streets. To ensure the most effective evaluation, only the best-performing model, from the initial analysis, which was trained with the Smooth L1 loss function, was selected for testing. 
 
-The results of this comprehensive evaluation are presented and discussed in detail below, highlighting the model's performance across the expanded dataset.
-
-
-\textbf{Full Dataset Results:} The figures below illustrate the improvements in angle prediction, which are attributed to the increased dataset size, the application of Smooth L1 loss, and the conversion of angles to degrees. Despite these advancements, significant challenges persist in addressing translation errors. While the current approach shows promise and demonstrates improvements, achieving precise HD map alignment will likely require further model refinement or still using the implementation of optimization techniques. This model version has the potential to assist in complex scenarios, but it does not fully resolve the alignment challenge.
+Figure~\ref{fig:total-loss-progression} illustrates the improvements in angle prediction, which are attributed to the increased dataset size, the application of Smooth L1 loss, and the conversion of angles to degrees. Despite these advancements, significant challenges persist in addressing translation errors. While the current approach shows promise and demonstrates improvements, achieving precise HD map alignment will likely require further model refinement or still using the implementation of optimization techniques. This model version has the potential to assist in complex scenarios, but it does not fully resolve the offline localization process.
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{loss_total_l1sDEG_progression_comparison.png}
-    \caption{Progression of total loss with Smooth L1 loss (in degrees).}
+    \caption{Progression of total loss with Smooth L1 Loss (Heading in degrees).}
     \label{fig:total-loss-progression}
 \end{figure}
 
@@ -284,10 +287,11 @@ The results indicate that the contributions of heading and translation errors ar
     \label{fig:pose-heading-loss-2}
 \end{figure}
 
-A summary of the results obtained during different evaluation stages, as iterations progress, is provided in the table below.
+A summary of the results obtained during different evaluation stages, as iterations progress, is provided in Table~\ref{tab:pose_variations_final_sumup}.
 
 \begin{table}[H]
     \centering
+    \scriptsize
     \renewcommand{\arraystretch}{1.2}
     \setlength{\tabcolsep}{10pt} 
     \begin{tabular}{c c c c c}
@@ -303,7 +307,7 @@ A summary of the results obtained during different evaluation stages, as iterati
         \num{100000}  & \textbf{1.61} & \textbf{0.74}  & \textbf{1.61} & \textbf{0.00} \\
         \bottomrule
     \end{tabular}
-    \caption{Variations in pose, angle (in degrees), combined displacement ($\Delta x + \Delta y$), and height across iterations.}
+    \caption{Evaluation (L1) values in pose, angle (in degrees), combined displacement ($\Delta x + \Delta y$), and height across iterations.}
     \label{tab:pose_variations_final_sumup}
 \end{table}
 
@@ -322,8 +326,7 @@ The figure below follows the same layout as before, showing the input, the targe
     \label{fig:inference-results}
 \end{figure}
 
-
-\section{Second Approach}
+\section{Image-Based Localization: BEV Reconstruction}
 
 Based on the results discussed, it became essential to develop an alternative approach to overcome the limitations identified in the initial method. To summarize, the primary issue was the lack of precision in cases where the detectors could not identify sufficient key points, such as on straight roads with minimal texture. This limitation often resulted in unsuccessful alignment. 
 Therefore, a new architecture was designed, starting with the reconstruction of a bird’s-eye view (BEV) from the images captured by the vehicle as a preliminary phase. This step is carried out before going on with the previous approach, where the network must align the inputs and outputs the rotation-translation matrix.
@@ -332,7 +335,7 @@ As outlined in Subsection (2.2), the inputs to the network now have also ten ima
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/architecture2.pdf}
-    \caption{Enter Caption}
+    \caption{Overview of the complete model architecture, illustrating input processing, BEV reconstruction, feature extraction, and output generation.}
     \label{fig:bev-architecture}
 \end{figure}
 
@@ -341,11 +344,12 @@ To reconstruct the bird’s-eye view (BEV), the images—grouped into tensors ar
 
 The chosen backbone for this task is RegNetX, a model designed to improve ResNet and its variants, widely used in computer vision tasks. While ResNet facilitates efficient gradient flow through shortcut connections, its additive approach limits the exploration of complementary features. RegNetX addresses this by introducing a regulator module that acts as a memory mechanism, enabling the extraction of complementary features and enhancing spatio-temporal feature extraction capabilities.
 
-For this implementation, a specific version of RegNetX was used. That model is designed with a linear parameterization of block widths across the network, ensuring consistency and simplicity. Additional constraints, such as fixed bottleneck ratios, width multipliers, and initial widths, further optimize the model structure. These features enable high performance while minimizing computational requirements, showing better results that a classical ResNet approach using less parameters and so less computational power \cite{Radosavovic2020}.
+For this implementation, a specific version of RegNetX was used. This model is designed with a linear parameterization of block widths across the network, ensuring consistency and simplicity. Additional constraints, such as fixed bottleneck ratios, width multipliers, and initial widths, further optimize the model structure. These features enable high performance while minimizing computational requirements, outperforming a classical ResNet approach with fewer parameters and less computational power (see Figure~\ref{fig:regnetvsresnet}) \cite{Radosavovic2020}.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{Radosavovic_Designing_Network_Design_Spaces_CVPR_2020_paper (2).pdf}
-    \caption{Enter Caption \cite{Radosavovic2020}}
+    \caption{Comparison of RegNetX and ResNet in terms of performance and computational efficiency \cite{Radosavovic2020}.}
     \label{fig:regnetvsresnet}
 \end{figure}
 
@@ -353,7 +357,7 @@ The BEV (Bird’s Eye View) network uses a transformer module to process both lo
 The key components and their roles in this process are:
 
 \begin{itemize}
-    \item \textbf{Camera Position Encoder} (\texttt{self.cam\_pos\_encoder}): Encodes the positional information of the cameras, enabling the network to understand spatial relationships between them.
+    \item \textbf{Camera Position Encoder} (\texttt{self.cam\_pos\_encoder}): Encodes the positional information of the cameras, enabling the network to understand spatial relationships between them;
     \item \textbf{Query Encoder} (\texttt{self.query\_encoder}): Generates query embeddings derived from BEV queries.
     \item \textbf{Key Encoders}:
     \begin{itemize}
@@ -371,7 +375,7 @@ The key components and their roles in this process are:
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/2205.02833v1.pdf}
-    \caption{Enter Caption \cite{zhou2022crossviewtransformersrealtimemapview}}
+    \caption{Architecture of the cross-view attention mechanism used in the transformer \cite{zhou2022crossviewtransformersrealtimemapview}.}
     \label{fig:bev-transformer}
 \end{figure}
 
@@ -393,14 +397,14 @@ The learning rate progression, shown in Figure~\ref{fig:learning_rate_2}, starts
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{LateX//figs/BEVlearning_rate_progression.png}
-    \caption{Learning rate progression showing warm-up and gradual decay for effective training.}
+    \caption{Learning rate progression during training, showcasing an initial warm-up phase followed by a gradual decrease. The learning rate peaks at a maximum value of $0.1$ at $5000$ iterations.}
     \label{fig:learning_rate_2}
 \end{figure}
 
 The following figure illustrates the training status across two distinct phases: an early stage, where the network was still learning, and a later stage, where the network demonstrates effective learning. In the input section of the figure, the images captured by the car are visible, showcasing both long-range and short-range views. These images highlight the integration of diverse perspectives, crucial for enhancing the alignment process.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/bev_traininig_phases.pdf}
+    \includegraphics[width=0.8\linewidth]{LateX//figs/bev_traininig_phases.pdf}
     \caption{Training progression during early and advanced phases, showing input images from long-range and short-range cameras.}
     \label{fig:bev_training_phases}
 \end{figure}
@@ -409,6 +413,7 @@ The results of the evaluation, as presented in Table~\ref{tab:pose_variations}, 
 
 \begin{table}[H]
     \centering
+    \scriptsize
     \begin{tabular}{>{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{3.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm}}
         \toprule
         \textbf{Iteration} & \textbf{$\Delta$ Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta h$} \\
@@ -418,25 +423,24 @@ The results of the evaluation, as presented in Table~\ref{tab:pose_variations}, 
         \num{40000} & 0.32 & 0.6  & 0.31 & 0.00 \\
         \num{60000} & 0.08 & 0.12  & 0.08 & 0.00\\
         \num{80000} & 0.05 & 0.01  & 0.05 & 0.00 \\
-        \num{100000} & 0.01 & 0.004 & 0.01 & 0.00 \\
+        \num{100000} & \textbf{0.01} & \textbf{0.004} & \textbf{0.01} & \textbf{ 0.00} \\
         \bottomrule
     \end{tabular}
-    \caption{Performance metrics across iterations, showing pose, angular, and positional deviations.}
+    \caption{Evaluation (L1) values in pose, angle, combined displacement ($\Delta x + \Delta y$), and height across iterations using Smooth L1 Loss Function, SGD,  and BEV reconstruction.}
     \label{tab:pose_variations}
 \end{table}
 
 Figures~\ref{fig:loss_comparison_2} and~\ref{fig:total_loss_2} illustrate the loss progression during training. The observed behavior, with the loss steadily decreasing despite minor noise, suggests stable training dynamics without divergence. The evaluation results further confirm that \textit{overfitting} was avoided, as the model generalizes well to unseen data.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/BEV1_l1sDEG_pose_heading_loss_comparison.png}
-    \caption{Loss comparison across training phases for pose and heading angle metrics.}
+    \includegraphics[width=1\linewidth]{LateX//figs/BEV2_loss_total_l1sDEG_progression_comparison.png}
+    \caption{Total loss progression using the Smooth L1 Loss, SGD and BEV reconstruction. The plot includes a standard scale (left) and logarithmic scale (right).}
     \label{fig:loss_comparison_2}
 \end{figure}
-
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/BEV2_loss_total_l1sDEG_progression_comparison.png}
-    \caption{Total loss progression during training.}
+    \includegraphics[width=1\linewidth]{LateX//figs/BEV2_l1sDEG_pose_heading_loss_comparison.png}
+    \caption{Pose (orange) and Heading (yellow) Loss comparison during training. The plot includes a standard scale on the left and a logarithmic scale on the right.}
     \label{fig:total_loss_2}
 \end{figure}
 
@@ -446,25 +450,27 @@ An attempt was made to use the Adam optimizer for training. Adam typically requi
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{BEV2learning_rate_progression.png}
-    \caption{Learning rate progression for the Adam optimizer.}
+    \caption{Learning rate progression during training with Adam, showcasing an initial warm-up phase followed by a gradual decrease. The learning rate peaks at a maximum value of $0.001$ at $5000$ iterations.}
     \label{fig:adam_learning_rate}
 \end{figure}
 
 Adam is a popular optimization algorithm in deep learning that combines the advantages of both the AdaGrad and RMSProp algorithms. It computes adaptive learning rates for each parameter by maintaining running averages of the gradients (momentum) and their squared values. This approach guarantees fast convergence and robustness in handling sparse gradients, making Adam well-suited for tasks with noisy or complex datasets.
 
-The loss curves observed during training with Adam showed consistent downward trends, as expected, indicating stable learning. Evaluating the results in Table~\ref{tab:pose_variations} further supports the conclusion that the model did not \textit{overfit}, maintaining good generalization capabilities. 
-\begin{figure}[H]
+The loss curves observed during training with Adam showed consistent downward trends, as expected, indicating stable learning. Evaluating the results in Table~\ref{tab:pose_variations_1} further supports the conclusion that the model did not \textit{overfit}, maintaining good generalization capabilities. 
+
+\begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/VEV1_loss_total_l1sDEG_progression_comparison.png}
-    \caption{Total loss progression during training with Adam.}
+    \includegraphics[width=1\linewidth]{LateX//figs/BEV1_loss_total_l1sDEG_progression_comparison.png}
+    \caption{Total loss progression using the Smooth L1 Loss, Adam and BEV reconstruction. The plot includes a standard scale (left) and logarithmic scale (right).}
     \label{fig:adam_loss_progression}
 \end{figure}
 
 Despite these promising results, the performance appeared to plateau toward the end of the training. It is likely that better results could have been achieved by extending the training for a few more iterations, potentially up to 10\% more, to allow further fine-tuning and refinement of the learned features.
-\begin{figure}[H]
+
+\begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{LateX//figs/BEV2_l1sDEG_pose_heading_loss_comparison.png}
-    \caption{Comparison of pose and heading angle losses during Adam training.}
+    \includegraphics[width=1\linewidth]{LateX//figs/BEV1_l1sDEG_pose_heading_loss_comparison.png}
+    \caption{Pose (orange) and Heading (yellow) Loss comparison during training. The plot includes a standard scale on the left and a logarithmic scale on the right.}
     \label{fig:adam_loss_comparison}
 \end{figure}
 
@@ -472,28 +478,28 @@ The choice of optimizer is a recurring topic in machine learning research. It is
 
 \begin{table}[H]
     \centering
+    \scriptsize
     \begin{tabular}{>{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{3.25cm} >{\centering\arraybackslash}p{2.25cm} >{\centering\arraybackslash}p{2.25cm}}
         \toprule
         \textbf{Iteration} & \textbf{$\Delta$ Pose} & \textbf{$\Delta \theta$} & \textbf{$\Delta x + \Delta y$} & \textbf{$\Delta h$} \\
         & \text{[m]} & \text{[deg]} & \text{[m]} & \text{[m]} \\
         \midrule
-        \num{20000} & 0.52 & 1.4  & 0.50 & 0.01 \\
-        \num{40000} & 0.32 & 0.6  & 0.31 & 0.00 \\
-        \num{60000} & 0.08 & 0.12  & 0.08 & 0.00\\
-        \num{80000} & 0.05 & 0.01  & 0.05 & 0.00 \\
-        \num{100000} & 0.01 & 0.004 & 0.01 & 0.00 \\
+        \num{20000}  & 0.58 & 1.50   & 0.57 & 0.01 \\
+        \num{40000}  & 0.41 & 0.90   & 0.41 & 0.00 \\
+        \num{60000}  & 0.10 & 0.23  & 0.10 & 0.00 \\
+        \num{80000}  & 0.07 & 0.01  & 0.07 & 0.00 \\
+        \num{100000} & \textbf{0.03} & \textbf{0.004} & \textbf{0.03} & \textbf{ 0.00} \\
         \bottomrule
     \end{tabular}
-    \caption{Performance metrics across iterations using the Adam optimizer. DA SISTEMARE E RIPORTARE I VALORI CORRETTI}
-    \label{tab:pose_variations}
+    \caption{Evaluation (L1) values in pose, angle, combined displacement ($\Delta x + \Delta y$), and height across iterations using Smooth L1 Loss Function, Adam, and BEV reconstruction.}
+    \label{tab:pose_variations_1}
 \end{table}
 
 Adam appears to be an excellent choice when the goal is to accelerate training, but it may not be ideal for achieving the lowest local minima or the highest possible performance. Its faster convergence makes it a practical option for iterative experimentation or when computational resources are limited, but SGD remains more suitable for fine-tuning models to achieve optimal generalization and final performance.
 
-
 \subsection{Inference}
 
-As in the initial approach, the model was tested by performing inference on sequences that were not included during the training phase. Figure~\ref{fig:bev_inference} highlights three particularly interesting scenarios, demonstrating the model's robustness in diverse and challenging conditions.
+As in the initial approach, the model was tested by performing inference on sequences that were not included during the training phase. Figure~\ref{fig:bev_inference_2} highlights three particularly interesting scenarios, demonstrating the model's robustness in diverse and challenging conditions.
 
 In the first case, the model performs well even on a straight road with minimal texture, a condition that previously posed difficulties for alignment. This result underscores the improved capability of the model to handle scenarios with limited visual cues.
 
@@ -506,5 +512,5 @@ Across these examples, and in the majority of cases not explicitly shown here, t
     \centering
     \includegraphics[width=1\linewidth]{LateX//figs/bev_inference.pdf}
     \caption{Examples of inference results in different scenarios: minimal texture, complex intersections, and lane merging.}
-    \label{fig:bev_inference}
+    \label{fig:bev_inference_2}
 \end{figure}

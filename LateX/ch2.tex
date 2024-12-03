@@ -1,4 +1,3 @@
-\NoBgThispage
 \chapter{MapAlign: Deep-Learning based approach}
 
 This chapter introduces neural networks, providing the foundational concepts needed to understand the architecture developed for MapAlign. It emphasizes the critical role of data in this process, followed by an explanation of the dataset and the methods used to manage data in MapAlign and its architecture. 
@@ -288,7 +287,7 @@ What sets CNNs apart from traditional neural networks is their ability to exploi
 \begin{itemize}
     \item \textit{Convolutional layers:} Apply filters (kernels) to the input image, generating feature maps that highlight patterns such as edges, textures, or shapes;
     \item \textit{Pooling layers:} Reduce the spatial dimensions of feature maps through operations like max pooling or average pooling, thereby lowering computational requirements and mitigating over-fitting;
-    \item \textbf{Fully connected layers:} Occurring near the network's end, these layers connect every neuron to the previous layer's neurons and play a key role in decision-making, such as classifying an image into categories.
+    \item \textit{Fully connected layers:} Occurring near the network's end, these layers connect every neuron to the previous layer's neurons and play a key role in decision-making, such as classifying an image into categories.
 \end{itemize}
 
 CNNs are particularly efficient at processing 2D data by replacing traditional matrix multiplications with convolutional operations. This design enables them to capture spatial hierarchies in image data, from low-level features like edges to high-level features such as objects and faces.
@@ -550,8 +549,9 @@ In this project, data augmentation is applied to simulate variations in the vehi
 
 Specifically, the data augmentation, depicted in Figure~\ref{fig:data_augmentation_maps} involves:
 \begin{itemize}
-    \item Rotation: The map is randomly rotated within a range of -30 to 30 degrees to simulate orientation variations between the map and the vehicle.
-    \item The map is shifted horizontally and vertically by up to 10\% of the image’s width and height, respectively, to account for minor lateral and vertical misalignments.
+    \item \textit{Rotation}: The map is randomly rotated within a range of -$30$ to $30$ degrees to simulate orientation variations between the map and the vehicle.
+    \item \textit{Translation}: The map is shifted horizontally and vertically by up to 10\% of the image’s width and height, respectively, to account for minor lateral and vertical misalignments. No translation is applied along the z-axis, as altitude is negligible for this scopes.
+
 \end{itemize}
 
 Directly using GNSS (Global Navigation Satellite System) data to align the map and vehicle pose can be problematic due to variability in GNSS accuracy. In some cases, GNSS data is highly accurate, providing near-perfect alignment with minimal adjustment effort. However, in other cases, GNSS data can be significantly inaccurate due to environmental factors like signal obstruction, leading to substantial misalignments. Relying just on GNSS data would result in an imbalanced dataset, with some examples well-aligned and others poorly aligned, which could negatively impact the training process.
@@ -571,7 +571,8 @@ The target loader is responsible for providing the target values that the networ
     \item Translation along the x-axis;
     \item Translation along the y-axis;
     \item Translation along the z-axis;
-    \item Rotation around the heading (yaw) axis.
+    \item Rotation around the vertical axis (yaw/heading angle).
+
 \end{enumerate}
 By learning these values, the network can effectively align the augmented data back to its original position, enhancing its robustness and accuracy in spatial localization.
 

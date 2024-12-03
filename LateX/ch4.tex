@@ -1,4 +1,3 @@
-\NoBgThispage
 \chapter{Analysis of Results and Future Improvements}
 
 This chapter presents a comparison of the results obtained from the two approaches investigated in this work. The strengths and limitations of each approach will be analyzed, and their potential real-world applications will be discussed. Additionally, future developments and improvements to enhance the performance and applicability of the methods will be proposed.
@@ -20,16 +19,15 @@ The second approach, incorporating bird’s-eye view (BEV) reconstruction, demon
 
 Table~\ref{tab:evaluation_results_2} summarizes all the attempts made, highlighting the best results for each architecture in bold. The table provides a clear comparison of the methods and the effectiveness of the proposed approaches.
 
-
 \begin{table}[H]
 \centering
-\caption{Evaluation Results}
+\caption{Comparison of evaluation results across different architectures, with the best performing results, for each, highlighted in bold.}
 \label{tab:evaluation_results_2}
-\scriptsize % Adjust font size for compactness
-\renewcommand{\arraystretch}{1} % Add a bit of padding between rows for readability
+\scriptsize 
+\renewcommand{\arraystretch}{1} 
 \begin{tabular}{llcllccr}
 \toprule
-\textbf{Method} & \textbf{Dataset Split} & \makecell{\textbf{Heading}\\\textbf{Measurement}\\\textbf{Unit}} & \textbf{Batch Size} & \makecell{\textbf{Loss}\\\textbf{Function}} & \textbf{Iterations} & \makecell{\textbf{Eval}\\$\Delta$ \textbf{Pose}} & \makecell{\textbf{Eval}\\$\Delta \theta$} \\
+\textbf{Method} & \makecell{\textbf{Dataset}\\\textbf{Split}} & \makecell{\textbf{Heading}\\\textbf{Measurement}\\\textbf{Unit}} & \textbf{Batch Size} & \makecell{\textbf{Loss}\\\textbf{Function}} & \textbf{Iterations} & \makecell{\textbf{Eval}\\$\Delta$\textbf{Pose}} & \makecell{\textbf{Eval}\\$\Delta \theta$} \\
 \midrule
 Just detector & Via Lang & RAD & 64 & MSE        & 100,000 & 1.54 & 1.15 \\
 Just detector & Via Lang & RAD & 64 & L1         & 100,000 & 1.40 & 1.72 \\
@@ -37,19 +35,16 @@ Just detector & Via Lang & RAD & 64 & L1 Smooth  & 100,000 & 1.38 & 1.15 \\
 Just detector & Via Lang & DEG & 64 & MSE        & 100,000 & 2.51 & 1.81 \\
 Just detector & Via Lang & DEG & 64 & L1         & 100,000 & 2.05 & 1.45 \\
 Just detector & Via Lang & DEG & 64 & L1 Smooth  & 100,000 & 1.65 & 1.10 \\
-Just detector & All      & DEG & 64 & L1 Smooth  & 100,000 & 1.61 & 0.74 \\
-BEV           & All      & DEG & 32 & L1 Smooth  & 100,000 & 0.01 & 0.004 \\
-BEV           & All      & DEG & 32 & L1 Smooth  & 100,000 & 0.01 & 0.004 \\
+Just detector & All      & DEG & 64 & L1 Smooth  & 100,000 & \textbf{1.61} & \textbf{0.74} \\
+BEV           & All      & DEG & 32 & L1 Smooth  & 100,000 & \textbf{0.01} & \textbf{0.004} \\
+BEV           & All      & DEG & 32 & L1 Smooth  & 100,000 & 0.03 & 0.004 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-
-
 The potential real-world applications of these methods are promising. The second approach, in particular, could be employed for ground truth generation during dataset creation, as described in Chapter 1. This application focuses on generating high-definition (HD) maps in real time using the car’s sensor suite and a basic standard-definition (SD) map. As mentioned earlier, perfect alignment is critical for defining the input and target data of the network.
 
 Furthermore, this method could be extended to enable online localization for autonomous vehicles using HD maps. However, this application would require the HD maps to be stored and maintained onboard the vehicle, bringing challenges such as storage limitations and associated costs, as discussed in previous chapters. Another limitation, not yet investigated in this work, is the latency introduced by the proposed system, which could impact real-time performance.
-
 
 \section{Future Developments and Improvements}
 

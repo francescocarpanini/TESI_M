@@ -9,11 +9,10 @@
 \usepackage{layout}
 
 \usepackage{csquotes}
-
 \usepackage{changepage}
 \usepackage{adjustbox}
-\RequirePackage{watermark}
-\usepackage{background}
+
+%\usepackage{background}
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc} 
 \usepackage{fancyhdr}
@@ -26,7 +25,7 @@
 \usepackage{xcolor}
 \usepackage{paralist}
 \usepackage{subfigure}
-\usepackage[backend=biber]{biblatex}
+\usepackage[backend=biber, sorting=none]{biblatex}
 \addbibresource{bibl.bib}
 
 \usepackage{amsmath}
@@ -44,7 +43,6 @@
 % SET THE GEOMETRY OF THE DOCUMENT
 \usepackage{geometry}
 \geometry{top=3cm, bottom=3cm, left=3cm, right=3cm}
-\NoBgThispage
 
 % PERSONAL DATA
 % Author:
@@ -101,7 +99,6 @@
 \begin{frontmatter}
 \input{Frontpage.tex}
 \restoregeometry
-\NoBgThispage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \clearpage
@@ -114,7 +111,7 @@
 \thispagestyle{empty}
 \vspace*{\stretch{1}}
 \begin{flushright}
-\itshape Dedica
+\itshape git commit -m "Implemented the logic: \\ 'If obstacles, avoid; if clear, accelerate.'"
 \end{flushright}
 \vspace{\stretch{2}}
 \cleardoublepage

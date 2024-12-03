@@ -1,4 +1,3 @@
-\NoBgThispage
 \chapter{Autonomous Driving and HD Maps}
 The goal of this Chapter is to provide an overview of High Definition (HD) maps and their importance in the field of Autonomous Driving. It examines the state-of-the-art localization techniques on HD maps to establish the context for introducing MapAlign, the project developed in this thesis.
 
@@ -223,7 +222,7 @@ The main drawbacks of this approach are:
     \item \textit{Sensitive to Initial Alignment}: Like ICP, NDT also depends on a good initial alignment. Poor initial guesses can lead to misalignment or failure to converge.
     \item \textit{Computational Cost}: The algorithm can be computationally expensive, especially for large datasets, as it involves dividing space into grids and performing complex calculations;
     \item \textit{Parameter Tuning}: NDT requires careful tuning of parameters, such as grid size. Improper settings can lead to inaccurate results or slow performance.
-    \item \textbf{Assumes Gaussian Distribution}: NDT assumes that points within each grid cell follow a Gaussian distribution. This assumption may not hold true in some real-world scenarios, leading to errors;
+    \item \textit{Assumes Gaussian Distribution}: NDT assumes that points within each grid cell follow a Gaussian distribution. This assumption may not hold true in some real-world scenarios, leading to errors;
     \item \textit{Not Robust to Noise}: NDT can struggle with noisy or incomplete data, which can disrupt the formation of accurate Gaussian models.
 \end{itemize}
 
